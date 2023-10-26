@@ -1,13 +1,5 @@
 package repo
 
-import "database/sql"
-
-type Countries struct {
-	db          *sql.DB
-	Countries   map[int]*Country
-	CountriesID []int
-}
-
 type Country struct {
 	CountryID int
 	Country   string
@@ -41,12 +33,4 @@ type Country struct {
 	Monarchy   bool
 	Landlocked bool
 	Island     bool
-}
-
-func New(db *sql.DB) *Countries {
-	return &Countries{db: db}
-}
-
-func (c *Countries) Get(id int) *Country {
-	return c.Countries[id]
 }
