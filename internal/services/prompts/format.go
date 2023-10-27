@@ -6,45 +6,42 @@ import (
 	ethnicGroups "geogame/internal/repo/ethnic_groups"
 	funfacts "geogame/internal/repo/funfacts"
 	languages "geogame/internal/repo/languages"
-	"strings"
 )
 
 func formatCapital(country *countries.Country) string {
 	if country.Capital != "" {
-		return "This country's capital starts with letter " + string(country.Capital[0])
+		return fmt.Sprintf("This country's capital starts with letter %s", string(country.Capital[0]))
 	}
 	return ""
 }
 
 func formatIndependent(country *countries.Country) string {
 	if country.IndependentFrom != "" {
-		return "This country used to be part of " + country.IndependentFrom
+		return fmt.Sprintf("This country used to be part of %s", country.IndependentFrom)
 	}
 	return ""
 }
 
-func formatMonarchy(country *countries.Country) (string, error) {
+func formatMonarchy(country *countries.Country) string {
 	if country.Monarchy {
-		return "This country is a monarchy", nil
+		return "This country is a monarchy"
 	}
-	return "This country is a republic", nil
+	return "This country is a republic"
 }
 
 func formatReligion(country *countries.Country) string {
 	if country.Religion != "" {
-		var res string
-		if country.Religion == "no religion" {
-			res = "Majority of people in this country are atheists"
+		if country.Religion != "no religion" {
 			if country.ReligionPerc != 0 {
-				res += fmt.Sprintf(" (%v&#37;)", country.ReligionPerc)
+				return fmt.Sprintf("Major religion of this country is %s. %v&#37; of people there practice it.", country.Religion, country.ReligionPerc)
 			}
-		} else {
-			res = "Major religion of this country is " + country.Religion
-			if country.ReligionPerc != 0 {
-				res += fmt.Sprintf(". %v&#37; of people there practice it.", country.ReligionPerc)
-			}
+			return fmt.Sprintf("Major religion of this country is %s", country.Religion)
 		}
-		return res
+
+		if country.ReligionPerc != 0 {
+			return fmt.Sprintf("Majority of people in this country are atheists (%v&#37;)", country.ReligionPerc)
+		}
+		return "Majority of people in this country are atheists"
 	}
 	return ""
 }
@@ -84,54 +81,47 @@ func formatHDI(country countries.Country) string {
 	return ""
 }
 
-func formatArgicultural(country countries.Country) (string, error) {
+func formatArgicultural(country countries.Country) string {
 	if country.AgriculturalSector != 0 {
-		return fmt.Sprintf("Argicultural sector of this country is %v &#37; of its GDP", country.AgriculturalSector), nil
+		return fmt.Sprintf("Argicultural sector of this country is %v&#37; of its GDP", country.AgriculturalSector)
 	}
-	return "", nil
+	return ""
 }
 
 func formatIndustrial(country countries.Country) string {
 	if country.IndustrialSector != 0 {
-		return fmt.Sprintf("Industrial sector of this country is %v &#37; of its GDP", country.IndustrialSector)
+		return fmt.Sprintf("Industrial sector of this country is %v&#37; of its GDP", country.IndustrialSector)
 	}
 	return ""
 }
 
 func formatService(country countries.Country) string {
 	if country.IndustrialSector != 0 {
-		return fmt.Sprintf("Service sector of this country is %v &#37; of its GDP", country.ServiceSector)
+		return fmt.Sprintf("Service sector of this country is %v&#37; of its GDP", country.ServiceSector)
 	}
 	return ""
 }
 
 func formatUN(country *countries.Country) string {
 	if country.UNNotMember != "" {
-		return "This country is " + country.UNNotMember
+		return fmt.Sprintf("This country is %s", country.UNNotMember)
 	}
 	return ""
 }
 
 func formatUnrecognised(country *countries.Country) string {
 	if country.Unrecognised != "" {
-		return "This country is " + country.Unrecognised
+		return fmt.Sprintf("This country is %s", country.Unrecognised)
 	}
 	return ""
 }
 
 func formatEthnicGroup(country *countries.Country, ethnicGroup *ethnicGroups.EthnicGroup) string {
-	// this condition is here to avoid obvious prompts like "x% of this country's population are Swedish" for Sweden, etc.
-	if !strings.Contains(ethnicGroup.Name, country.Name[:3]) {
-		return fmt.Sprintf("%v&#37; of this country's population are %s", ethnicGroup.Percentage, ethnicGroup.Name)
-	}
-	return ""
+	return fmt.Sprintf("%v&#37; of this country's population are %s", ethnicGroup.Percentage, ethnicGroup.Name)
 }
 
 func formatLanguage(country *countries.Country, language *languages.Language) string {
-	if !strings.Contains(language.Name, country.Name[:3]) {
-		return "Official language of this country is " + language.Name
-	}
-	return ""
+	return fmt.Sprintf("Official language of this country is %s", language.Name)
 }
 
 func formatFunFact(funfact *funfacts.Funfact) string {
