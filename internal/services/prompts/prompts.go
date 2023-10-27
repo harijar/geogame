@@ -9,11 +9,9 @@ type Prompts struct {
 	ethnicGroupsRepo *repo.EthnicGroupsRepository
 	languagesRepo    *repo.LanguagesRepository
 	funfactsRepo     *repo.FunfactsRepository
-
-	prompts map[int][]string
 }
 
-func GetPromptsObject(countriesRepo *repo.CountriesRepository,
+func New(countriesRepo *repo.CountriesRepository,
 	ethnicGroups *repo.EthnicGroupsRepository,
 	languages *repo.LanguagesRepository,
 	funfacts *repo.FunfactsRepository) *Prompts {
