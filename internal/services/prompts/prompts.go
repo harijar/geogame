@@ -13,13 +13,13 @@ type Prompts struct {
 	prompts map[int][]string
 }
 
-func GetPromptsObject(countries *repo.CountriesRepository,
+func GetPromptsObject(countriesRepo *repo.CountriesRepository,
 	ethnicGroups *repo.EthnicGroupsRepository,
 	languages *repo.LanguagesRepository,
 	funfacts *repo.FunfactsRepository) *Prompts {
 
 	return &Prompts{
-		countriesRepo:    countries,
+		countriesRepo:    countriesRepo,
 		ethnicGroupsRepo: ethnicGroups,
 		languagesRepo:    languages,
 		funfactsRepo:     funfacts,

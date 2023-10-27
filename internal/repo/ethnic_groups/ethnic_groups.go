@@ -1,7 +1,7 @@
 package repo
 
 type EthnicGroup struct {
-	CountryID   int
-	EthnicGroup string
-	Percentage  float64
+	CountryID  int
+	Name       string
+	Percentage float64
 }

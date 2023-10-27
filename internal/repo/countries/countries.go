@@ -1,9 +1,15 @@
 package repo
 
+import (
+	ethnicGroups "geogame/internal/repo/ethnic_groups"
+	funfacts "geogame/internal/repo/funfacts"
+	languages "geogame/internal/repo/languages"
+)
+
 type Country struct {
-	CountryID int
-	Country   string
-	Aliases   []string
+	ID      int
+	Name    string
+	Aliases []string
 
 	UNNotMember  string
 	Unrecognised string
@@ -33,4 +39,8 @@ type Country struct {
 	Monarchy   bool
 	Landlocked bool
 	Island     bool
+
+	EthnicGroups []*ethnicGroups.EthnicGroup
+	Languages    []*languages.Language
+	Funfacts     []*funfacts.Funfact
 }
