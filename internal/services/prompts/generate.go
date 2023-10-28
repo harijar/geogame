@@ -6,77 +6,78 @@ import (
 	"math/rand"
 )
 
-func (p *Prompts) GenRandom(country *countries.Country, prevPrompts []int) (string, error) {
+func (p *Prompts) GenRandom(country *countries.Country, prevPrompts []int) (int, string, error) {
 	for {
 		promptID := rand.Intn(17)
-		present := false
 		for _, id := range prevPrompts {
 			if id == promptID {
-				present = true
+				promptID = -1
 				break
 			}
 		}
-		if present == true {
+		if promptID == -1 {
 			continue
 		}
-		res, err := Gen(promptID, country)
+		res, err := p.Gen(promptID, country)
 		if err != nil {
-			return "", err
+			return -1, "", err
 		}
 		if res == "" {
 			continue
 		}
-		return res, nil
+		return promptID, res, nil
 	}
 }
 
-func Gen(promptID int, country *countries.Country) (string, error) {
+func (p *Prompts) Gen(promptID int, country *countries.Country) (string, error) {
 	switch promptID {
-	case capital:
+	case capitalID:
 		return formatCapital(country), nil
-	case independent:
+	case independentID:
 		return formatIndependent(country), nil
-	case monarchy:
+	case monarchyID:
 		return formatMonarchy(country), nil
-	case religion:
+	case religionID:
 		return formatReligion(country), nil
-	case un:
+	case uNID:
 		return formatUN(country), nil
-	case unrecognised:
+	case unrecognisedID:
 		return formatUnrecognised(country), nil
-	case ethnicGroup:
+	case ethnicGroupID:
 		if len(country.EthnicGroups) != 0 {
-			ethnicGroupID := rand.Intn(len(country.EthnicGroups))
-			return formatEthnicGroup(country.EthnicGroups[ethnicGroupID]), nil
+			random := rand.Intn(len(country.EthnicGroups))
+			return formatEthnicGroup(country.EthnicGroups[random]), nil
 		}
-	case language:
+		return "", nil
+	case languageID:
 		if len(country.Languages) != 0 {
-			languageID := rand.Intn(len(country.Languages))
-			return formatLanguage(country.Languages[languageID]), nil
+			random := rand.Intn(len(country.Languages))
+			return formatLanguage(country.Languages[random]), nil
 		}
-	case funfact:
+		return "", nil
+	case funfactID:
 		if len(country.Funfacts) != 0 {
-			funfactID := rand.Intn(len(country.Funfacts))
-			return formatFunFact(country.Funfacts[funfactID]), nil
+			random := rand.Intn(len(country.Funfacts))
+			return formatFunFact(country.Funfacts[random]), nil
 		}
-	case area:
+		return "", nil
+	case areaID:
 		return formatArea(country), nil
-	case population:
+	case populationID:
 		return formatPopulation(country), nil
-	case gDP:
+	case gDPID:
 		return formatGDP(country), nil
-	case gDPPerCapita:
+	case gDPPerCapitaID:
 		return formatGDPPerCapita(country), nil
-	case hDI:
+	case hDIID:
 		return formatHDI(country), nil
-	case agriculturalSector:
+	case agriculturalSectorID:
 		return formatArgicultural(country), nil
-	case industrialSector:
+	case industrialSectorID:
 		return formatIndustrial(country), nil
-	case serviceSector:
+	case serviceSectorID:
 		return formatService(country), nil
 	default:
 		return "", fmt.Errorf("prompt ID not correct")
 	}
-	return "", nil
 }

@@ -5,23 +5,23 @@ import (
 )
 
 const (
-	capital            = 0
-	independent        = 1
-	monarchy           = 2
-	religion           = 3
-	un                 = 4
-	unrecognised       = 5
-	ethnicGroup        = 6
-	language           = 7
-	funfact            = 8
-	area               = 9
-	population         = 10
-	gDP                = 11
-	gDPPerCapita       = 12
-	hDI                = 13
-	agriculturalSector = 14
-	industrialSector   = 15
-	serviceSector      = 16
+	capitalID            = 0
+	independentID        = 1
+	monarchyID           = 2
+	religionID           = 3
+	uNID                 = 4
+	unrecognisedID       = 5
+	ethnicGroupID        = 6
+	languageID           = 7
+	funfactID            = 8
+	areaID               = 9
+	populationID         = 10
+	gDPID                = 11
+	gDPPerCapitaID       = 12
+	hDIID                = 13
+	agriculturalSectorID = 14
+	industrialSectorID   = 15
+	serviceSectorID      = 16
 )
 
 type Prompts struct {
