@@ -3,9 +3,6 @@ package prompts
 import (
 	"fmt"
 	countries "geogame/internal/repo/countries"
-	ethnicGroups "geogame/internal/repo/ethnic_groups"
-	funfacts "geogame/internal/repo/funfacts"
-	languages "geogame/internal/repo/languages"
 )
 
 func formatCapital(country *countries.Country) string {
@@ -116,14 +113,14 @@ func formatUnrecognised(country *countries.Country) string {
 	return ""
 }
 
-func formatEthnicGroup(ethnicGroup *ethnicGroups.EthnicGroup) string {
+func formatEthnicGroup(ethnicGroup *countries.EthnicGroup) string {
 	return fmt.Sprintf("%v&#37; of this country's population are %s", ethnicGroup.Percentage, ethnicGroup.Name)
 }
 
-func formatLanguage(language *languages.Language) string {
+func formatLanguage(language *countries.Language) string {
 	return fmt.Sprintf("Official language of this country is %s", language.Name)
 }
 
-func formatFunFact(funfact *funfacts.Funfact) string {
+func formatFunFact(funfact *countries.Funfact) string {
 	return funfact.Text
 }
