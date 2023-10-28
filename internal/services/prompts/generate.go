@@ -15,17 +15,16 @@ func (p *Prompts) GenRandom(country *countries.Country, prevPrompts []int) (int,
 				break
 			}
 		}
-		if promptID == -1 {
-			continue
+		if promptID != -1 {
+			res, err := p.Gen(promptID, country)
+			if err != nil {
+				return promptID, "", err
+			}
+			if res != "" {
+				return promptID, res, nil
+			}
 		}
-		res, err := p.Gen(promptID, country)
-		if err != nil {
-			return -1, "", err
-		}
-		if res == "" {
-			continue
-		}
-		return promptID, res, nil
+		continue
 	}
 }
 
