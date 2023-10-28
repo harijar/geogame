@@ -116,11 +116,11 @@ func formatUnrecognised(country *countries.Country) string {
 	return ""
 }
 
-func formatEthnicGroup(country *countries.Country, ethnicGroup *ethnicGroups.EthnicGroup) string {
+func formatEthnicGroup(ethnicGroup *ethnicGroups.EthnicGroup) string {
 	return fmt.Sprintf("%v&#37; of this country's population are %s", ethnicGroup.Percentage, ethnicGroup.Name)
 }
 
-func formatLanguage(country *countries.Country, language *languages.Language) string {
+func formatLanguage(language *languages.Language) string {
 	return fmt.Sprintf("Official language of this country is %s", language.Name)
 }
 
