@@ -43,19 +43,19 @@ func (p *Prompts) Gen(promptID int, country *countries.Country) (string, error) 
 	case UnrecognisedID:
 		return formatUnrecognised(country), nil
 	case EthnicGroupID:
-		if len(country.EthnicGroups) != 0 {
+		if len(country.EthnicGroups) > 0 {
 			random := rand.Intn(len(country.EthnicGroups))
 			return formatEthnicGroup(country.EthnicGroups[random]), nil
 		}
 		return "", nil
 	case LanguageID:
-		if len(country.Languages) != 0 {
+		if len(country.Languages) > 0 {
 			random := rand.Intn(len(country.Languages))
 			return formatLanguage(country.Languages[random]), nil
 		}
 		return "", nil
 	case FunfactID:
-		if len(country.Funfacts) != 0 {
+		if len(country.Funfacts) > 0 {
 			random := rand.Intn(len(country.Funfacts))
 			return formatFunFact(country.Funfacts[random]), nil
 		}

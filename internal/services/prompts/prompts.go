@@ -25,9 +25,9 @@ const (
 )
 
 type Prompts struct {
-	countriesRepo *repo.CountriesRepository
+	countriesRepo *repo.Countries
 }
 
-func New(countriesRepo *repo.CountriesRepository) *Prompts {
+func New(countriesRepo *repo.Countries) *Prompts {
 	return &Prompts{countriesRepo: countriesRepo}
 }
