@@ -2,7 +2,7 @@ package prompts
 
 import (
 	"fmt"
-	"geogame/internal/repo/countries"
+	"github.com/harijar/geogame/internal/repo/countries"
 )
 
 func formatCapital(country *countries.Country) string {
@@ -71,28 +71,28 @@ func formatGDPPerCapita(country *countries.Country) string {
 	return ""
 }
 
-func formatHDI(country countries.Country) string {
+func formatHDI(country *countries.Country) string {
 	if country.HDI != 0 {
 		return fmt.Sprintf("HDI of this country is %v", country.HDI)
 	}
 	return ""
 }
 
-func formatArgicultural(country countries.Country) string {
+func formatArgicultural(country *countries.Country) string {
 	if country.AgriculturalSector != 0 {
 		return fmt.Sprintf("Argicultural sector of this country is %v&#37; of its GDP", country.AgriculturalSector)
 	}
 	return ""
 }
 
-func formatIndustrial(country countries.Country) string {
+func formatIndustrial(country *countries.Country) string {
 	if country.IndustrialSector != 0 {
 		return fmt.Sprintf("Industrial sector of this country is %v&#37; of its GDP", country.IndustrialSector)
 	}
 	return ""
 }
 
-func formatService(country countries.Country) string {
+func formatService(country *countries.Country) string {
 	if country.IndustrialSector != 0 {
 		return fmt.Sprintf("Service sector of this country is %v&#37; of its GDP", country.ServiceSector)
 	}
