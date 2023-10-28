@@ -1,4 +1,4 @@
-package repo
+package countries
 
 type Country struct {
 	ID      int

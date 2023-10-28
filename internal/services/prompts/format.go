@@ -2,7 +2,7 @@ package prompts
 
 import (
 	"fmt"
-	countries "geogame/internal/repo/countries"
+	"geogame/internal/repo/countries"
 )
 
 func formatCapital(country *countries.Country) string {
