@@ -31,51 +31,51 @@ func (p *Prompts) GenRandom(country *countries.Country, prevPrompts []int) (int,
 
 func (p *Prompts) Gen(promptID int, country *countries.Country) (string, error) {
 	switch promptID {
-	case capitalID:
+	case CapitalID:
 		return formatCapital(country), nil
-	case independentID:
+	case IndependentID:
 		return formatIndependent(country), nil
-	case monarchyID:
+	case MonarchyID:
 		return formatMonarchy(country), nil
-	case religionID:
+	case ReligionID:
 		return formatReligion(country), nil
-	case uNID:
+	case UNID:
 		return formatUN(country), nil
-	case unrecognisedID:
+	case UnrecognisedID:
 		return formatUnrecognised(country), nil
-	case ethnicGroupID:
+	case EthnicGroupID:
 		if len(country.EthnicGroups) != 0 {
 			random := rand.Intn(len(country.EthnicGroups))
 			return formatEthnicGroup(country.EthnicGroups[random]), nil
 		}
 		return "", nil
-	case languageID:
+	case LanguageID:
 		if len(country.Languages) != 0 {
 			random := rand.Intn(len(country.Languages))
 			return formatLanguage(country.Languages[random]), nil
 		}
 		return "", nil
-	case funfactID:
+	case FunfactID:
 		if len(country.Funfacts) != 0 {
 			random := rand.Intn(len(country.Funfacts))
 			return formatFunFact(country.Funfacts[random]), nil
 		}
 		return "", nil
-	case areaID:
+	case AreaID:
 		return formatArea(country), nil
-	case populationID:
+	case PopulationID:
 		return formatPopulation(country), nil
-	case gDPID:
+	case GDPID:
 		return formatGDP(country), nil
-	case gDPPerCapitaID:
+	case GDPPerCapitaID:
 		return formatGDPPerCapita(country), nil
-	case hDIID:
+	case HDIID:
 		return formatHDI(country), nil
-	case agriculturalSectorID:
+	case AgriculturalSectorID:
 		return formatArgicultural(country), nil
-	case industrialSectorID:
+	case IndustrialSectorID:
 		return formatIndustrial(country), nil
-	case serviceSectorID:
+	case ServiceSectorID:
 		return formatService(country), nil
 	default:
 		return "", fmt.Errorf("prompt ID not correct")
