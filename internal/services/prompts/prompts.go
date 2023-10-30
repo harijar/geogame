@@ -9,7 +9,7 @@ const (
 	IndependentID        = 1
 	MonarchyID           = 2
 	ReligionID           = 3
-	UNID                 = 4
+	UNNotMemberID        = 4
 	UnrecognisedID       = 5
 	EthnicGroupID        = 6
 	LanguageID           = 7
