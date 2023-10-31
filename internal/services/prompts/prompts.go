@@ -22,6 +22,8 @@ const (
 	AgriculturalSectorID = 14
 	IndustrialSectorID   = 15
 	ServiceSectorID      = 16
+
+	Count = 17
 )
 
 type Prompts struct {

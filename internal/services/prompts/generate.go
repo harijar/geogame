@@ -1,14 +1,15 @@
 package prompts
 
 import (
+	"errors"
 	"fmt"
 	"github.com/harijar/geogame/internal/repo/countries"
 	"math/rand"
 )
 
 func (p *Prompts) GenRandom(c *countries.Country, prev []int) (int, string, error) {
-	for {
-		promptID := rand.Intn(17)
+	shuffled := rand.Perm(Count)
+	for _, promptID := range shuffled {
 		for _, id := range prev {
 			if id == promptID {
 				promptID = -1
@@ -24,8 +25,8 @@ func (p *Prompts) GenRandom(c *countries.Country, prev []int) (int, string, erro
 				return promptID, res, nil
 			}
 		}
-		continue
 	}
+	return -1, "", errors.New("unable to find prompt")
 }
 
 func (p *Prompts) Gen(id int, c *countries.Country) (string, error) {
@@ -43,19 +44,19 @@ func (p *Prompts) Gen(id int, c *countries.Country) (string, error) {
 	case UnrecognisedID:
 		return formatUnrecognised(c), nil
 	case EthnicGroupID:
-		if len(c.EthnicGroups) != 0 {
+		if len(c.EthnicGroups) > 0 {
 			random := rand.Intn(len(c.EthnicGroups))
 			return formatEthnicGroup(c.EthnicGroups[random]), nil
 		}
 		return "", nil
 	case LanguageID:
-		if len(c.Languages) != 0 {
+		if len(c.Languages) > 0 {
 			random := rand.Intn(len(c.Languages))
 			return formatLanguage(c.Languages[random]), nil
 		}
 		return "", nil
 	case FunfactID:
-		if len(c.Funfacts) != 0 {
+		if len(c.Funfacts) > 0 {
 			random := rand.Intn(len(c.Funfacts))
 			return formatFunFact(c.Funfacts[random]), nil
 		}
