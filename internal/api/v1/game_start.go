@@ -29,7 +29,7 @@ func (a *V1) gameStart(c *gin.Context) {
 
 	promptsOut, err := json.Marshal([]int{id})
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "invalid prompts"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
 		return
 	}
 	c.SetCookie("country", strconv.Itoa(country.ID), -1, "/", c.Request.Host, false, true)

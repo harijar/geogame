@@ -10,9 +10,9 @@ import (
 )
 
 type GuessResponse struct {
-	Right   bool   `json:"json:right"`
+	Right   bool   `json:"right"`
 	Country string `json:"country"`
-	Prompt  string `json:"prompt,omitempty"`
+	Prompt  string `json:"prompt"`
 }
 
 func (a *V1) gameGuess(c *gin.Context) {
@@ -72,7 +72,7 @@ func (a *V1) gameGuess(c *gin.Context) {
 		prompts = append(prompts, id)
 		promptsOut, err := json.Marshal(&prompts)
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "invalid prompts"})
+			c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
 			return
 		}
 		c.SetCookie("prompts", string(promptsOut), -1, "/", c.Request.Host, false, true)
