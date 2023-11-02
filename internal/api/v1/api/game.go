@@ -12,14 +12,15 @@ func (a *API) Start(c *gin.Context) {
 		c.Request.AddCookie(cookie)
 	}
 	country := a.countries.GetRandom()
-	c.Set("country", country.Name)
+	c.Set("country", country.ID)
 	// request to frontend
 }
 
 func (a *API) Play(c *gin.Context) {
 	// display start page
 	countryGot := c.PostForm("country")
-	if countryGot == c.GetString("country") {
+	country := a.countries.Get(c.GetInt("country"))
+	if countryGot == country.Name {
 		// request to frontend
 	}
 
@@ -36,7 +37,7 @@ func (a *API) Play(c *gin.Context) {
 		// request to frontend
 	}
 
-	id, next, err := a.prompt.GenRandom(a.country, []int{})
+	id, next, err := a.prompt.GenRandom(country, []int{})
 	if err != nil {
 		// send error to frontend?
 	}

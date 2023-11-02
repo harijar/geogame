@@ -8,9 +8,9 @@ import (
 
 type API struct {
 	router     *gin.Engine
-	countries  *repo.Countries
+	countries  repo.Countries
 	country    *countries.Country
-	prompt     *PromptsService
+	prompt     PromptsService
 	triesLimit int
 }
 
@@ -19,7 +19,7 @@ type PromptsService interface {
 	GenRandom(c *countries.Country, prev []int) (int, string, error)
 }
 
-func New(countries *repo.Countries, triesLimit int, prompt *PromptsService) *API {
+func New(countries repo.Countries, triesLimit int, prompt PromptsService) *API {
 	router := gin.Default()
 	return &API{
 		router:     router,
