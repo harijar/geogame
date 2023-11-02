@@ -29,7 +29,7 @@ paths:
                   error:
                     type: string
                     description: error text
-  /game/guess:
+  /game/play:
     post:
       summary: Guess the country
       requestBody:
