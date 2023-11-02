@@ -9,7 +9,6 @@ import (
 type API struct {
 	router     *gin.Engine
 	countries  repo.Countries
-	country    *countries.Country
 	prompt     PromptsService
 	triesLimit int
 }
