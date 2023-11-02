@@ -1,6 +1,6 @@
 package v1
 
-func (a *V1) registerRoutes() {
-	a.router.POST("/game/start", a.gameStart)
-	a.router.POST("/game/guess", a.gameGuess)
+func (v *V1) registerRoutes() {
+	v.router.POST("/game/start", v.gameStart)
+	v.router.POST("/game/guess", v.gameGuess)
 }

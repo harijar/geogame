@@ -18,16 +18,16 @@ type GuessResponse struct {
 	Prompt  string `json:"prompt,omitempty"`
 }
 
-func (a *V1) gameStart(c *gin.Context) {
+func (v *V1) gameStart(c *gin.Context) {
 	prevCountry, _ := c.Cookie("country")
 	var country *countries.Country
 	for country == nil {
-		country = a.countries.GetRandom()
+		country = v.countries.GetRandom()
 		if strconv.FormatInt(int64(country.ID), 10) == prevCountry {
 			country = nil
 		}
 	}
-	prompt, _, err := a.prompts.GenRandom(country, []int{})
+	prompt, _, err := v.prompts.GenRandom(country, []int{})
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
 		return
