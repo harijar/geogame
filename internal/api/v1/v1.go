@@ -1,4 +1,4 @@
-package api
+package v1
 
 import (
 	"github.com/gin-gonic/gin"
@@ -6,10 +6,10 @@ import (
 	"github.com/harijar/geogame/internal/repo/countries"
 )
 
-type API struct {
+type V1 struct {
 	router     *gin.Engine
 	countries  repo.Countries
-	prompt     PromptsService
+	prompts    PromptsService
 	triesLimit int
 }
 
@@ -18,12 +18,12 @@ type PromptsService interface {
 	GenRandom(c *countries.Country, prev []int) (int, string, error)
 }
 
-func New(countries repo.Countries, triesLimit int, prompt PromptsService) *API {
+func New(countries repo.Countries, prompts PromptsService, triesLimit int) *V1 {
 	router := gin.Default()
-	return &API{
+	return &V1{
 		router:     router,
 		countries:  countries,
-		prompt:     prompt,
+		prompts:    prompts,
 		triesLimit: triesLimit,
 	}
 }

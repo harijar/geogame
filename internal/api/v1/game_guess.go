@@ -1,44 +1,15 @@
-package api
+package v1
 
 import (
 	"encoding/json"
 	"github.com/agnivade/levenshtein"
 	"github.com/gin-gonic/gin"
-	"github.com/harijar/geogame/internal/repo/countries"
 	"net/http"
 	"strconv"
 	"strings"
 )
 
-type StartResponse struct {
-	Prompt string `json:"prompt"`
-}
-
-type GuessResponse struct {
-	Right   bool   `json:"json:right,omitempty"`
-	Country string `json:"country,omitempty"`
-	Prompt  string `json:"prompt,omitempty"`
-}
-
-func (a *API) Start(c *gin.Context) {
-	prevCountry, _ := c.Cookie("country")
-	var country *countries.Country
-	for {
-		country = a.countries.GetRandom()
-		prevCountryID, _ := strconv.Atoi(prevCountry)
-		if country.ID != prevCountryID {
-			break
-		}
-	}
-	prompt, _, err := a.prompt.GenRandom(country, []int{})
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
-		return
-	}
-	c.JSON(200, &StartResponse{strconv.Itoa(prompt)})
-}
-
-func (a *API) Guess(c *gin.Context) {
+func (a *V1) gameGuess(c *gin.Context) {
 	countryGot := strings.ToLower(c.PostForm("country"))
 	if countryGot == "" {
 		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, &gin.H{"error": "missing country input"})
@@ -47,7 +18,7 @@ func (a *API) Guess(c *gin.Context) {
 
 	countryID, err := c.Cookie("country")
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusNotFound, &gin.H{"error": "game not started"})
+		c.AbortWithStatusJSON(http.StatusNotFound, &gin.H{"error": "game has not started"})
 		return
 	}
 	countryIDi, err := strconv.Atoi(countryID)
@@ -74,26 +45,30 @@ func (a *API) Guess(c *gin.Context) {
 
 	promptsStr, err := c.Cookie("prompts")
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusNotFound, &gin.H{"error": "game not started"})
+		c.AbortWithStatusJSON(http.StatusNotFound, &gin.H{"error": "game has not started"})
 		return
 	}
 	prompts := make([]int, 0)
 	err = json.Unmarshal([]byte(promptsStr), &prompts)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, &gin.H{"error": "invalid country id"})
+		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, &gin.H{"error": "invalid prompts id"})
 		return
 	}
 
 	if a.triesLimit == len(prompts) {
 		response.Country = country.Name
 	} else {
-		id, prompt, err := a.prompt.GenRandom(country, prompts)
+		id, prompt, err := a.prompts.GenRandom(country, prompts)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
 			return
 		}
 		prompts = append(prompts, id)
 		promptsOut, err := json.Marshal(&prompts)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusUnprocessableEntity, &gin.H{"error": "invalid prompt id"})
+			return
+		}
 		c.SetCookie("prompts", string(promptsOut), -1, "/", "localhost", false, true)
 		response.Prompt = prompt
 	}
