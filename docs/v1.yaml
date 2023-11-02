@@ -1,0 +1,73 @@
+openapi: 3.0.0
+info:
+  title: GeoGame V1 API
+  version: 0.1.0
+paths:
+  /game/start:
+    post:
+      summary: Start a new game
+      description: If there is already started game it will be restarted. 
+                   If we have information about last(or ongoing) game we should ensure that the new country is different from the previous one.
+      responses:
+        '200':
+          description: First prompt
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  prompt:
+                    type: string
+                    description: first hint
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: error text
+  /game/guess:
+    post:
+      summary: Guess the country
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                prompt:
+                  type: string
+                  description: user's guess
+      responses:
+        '200':
+          description: Guess check result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  right:
+                    type: boolean
+                    description: is the guess right
+                  country:
+                    type: string
+                    nullable: true
+                    description: presence when the guess is right or tries limit exceeded
+                  prompt:
+                    type: string
+                    nullable: true
+                    description: a one another prompt, presence only if the guess is wrong and tries limit not exceeded
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: error text
