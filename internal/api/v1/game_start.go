@@ -9,36 +9,30 @@ import (
 )
 
 type StartResponse struct {
-	Prompt int `json:"prompt"`
+	Prompt string `json:"prompt"`
 }
 
-type GuessResponse struct {
-	Right   bool   `json:"json:right,omitempty"`
-	Country string `json:"country,omitempty"`
-	Prompt  string `json:"prompt,omitempty"`
-}
-
-func (v *V1) gameStart(c *gin.Context) {
+func (a *V1) gameStart(c *gin.Context) {
 	prevCountry, _ := c.Cookie("country")
 	var country *countries.Country
 	for country == nil {
-		country = v.countries.GetRandom()
+		country = a.countries.GetRandom()
 		if strconv.FormatInt(int64(country.ID), 10) == prevCountry {
 			country = nil
 		}
 	}
-	prompt, _, err := v.prompts.GenRandom(country, []int{})
+	id, prompt, err := a.prompts.GenRandom(country, []int{})
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
 		return
 	}
 
-	promptsOut, err := json.Marshal([]int{prompt})
+	promptsOut, err := json.Marshal([]int{id})
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, &gin.H{"error": "invalid prompt id"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "invalid prompts"})
 		return
 	}
-	c.SetCookie("country", strconv.Itoa(country.ID), -1, "/", "localhost", false, true)
-	c.SetCookie("prompts", string(promptsOut), -1, "/", "localhost", false, true)
+	c.SetCookie("country", strconv.Itoa(country.ID), -1, "/", c.Request.Host, false, true)
+	c.SetCookie("prompts", string(promptsOut), -1, "/", c.Request.Host, false, true)
 	c.JSON(200, &StartResponse{prompt})
 }

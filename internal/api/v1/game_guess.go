@@ -9,7 +9,13 @@ import (
 	"strings"
 )
 
-func (v *V1) gameGuess(c *gin.Context) {
+type GuessResponse struct {
+	Right   bool   `json:"json:right"`
+	Country string `json:"country"`
+	Prompt  string `json:"prompt,omitempty"`
+}
+
+func (a *V1) gameGuess(c *gin.Context) {
 	countryGot := strings.ToLower(c.PostForm("country"))
 	if countryGot == "" {
 		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, &gin.H{"error": "missing country input"})
@@ -26,7 +32,7 @@ func (v *V1) gameGuess(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, &gin.H{"error": "invalid country id"})
 		return
 	}
-	country := v.countries.Get(countryIDi)
+	country := a.countries.Get(countryIDi)
 	if country == nil {
 		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, &gin.H{"error": "invalid country id"})
 		return
@@ -51,14 +57,14 @@ func (v *V1) gameGuess(c *gin.Context) {
 	prompts := make([]int, 0)
 	err = json.Unmarshal([]byte(promptsStr), &prompts)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, &gin.H{"error": "invalid prompts id"})
+		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, &gin.H{"error": "invalid prompts"})
 		return
 	}
 
-	if v.triesLimit == len(prompts) {
+	if a.triesLimit == len(prompts) {
 		response.Country = country.Name
 	} else {
-		id, prompt, err := v.prompts.GenRandom(country, prompts)
+		id, prompt, err := a.prompts.GenRandom(country, prompts)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
 			return
@@ -66,10 +72,10 @@ func (v *V1) gameGuess(c *gin.Context) {
 		prompts = append(prompts, id)
 		promptsOut, err := json.Marshal(&prompts)
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusUnprocessableEntity, &gin.H{"error": "invalid prompt id"})
+			c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "invalid prompts"})
 			return
 		}
-		c.SetCookie("prompts", string(promptsOut), -1, "/", "localhost", false, true)
+		c.SetCookie("prompts", string(promptsOut), -1, "/", c.Request.Host, false, true)
 		response.Prompt = prompt
 	}
 	c.JSON(200, &response)
