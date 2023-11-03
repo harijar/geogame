@@ -27,7 +27,7 @@ func New(countries repo.Countries, prompts PromptsService, triesLimit int) *V1 {
 	}
 }
 
-func (a *V1) Run() error {
+func (a *V1) Run(addr string) error {
 	a.registerRoutes()
-	return a.server.Run(":8080")
+	return a.server.Run(addr)
 }
