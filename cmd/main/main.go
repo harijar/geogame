@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"github.com/harijar/geogame/internal/api/v1"
+	"github.com/harijar/geogame/internal/config"
 	"github.com/harijar/geogame/internal/repo"
 	"github.com/harijar/geogame/internal/repo/countries"
 	"github.com/harijar/geogame/internal/service/prompts"
@@ -13,13 +14,17 @@ import (
 )
 
 func main() {
-	dsn := "postgres://postgres:password@localhost:5433/geogame?sslmode=disable"
-	err := repo.Migrate(dsn)
+	cfg, err := config.New()
 	if err != nil {
 		panic(err)
 	}
 
-	conn := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(dsn)))
+	err = repo.Migrate(cfg.PostgresURL)
+	if err != nil {
+		panic(err)
+	}
+
+	conn := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(cfg.PostgresURL)))
 	db := bun.NewDB(conn, pgdialect.New())
 	err = db.Ping()
 	if err != nil {
@@ -33,6 +38,6 @@ func main() {
 		panic(err)
 	}
 	promptsService := prompts.New(countriesRepo)
-	api := v1.New(countriesRepo, promptsService, 10)
-	panic(api.Run("localhost:8080"))
+	api := v1.New(countriesRepo, promptsService, cfg.TriesLimit)
+	panic(api.Run(cfg.ListenAddr))
 }
