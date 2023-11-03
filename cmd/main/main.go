@@ -31,13 +31,15 @@ func main() {
 		panic(err)
 	}
 
-	ctx := context.Background()
 	countriesRepo := countries.New(db)
+	ctx := context.Background()
 	err = countriesRepo.Init(ctx)
 	if err != nil {
 		panic(err)
 	}
+
 	promptsService := prompts.New(countriesRepo)
+
 	api := v1.New(countriesRepo, promptsService, cfg.TriesLimit)
 	panic(api.Run(cfg.ListenAddr))
 }
