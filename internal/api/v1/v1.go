@@ -7,7 +7,7 @@ import (
 )
 
 type V1 struct {
-	router     *gin.Engine
+	server     *gin.Engine
 	countries  repo.Countries
 	prompts    PromptsService
 	triesLimit int
@@ -19,11 +19,15 @@ type PromptsService interface {
 }
 
 func New(countries repo.Countries, prompts PromptsService, triesLimit int) *V1 {
-	router := gin.Default()
 	return &V1{
-		router:     router,
+		server:     gin.Default(),
 		countries:  countries,
 		prompts:    prompts,
 		triesLimit: triesLimit,
 	}
+}
+
+func (a *V1) Run() error {
+	a.registerRoutes()
+	return a.server.Run(":8080")
 }

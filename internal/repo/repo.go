@@ -6,7 +6,7 @@ import (
 
 //go:generate mockgen -destination=../mocks/mock_countries.go -package=mocks . Countries
 type Countries interface {
-	Create(country *countries.Country)
+	Create(country *countries.Country) error
 	Get(id int) *countries.Country
 	GetRandom() *countries.Country
 }
