@@ -6,7 +6,7 @@ paths:
   /game/start:
     post:
       summary: Start a new game
-      description: If there is already started game it will be restarted. 
+      description: If there is already a started game, it will be restarted. 
                    If we have information about last(or ongoing) game we should ensure that the new country is different from the previous one.
       responses:
         '200':
@@ -19,6 +19,15 @@ paths:
                   prompt:
                     type: string
                     description: first hint
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
         default:
           description: Unexpected error
           content:
@@ -28,7 +37,6 @@ paths:
                 properties:
                   error:
                     type: string
-                    description: error text
   /game/guess:
     post:
       summary: Guess the country
@@ -56,11 +64,38 @@ paths:
                   country:
                     type: string
                     nullable: true
-                    description: presence when the guess is right or tries limit exceeded
+                    description: present when the guess is right or tries limit is exceeded
                   prompt:
                     type: string
                     nullable: true
-                    description: a one another prompt, presence only if the guess is wrong and tries limit not exceeded
+                    description: next prompt, present only if the guess is wrong and tries limit is not exceeded
+        '404':
+          description: Endpoint accessed without the game being started
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '422':
+          description: Unable to get previous prompts, missing form input or the country guessed by the game is invalid.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
         default:
           description: Unexpected error
           content:
@@ -70,4 +105,3 @@ paths:
                 properties:
                   error:
                     type: string
-                    description: error text
