@@ -2,6 +2,7 @@ package countries
 
 import (
 	"context"
+	"errors"
 	"github.com/uptrace/bun"
 	"math/rand"
 )
@@ -32,4 +33,9 @@ func (c *Countries) Get(id int) *Country {
 
 func (c *Countries) GetRandom() *Country {
 	return c.cache[rand.Intn(len(c.cache))]
+}
+
+func (c *Countries) Create(country *Country) error {
+	// TODO: implement
+	panic(errors.New("unimplemented"))
 }

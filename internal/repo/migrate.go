@@ -12,5 +12,8 @@ func Migrate(url string) error {
 		return err
 	}
 	err = m.Up()
+	if err.Error() == "no change" {
+		return nil
+	}
 	return err
 }
