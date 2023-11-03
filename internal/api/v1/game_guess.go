@@ -75,7 +75,7 @@ func (a *V1) gameGuess(c *gin.Context) {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
 			return
 		}
-		c.SetCookie("prompts", string(promptsOut), -1, "/", c.Request.Host, false, true)
+		c.SetCookie("prompts", string(promptsOut), 0, "/", c.Request.Host, false, true)
 		response.Prompt = prompt
 	}
 	c.JSON(200, &response)

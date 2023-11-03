@@ -32,7 +32,7 @@ func (a *V1) gameStart(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
 		return
 	}
-	c.SetCookie("country", strconv.Itoa(country.ID), -1, "/", c.Request.Host, false, true)
-	c.SetCookie("prompts", string(promptsOut), -1, "/", c.Request.Host, false, true)
+	c.SetCookie("country", strconv.Itoa(country.ID), 0, "/", c.Request.Host, false, true)
+	c.SetCookie("prompts", string(promptsOut), 0, "/", c.Request.Host, false, true)
 	c.JSON(200, &StartResponse{prompt})
 }
