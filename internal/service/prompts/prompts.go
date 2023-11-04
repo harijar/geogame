@@ -22,8 +22,14 @@ const (
 	AgriculturalSectorID = 14
 	IndustrialSectorID   = 15
 	ServiceSectorID      = 16
+	StaticCount          = 17
 
-	Count = 17
+	HemisphereLatID  = 17
+	HemisphereLongID = 18
+	LocationLatID    = 19
+	LocationLongID   = 20
+
+	Count = 21
 )
 
 type Prompts struct {

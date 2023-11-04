@@ -21,11 +21,11 @@ CREATE TABLE IF NOT EXISTS countries (
     industrial_sector FLOAT,
     service_sector FLOAT,
 
-    northernmost TEXT,
-    southernmost TEXT,
-    easternmost TEXT,
-    westernmost TEXT,
-    hemisphere_latt TEXT,
+    northernmost FLOAT,
+    southernmost FLOAT,
+    easternmost FLOAT,
+    westernmost FLOAT,
+    hemisphere_lat TEXT,
     hemisphere_long TEXT,
 
     monarchy BOOL,

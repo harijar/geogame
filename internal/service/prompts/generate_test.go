@@ -46,7 +46,7 @@ func TestPrompts_Gen(t *testing.T) {
 	p := &Prompts{}
 	for index, cs := range casesGen {
 		t.Run(strconv.Itoa(index), func(t *testing.T) {
-			prompt, err := p.Gen(cs.id, cs.country)
+			prompt, err := p.GenStatic(cs.id, cs.country)
 
 			assert.Equal(t, cs.error, err)
 			assert.Equal(t, cs.prompt, prompt)

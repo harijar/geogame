@@ -27,12 +27,12 @@ type Country struct {
 	IndustrialSector   float64 `bun:"industrial_sector"`
 	ServiceSector      float64 `bun:"service_sector"`
 
-	Northernmost   string `bun:"northernmost"`
-	Southernmost   string `bun:"southernmost"`
-	Easternmost    string `bun:"easternmost"`
-	Westernmost    string `bun:"westernmost"`
-	HemisphereLatt string `bun:"hemisphere_latt"`
-	HemisphereLong string `bun:"hemisphere_long"`
+	Northernmost   float64 `bun:"northernmost"`
+	Southernmost   float64 `bun:"southernmost"`
+	Easternmost    float64 `bun:"easternmost"`
+	Westernmost    float64 `bun:"westernmost"`
+	HemisphereLat  string  `bun:"hemisphere_lat"`
+	HemisphereLong string  `bun:"hemisphere_long"`
 
 	Monarchy   bool `bun:"monarchy"`
 	Landlocked bool `bun:"landlocked"`
