@@ -5,6 +5,7 @@ import (
 )
 
 const (
+	// These are static prompts - prompts that don't depend on previos prompts return to the user
 	CapitalID            = 0
 	IndependentID        = 1
 	MonarchyID           = 2
@@ -24,6 +25,7 @@ const (
 	ServiceSectorID      = 16
 	StaticCount          = 17
 
+	// These are dynamic prompts - prompts that can change because of different reasons depending on previous prompts
 	HemisphereLatID  = 17
 	HemisphereLongID = 18
 	LocationLatID    = 19

@@ -8,9 +8,9 @@ import (
 )
 
 type Prompt struct {
-	ID               int `json:"id"`
-	Text             string
-	AnotherCountryID int `json:"another_country_id"`
+	ID               int    `json:"id"`
+	Text             string `json:"-"`
+	AnotherCountryID int    `json:"another_country_id"`
 }
 
 func (p *Prompts) GenRandom(c *countries.Country, prev []*Prompt) (*Prompt, error) {
@@ -30,9 +30,7 @@ func (p *Prompts) GenRandom(c *countries.Country, prev []*Prompt) (*Prompt, erro
 				return nil, err
 			}
 			if prompt != nil {
-				if prompt.Text != "" {
-					return prompt, nil
-				}
+				return prompt, nil
 			}
 		}
 	}
@@ -40,53 +38,54 @@ func (p *Prompts) GenRandom(c *countries.Country, prev []*Prompt) (*Prompt, erro
 }
 
 func (p *Prompts) Gen(id int, c *countries.Country, prev []*Prompt) (*Prompt, error) {
+	text := ""
 	switch id {
 	case CapitalID:
-		return &Prompt{ID: id, Text: formatCapital(c)}, nil
+		text = formatCapital(c)
 	case IndependentID:
-		return &Prompt{ID: id, Text: formatIndependent(c)}, nil
+		text = formatIndependent(c)
 	case MonarchyID:
-		return &Prompt{ID: id, Text: formatMonarchy(c)}, nil
+		text = formatMonarchy(c)
 	case ReligionID:
-		return &Prompt{ID: id, Text: formatReligion(c)}, nil
+		text = formatReligion(c)
 	case UNNotMemberID:
-		return &Prompt{ID: id, Text: formatUNNotMember(c)}, nil
+		text = formatUNNotMember(c)
 	case UnrecognisedID:
-		return &Prompt{ID: id, Text: formatUnrecognised(c)}, nil
+		text = formatUnrecognised(c)
 	case EthnicGroupID:
 		if len(c.EthnicGroups) > 0 {
 			random := rand.Intn(len(c.EthnicGroups))
-			return &Prompt{ID: id, Text: formatEthnicGroup(c.EthnicGroups[random])}, nil
+			text = formatEthnicGroup(c.EthnicGroups[random])
 		}
 		return nil, nil
 	case LanguageID:
 		if len(c.Languages) > 0 {
 			random := rand.Intn(len(c.Languages))
-			return &Prompt{ID: id, Text: formatLanguage(c.Languages[random])}, nil
+			text = formatLanguage(c.Languages[random])
 		}
 		return nil, nil
 	case FunfactID:
 		if len(c.Funfacts) > 0 {
 			random := rand.Intn(len(c.Funfacts))
-			return &Prompt{ID: id, Text: formatFunFact(c.Funfacts[random])}, nil
+			text = formatFunFact(c.Funfacts[random])
 		}
 		return nil, nil
 	case AreaID:
-		return &Prompt{ID: id, Text: formatArea(c)}, nil
+		text = formatArea(c)
 	case PopulationID:
-		return &Prompt{ID: id, Text: formatPopulation(c)}, nil
+		text = formatPopulation(c)
 	case GDPID:
-		return &Prompt{ID: id, Text: formatGDP(c)}, nil
+		text = formatGDP(c)
 	case GDPPerCapitaID:
-		return &Prompt{ID: id, Text: formatGDPPerCapita(c)}, nil
+		text = formatGDPPerCapita(c)
 	case HDIID:
-		return &Prompt{ID: id, Text: formatHDI(c)}, nil
+		text = formatHDI(c)
 	case AgriculturalSectorID:
-		return &Prompt{ID: id, Text: formatAgriculturalSector(c)}, nil
+		text = formatAgriculturalSector(c)
 	case IndustrialSectorID:
-		return &Prompt{ID: id, Text: formatIndustrialSector(c)}, nil
+		text = formatIndustrialSector(c)
 	case ServiceSectorID:
-		return &Prompt{ID: id, Text: formatServiceSector(c)}, nil
+		text = formatServiceSector(c)
 	case HemisphereLatID:
 		return p.genHemisphereLat(c, prev), nil
 	case HemisphereLongID:
@@ -98,4 +97,8 @@ func (p *Prompts) Gen(id int, c *countries.Country, prev []*Prompt) (*Prompt, er
 	default:
 		return nil, fmt.Errorf("prompt ID not correct")
 	}
+	if text != "" {
+		return &Prompt{ID: id, Text: text}, nil
+	}
+	return nil, nil
 }

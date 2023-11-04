@@ -55,28 +55,28 @@ func (a *V1) gameGuess(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusNotFound, &gin.H{"error": "game has not started"})
 		return
 	}
-	shown := make([]*prompts.Prompt, 0)
-	err = json.Unmarshal([]byte(promptsStr), &shown)
+	prev := make([]*prompts.Prompt, 0)
+	err = json.Unmarshal([]byte(promptsStr), &prev)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, &gin.H{"error": "invalid prompts"})
 		return
 	}
 
-	if a.triesLimit == len(shown) {
+	if a.triesLimit == len(prev) {
 		response.Country = country.Name
 	} else {
-		prompt, err := a.prompts.GenRandom(country, shown)
+		prompt, err := a.prompts.GenRandom(country, prev)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
 			return
 		}
-		shown = append(shown, prompt)
-		promptsOut, err := json.Marshal(&shown)
+		prev = append(prev, prompt)
+		prevOut, err := json.Marshal(&prev)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
 			return
 		}
-		c.SetCookie("prompts", string(promptsOut), 0, "/", c.Request.Host, false, true)
+		c.SetCookie("prompts", string(prevOut), 0, "/", c.Request.Host, false, true)
 		response.Prompt = prompt.Text
 	}
 	c.JSON(200, &response)

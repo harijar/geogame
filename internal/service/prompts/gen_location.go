@@ -5,11 +5,11 @@ import (
 	"github.com/harijar/geogame/internal/repo/countries"
 )
 
-// logic of these functions:
-// northernmost, southernmost, easternmost and westernmost are coordinates of country's extreme points in float format (minutes are turned to decimal points, seconds are just dropped if they were present)
-// coordinates with south latitude and west longitude are turned into negative numbers to be able to compare all points on the globe.
-// we can say that one country is north, south, east or west to another country looking at their extreme points.
-// for example, country A is north to country B only if its southernmost point is norther (and its representative number is bigger) than B's northernmost point.
+// Logic of these functions:
+// Northernmost, Southernmost, Easternmost and Westernmost are coordinates of country's extreme points in float format (minutes are turned to decimal points, seconds are just dropped if they were present)
+// Coordinates with south latitude and west longitude are turned into negative numbers to be able to compare all points on the globe.
+// We can say that one country is north, south, east or west to another country looking at their extreme points.
+// For example, country A is north to country B only if its southernmost point is norther (and its representative number is bigger) than B's northernmost point.
 
 func (p *Prompts) genLocationLat(c *countries.Country, prev []*Prompt) *Prompt {
 	country := p.countriesRepo.GetAnotherRandom(c)
@@ -24,12 +24,12 @@ func (p *Prompts) genLocationLat(c *countries.Country, prev []*Prompt) *Prompt {
 	}
 
 	if c.Southernmost > country.Northernmost { // current country is to the north
-		if hemisphere == true && country.HemisphereLat != "Northern" && c.HemisphereLat != "Southern" {
+		if hemisphere == true && country.HemisphereLat != 0 && c.HemisphereLat != 1 {
 			return nil
 		}
 		prompt.Text = fmt.Sprintf("This country is located north to %s", country.Name)
 	} else { // current country is to the south
-		if hemisphere == true && country.HemisphereLat != "Southern" && c.HemisphereLat != "Northern" {
+		if hemisphere == true && country.HemisphereLat != 1 && c.HemisphereLat != 0 {
 			return nil
 		}
 		prompt.Text = fmt.Sprintf("This country is located south to %s", country.Name)
@@ -50,12 +50,12 @@ func (p *Prompts) genLocationLong(c *countries.Country, prev []*Prompt) *Prompt 
 	}
 
 	if c.Westernmost > country.Easternmost { // current country is to the east
-		if hemisphere == true && country.HemisphereLong != "Eastern" && c.HemisphereLong != "Western" {
+		if hemisphere == true && country.HemisphereLong != 0 && c.HemisphereLong != 1 {
 			return nil
 		}
 		prompt.Text = fmt.Sprintf("This country is located east to %s", country.Name)
 	} else { // current country is to the west
-		if hemisphere == true && country.HemisphereLong != "Western" && c.HemisphereLong != "Eastern" {
+		if hemisphere == true && country.HemisphereLong != 1 && c.HemisphereLong != 0 {
 			return nil
 		}
 		prompt.Text = fmt.Sprintf("This country is located west to %s", country.Name)

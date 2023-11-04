@@ -31,8 +31,8 @@ type Country struct {
 	Southernmost   float64 `bun:"southernmost"`
 	Easternmost    float64 `bun:"easternmost"`
 	Westernmost    float64 `bun:"westernmost"`
-	HemisphereLat  string  `bun:"hemisphere_lat"`
-	HemisphereLong string  `bun:"hemisphere_long"`
+	HemisphereLat  int     `bun:"hemisphere_lat"`  // 0 = Northern, 1 = Southern, 2 = Equator
+	HemisphereLong int     `bun:"hemisphere_long"` // 0 = Eastern, 1 = Western, 2 = Greenwich
 
 	Monarchy   bool `bun:"monarchy"`
 	Landlocked bool `bun:"landlocked"`

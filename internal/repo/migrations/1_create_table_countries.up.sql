@@ -25,8 +25,8 @@ CREATE TABLE IF NOT EXISTS countries (
     southernmost FLOAT,
     easternmost FLOAT,
     westernmost FLOAT,
-    hemisphere_lat TEXT,
-    hemisphere_long TEXT,
+    hemisphere_lat INT,
+    hemisphere_long INT,
 
     monarchy BOOL,
     landlocked BOOL,
