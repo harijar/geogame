@@ -78,7 +78,7 @@ func formatHDI(c *countries.Country) string {
 	return ""
 }
 
-func formatArgiculturalSector(c *countries.Country) string {
+func formatAgriculturalSector(c *countries.Country) string {
 	if c.AgriculturalSector != 0 {
 		return fmt.Sprintf("Argicultural sector of this country is %v&#37; of its GDP", c.AgriculturalSector)
 	}

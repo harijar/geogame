@@ -8,9 +8,9 @@ import (
 )
 
 type Prompt struct {
-	ID               int    `json:"id"`
-	Text             string `json:"text"`
-	AnotherCountryID int    `json:"another_country_id"`
+	ID               int `json:"id"`
+	Text             string
+	AnotherCountryID int `json:"another_country_id"`
 }
 
 func (p *Prompts) GenRandom(c *countries.Country, prev []*Prompt) (*Prompt, error) {
@@ -23,92 +23,78 @@ func (p *Prompts) GenRandom(c *countries.Country, prev []*Prompt) (*Prompt, erro
 					break
 				}
 			}
-			if promptID != -1 {
-				text, err := p.GenStatic(promptID, c)
-				if err != nil {
-					return nil, err
-				}
-				if text != "" {
-					return &Prompt{ID: promptID, Text: text}, nil
-				}
-			}
-		} else {
-			prompt, err := p.GenDynamic(promptID, prev, c)
+		}
+		if promptID != -1 {
+			prompt, err := p.Gen(promptID, c, prev)
 			if err != nil {
 				return nil, err
 			}
 			if prompt != nil {
-				return prompt, nil
+				if prompt.Text != "" {
+					return prompt, nil
+				}
 			}
 		}
-
 	}
 	return nil, errors.New("unable to find prompt")
 }
 
-func (p *Prompts) GenStatic(id int, c *countries.Country) (string, error) {
+func (p *Prompts) Gen(id int, c *countries.Country, prev []*Prompt) (*Prompt, error) {
 	switch id {
 	case CapitalID:
-		return formatCapital(c), nil
+		return &Prompt{ID: id, Text: formatCapital(c)}, nil
 	case IndependentID:
-		return formatIndependent(c), nil
+		return &Prompt{ID: id, Text: formatIndependent(c)}, nil
 	case MonarchyID:
-		return formatMonarchy(c), nil
+		return &Prompt{ID: id, Text: formatMonarchy(c)}, nil
 	case ReligionID:
-		return formatReligion(c), nil
+		return &Prompt{ID: id, Text: formatReligion(c)}, nil
 	case UNNotMemberID:
-		return formatUNNotMember(c), nil
+		return &Prompt{ID: id, Text: formatUNNotMember(c)}, nil
 	case UnrecognisedID:
-		return formatUnrecognised(c), nil
+		return &Prompt{ID: id, Text: formatUnrecognised(c)}, nil
 	case EthnicGroupID:
 		if len(c.EthnicGroups) > 0 {
 			random := rand.Intn(len(c.EthnicGroups))
-			return formatEthnicGroup(c.EthnicGroups[random]), nil
+			return &Prompt{ID: id, Text: formatEthnicGroup(c.EthnicGroups[random])}, nil
 		}
-		return "", nil
+		return nil, nil
 	case LanguageID:
 		if len(c.Languages) > 0 {
 			random := rand.Intn(len(c.Languages))
-			return formatLanguage(c.Languages[random]), nil
+			return &Prompt{ID: id, Text: formatLanguage(c.Languages[random])}, nil
 		}
-		return "", nil
+		return nil, nil
 	case FunfactID:
 		if len(c.Funfacts) > 0 {
 			random := rand.Intn(len(c.Funfacts))
-			return formatFunFact(c.Funfacts[random]), nil
+			return &Prompt{ID: id, Text: formatFunFact(c.Funfacts[random])}, nil
 		}
-		return "", nil
+		return nil, nil
 	case AreaID:
-		return formatArea(c), nil
+		return &Prompt{ID: id, Text: formatArea(c)}, nil
 	case PopulationID:
-		return formatPopulation(c), nil
+		return &Prompt{ID: id, Text: formatPopulation(c)}, nil
 	case GDPID:
-		return formatGDP(c), nil
+		return &Prompt{ID: id, Text: formatGDP(c)}, nil
 	case GDPPerCapitaID:
-		return formatGDPPerCapita(c), nil
+		return &Prompt{ID: id, Text: formatGDPPerCapita(c)}, nil
 	case HDIID:
-		return formatHDI(c), nil
+		return &Prompt{ID: id, Text: formatHDI(c)}, nil
 	case AgriculturalSectorID:
-		return formatArgiculturalSector(c), nil
+		return &Prompt{ID: id, Text: formatAgriculturalSector(c)}, nil
 	case IndustrialSectorID:
-		return formatIndustrialSector(c), nil
+		return &Prompt{ID: id, Text: formatIndustrialSector(c)}, nil
 	case ServiceSectorID:
-		return formatServiceSector(c), nil
-	default:
-		return "", fmt.Errorf("prompt ID not correct")
-	}
-}
-
-func (p *Prompts) GenDynamic(id int, prev []*Prompt, c *countries.Country) (*Prompt, error) {
-	switch id {
+		return &Prompt{ID: id, Text: formatServiceSector(c)}, nil
 	case HemisphereLatID:
-		return p.formatHemisphereLat(c, prev), nil
+		return p.genHemisphereLat(c, prev), nil
 	case HemisphereLongID:
-		return p.formatHemisphereLong(c, prev), nil
+		return p.genHemisphereLong(c, prev), nil
 	case LocationLatID:
-		return p.FormatLocationLat(c, prev), nil
+		return p.genLocationLat(c, prev), nil
 	case LocationLongID:
-		return p.formatHemisphereLong(c, prev), nil
+		return p.genHemisphereLong(c, prev), nil
 	default:
 		return nil, fmt.Errorf("prompt ID not correct")
 	}

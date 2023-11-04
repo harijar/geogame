@@ -39,3 +39,14 @@ func (c *Countries) Create(country *Country) error {
 	// TODO: implement
 	panic(errors.New("unimplemented"))
 }
+
+func (c *Countries) GetAnotherRandom(country *Country) *Country {
+	var newCountry *Country
+	for newCountry == nil {
+		newCountry = c.GetRandom()
+		if newCountry.ID == country.ID {
+			newCountry = nil
+		}
+	}
+	return newCountry
+}

@@ -15,7 +15,7 @@ type V1 struct {
 }
 
 type PromptsService interface {
-	GenStatic(id int, c *countries.Country) (string, error)
+	Gen(id int, c *countries.Country, prev []*prompts.Prompt) (*prompts.Prompt, error)
 	GenRandom(c *countries.Country, prev []*prompts.Prompt) (*prompts.Prompt, error)
 }
 
