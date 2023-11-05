@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/harijar/geogame/internal/repo/countries"
+	"github.com/harijar/geogame/internal/service/prompts"
 	"net/http"
 	"strconv"
 )
@@ -21,18 +22,18 @@ func (a *V1) gameStart(c *gin.Context) {
 			country = nil
 		}
 	}
-	id, prompt, err := a.prompts.GenRandom(country, []int{})
+	prompt, err := a.prompts.GenRandom(country, []*prompts.Prompt{})
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
 		return
 	}
 
-	promptsOut, err := json.Marshal([]int{id})
+	promptsOut, err := json.Marshal([]*prompts.Prompt{prompt})
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
 		return
 	}
 	c.SetCookie("country", strconv.Itoa(country.ID), 0, "/", c.Request.Host, false, true)
 	c.SetCookie("prompts", string(promptsOut), 0, "/", c.Request.Host, false, true)
-	c.JSON(200, &StartResponse{prompt})
+	c.JSON(200, &StartResponse{prompt.Text})
 }

@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/harijar/geogame/internal/repo"
 	"github.com/harijar/geogame/internal/repo/countries"
+	"github.com/harijar/geogame/internal/service/prompts"
 )
 
 type V1 struct {
@@ -14,8 +15,8 @@ type V1 struct {
 }
 
 type PromptsService interface {
-	Gen(id int, c *countries.Country) (string, error)
-	GenRandom(c *countries.Country, prev []int) (int, string, error)
+	Gen(id int, c *countries.Country, prev []*prompts.Prompt) (*prompts.Prompt, error)
+	GenRandom(c *countries.Country, prev []*prompts.Prompt) (*prompts.Prompt, error)
 }
 
 func New(countries repo.Countries, prompts PromptsService, triesLimit int) *V1 {

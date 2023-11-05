@@ -5,6 +5,7 @@ import (
 )
 
 const (
+	// These are static prompts - prompts that don't depend on previous prompts returned to the user
 	CapitalID            = 0
 	IndependentID        = 1
 	MonarchyID           = 2
@@ -23,11 +24,24 @@ const (
 	IndustrialSectorID   = 15
 	ServiceSectorID      = 16
 
-	Count = 17
+	// These are dynamic prompts - prompts that can change because of different reasons depending on previous prompts
+	HemisphereLatID  = 17
+	HemisphereLongID = 18
+	LocationLatID    = 19
+	LocationLongID   = 20
+
+	StaticCount = 17
+	Count       = 21
 )
 
 type Prompts struct {
 	countriesRepo repo.Countries
+}
+
+type Prompt struct {
+	ID               int    `json:"id"`
+	Text             string `json:"-"`
+	AnotherCountryID int    `json:"another_country_id"`
 }
 
 func New(countriesRepo repo.Countries) *Prompts {

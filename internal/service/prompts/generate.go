@@ -7,77 +7,89 @@ import (
 	"math/rand"
 )
 
-func (p *Prompts) GenRandom(c *countries.Country, prev []int) (int, string, error) {
+func (p *Prompts) GenRandom(c *countries.Country, prev []*Prompt) (*Prompt, error) {
 	shuffled := rand.Perm(Count)
 	for _, promptID := range shuffled {
-		for _, id := range prev {
-			if id == promptID {
-				promptID = -1
-				break
+		if promptID < StaticCount {
+			for _, prompt := range prev {
+				if prompt.ID == promptID {
+					promptID = -1
+					break
+				}
 			}
 		}
 		if promptID != -1 {
-			res, err := p.Gen(promptID, c)
+			prompt, err := p.Gen(promptID, c, prev)
 			if err != nil {
-				return promptID, "", err
+				return nil, err
 			}
-			if res != "" {
-				return promptID, res, nil
+			if prompt != nil {
+				return prompt, nil
 			}
 		}
 	}
-	return -1, "", errors.New("unable to find prompt")
+	return nil, errors.New("failed to find prompt")
 }
 
-func (p *Prompts) Gen(id int, c *countries.Country) (string, error) {
+func (p *Prompts) Gen(id int, c *countries.Country, prev []*Prompt) (*Prompt, error) {
+	text := ""
 	switch id {
 	case CapitalID:
-		return formatCapital(c), nil
+		text = formatCapital(c)
 	case IndependentID:
-		return formatIndependent(c), nil
+		text = formatIndependent(c)
 	case MonarchyID:
-		return formatMonarchy(c), nil
+		text = formatMonarchy(c)
 	case ReligionID:
-		return formatReligion(c), nil
+		text = formatReligion(c)
 	case UNNotMemberID:
-		return formatUNNotMember(c), nil
+		text = formatUNNotMember(c)
 	case UnrecognisedID:
-		return formatUnrecognised(c), nil
+		text = formatUnrecognised(c)
 	case EthnicGroupID:
 		if len(c.EthnicGroups) > 0 {
 			random := rand.Intn(len(c.EthnicGroups))
-			return formatEthnicGroup(c.EthnicGroups[random]), nil
+			text = formatEthnicGroup(c.EthnicGroups[random])
 		}
-		return "", nil
 	case LanguageID:
 		if len(c.Languages) > 0 {
 			random := rand.Intn(len(c.Languages))
-			return formatLanguage(c.Languages[random]), nil
+			text = formatLanguage(c.Languages[random])
 		}
-		return "", nil
 	case FunfactID:
 		if len(c.Funfacts) > 0 {
 			random := rand.Intn(len(c.Funfacts))
-			return formatFunFact(c.Funfacts[random]), nil
+			text = formatFunFact(c.Funfacts[random])
 		}
-		return "", nil
 	case AreaID:
-		return formatArea(c), nil
+		text = formatArea(c)
 	case PopulationID:
-		return formatPopulation(c), nil
+		text = formatPopulation(c)
 	case GDPID:
-		return formatGDP(c), nil
+		text = formatGDP(c)
 	case GDPPerCapitaID:
-		return formatGDPPerCapita(c), nil
+		text = formatGDPPerCapita(c)
 	case HDIID:
-		return formatHDI(c), nil
+		text = formatHDI(c)
 	case AgriculturalSectorID:
-		return formatArgiculturalSector(c), nil
+		text = formatAgriculturalSector(c)
 	case IndustrialSectorID:
-		return formatIndustrialSector(c), nil
+		text = formatIndustrialSector(c)
 	case ServiceSectorID:
-		return formatServiceSector(c), nil
+		text = formatServiceSector(c)
+	case HemisphereLatID:
+		return p.genHemisphereLat(c, prev), nil
+	case HemisphereLongID:
+		return p.genHemisphereLong(c, prev), nil
+	case LocationLatID:
+		return p.genLocationLat(c, prev), nil
+	case LocationLongID:
+		return p.genHemisphereLong(c, prev), nil
 	default:
-		return "", fmt.Errorf("prompt ID not correct")
+		return nil, fmt.Errorf("prompt ID not correct")
 	}
+	if text != "" {
+		return &Prompt{ID: id, Text: text}, nil
+	}
+	return nil, nil
 }

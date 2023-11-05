@@ -9,4 +9,5 @@ type Countries interface {
 	Create(country *countries.Country) error
 	Get(id int) *countries.Country
 	GetRandom() *countries.Country
+	GetAnotherRandom(country *countries.Country) *countries.Country
 }

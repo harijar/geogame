@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/agnivade/levenshtein"
 	"github.com/gin-gonic/gin"
+	"github.com/harijar/geogame/internal/service/prompts"
 	"net/http"
 	"strconv"
 	"strings"
@@ -54,29 +55,29 @@ func (a *V1) gameGuess(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusNotFound, &gin.H{"error": "game has not started"})
 		return
 	}
-	prompts := make([]int, 0)
-	err = json.Unmarshal([]byte(promptsStr), &prompts)
+	prev := make([]*prompts.Prompt, 0)
+	err = json.Unmarshal([]byte(promptsStr), &prev)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, &gin.H{"error": "invalid prompts"})
 		return
 	}
 
-	if a.triesLimit == len(prompts) {
+	if a.triesLimit == len(prev) {
 		response.Country = country.Name
 	} else {
-		id, prompt, err := a.prompts.GenRandom(country, prompts)
+		prompt, err := a.prompts.GenRandom(country, prev)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
 			return
 		}
-		prompts = append(prompts, id)
-		promptsOut, err := json.Marshal(&prompts)
+		prev = append(prev, prompt)
+		prevOut, err := json.Marshal(&prev)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
 			return
 		}
-		c.SetCookie("prompts", string(promptsOut), 0, "/", c.Request.Host, false, true)
-		response.Prompt = prompt
+		c.SetCookie("prompts", string(prevOut), 0, "/", c.Request.Host, false, true)
+		response.Prompt = prompt.Text
 	}
 	c.JSON(200, &response)
 }

@@ -2,6 +2,17 @@ package countries
 
 import "github.com/uptrace/bun"
 
+// Values of HemisphereLat and HemisphereLong
+const (
+	Northern = 0
+	Southern = 1
+	Equator  = 2
+
+	Eastern   = 0
+	Western   = 1
+	Greenwich = 2
+)
+
 type Country struct {
 	bun.BaseModel `bun:"table:countries"`
 
@@ -27,12 +38,12 @@ type Country struct {
 	IndustrialSector   float64 `bun:"industrial_sector"`
 	ServiceSector      float64 `bun:"service_sector"`
 
-	Northernmost   string `bun:"northernmost"`
-	Southernmost   string `bun:"southernmost"`
-	Easternmost    string `bun:"easternmost"`
-	Westernmost    string `bun:"westernmost"`
-	HemisphereLatt string `bun:"hemisphere_latt"`
-	HemisphereLong string `bun:"hemisphere_long"`
+	Northernmost   float64 `bun:"northernmost"`
+	Southernmost   float64 `bun:"southernmost"`
+	Easternmost    float64 `bun:"easternmost"`
+	Westernmost    float64 `bun:"westernmost"`
+	HemisphereLat  int     `bun:"hemisphere_lat"`  // Southern, Northern, Equator
+	HemisphereLong int     `bun:"hemisphere_long"` // Eastern, Western, Greenwich
 
 	Monarchy   bool `bun:"monarchy"`
 	Landlocked bool `bun:"landlocked"`
