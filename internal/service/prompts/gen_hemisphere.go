@@ -11,8 +11,6 @@ func (p *Prompts) genHemisphereLat(c *countries.Country, prev []*Prompt) *Prompt
 			return nil
 		case LocationLatID:
 			ids = append(ids, pr.AnotherCountryID)
-		default:
-			return nil
 		}
 	}
 
@@ -45,6 +43,8 @@ func (p *Prompts) genHemisphereLat(c *countries.Country, prev []*Prompt) *Prompt
 
 	case countries.Equator:
 		prompt.Text = "This country is crossed by Equator"
+	default:
+		return nil
 	}
 	return prompt
 }
@@ -58,8 +58,6 @@ func (p *Prompts) genHemisphereLong(c *countries.Country, prev []*Prompt) *Promp
 			return nil
 		case LocationLongID:
 			ids = append(ids, pr.AnotherCountryID)
-		default:
-			return nil
 		}
 	}
 
@@ -92,6 +90,8 @@ func (p *Prompts) genHemisphereLong(c *countries.Country, prev []*Prompt) *Promp
 
 	case countries.Greenwich:
 		prompt.Text = "This country is crossed by Greenwich meridian"
+	default:
+		return nil
 	}
 	return prompt
 }
