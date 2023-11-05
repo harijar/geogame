@@ -15,9 +15,12 @@ func (p *Prompts) genHemisphereLat(c *countries.Country, prev []*Prompt) *Prompt
 	}
 
 	switch c.HemisphereLat {
-	case 0:
+	case countries.Northern:
 		for _, id := range ids {
 			country := p.countriesRepo.Get(id)
+			if country == nil {
+				return nil
+			}
 			// if current country is to the north and another country is in northern hemisphere
 			if country.HemisphereLat == 0 && c.Southernmost > country.Northernmost {
 				return nil
@@ -25,9 +28,12 @@ func (p *Prompts) genHemisphereLat(c *countries.Country, prev []*Prompt) *Prompt
 		}
 		prompt.Text = "This country is located in Northern hemisphere"
 
-	case 1:
+	case countries.Southern:
 		for _, id := range ids {
 			country := p.countriesRepo.Get(id)
+			if country == nil {
+				return nil
+			}
 			// if current country is to the south and another country is in southern hemisphere
 			if country.HemisphereLat == 1 && c.Northernmost < country.Southernmost {
 				return nil
@@ -35,7 +41,7 @@ func (p *Prompts) genHemisphereLat(c *countries.Country, prev []*Prompt) *Prompt
 		}
 		prompt.Text = "This country is located in Southern hemisphere"
 
-	case 2:
+	case countries.Equator:
 		prompt.Text = "This country is crossed by Equator"
 	}
 	return prompt
@@ -54,9 +60,12 @@ func (p *Prompts) genHemisphereLong(c *countries.Country, prev []*Prompt) *Promp
 	}
 
 	switch c.HemisphereLong {
-	case 0:
+	case countries.Eastern:
 		for _, id := range ids {
 			country := p.countriesRepo.Get(id)
+			if country == nil {
+				return nil
+			}
 			// if current country is to the east and another country is in eastern hemisphere
 			if country.HemisphereLat == 0 && c.Westernmost > country.Easternmost {
 				return nil
@@ -64,9 +73,12 @@ func (p *Prompts) genHemisphereLong(c *countries.Country, prev []*Prompt) *Promp
 		}
 		prompt.Text = "This country is located in Eastern hemisphere"
 
-	case 1:
+	case countries.Western:
 		for _, id := range ids {
 			country := p.countriesRepo.Get(id)
+			if country == nil {
+				return nil
+			}
 			// if current country is to the west and another country is in western hemisphere
 			if country.HemisphereLat == 1 && c.Easternmost < country.Westernmost {
 				return nil
@@ -74,7 +86,7 @@ func (p *Prompts) genHemisphereLong(c *countries.Country, prev []*Prompt) *Promp
 		}
 		prompt.Text = "This country is located in Western hemisphere"
 
-	case 2:
+	case countries.Greenwich:
 		prompt.Text = "This country is crossed by Greenwich meridian"
 	}
 	return prompt

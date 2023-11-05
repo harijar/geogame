@@ -7,12 +7,6 @@ import (
 	"math/rand"
 )
 
-type Prompt struct {
-	ID               int    `json:"id"`
-	Text             string `json:"-"`
-	AnotherCountryID int    `json:"another_country_id"`
-}
-
 func (p *Prompts) GenRandom(c *countries.Country, prev []*Prompt) (*Prompt, error) {
 	shuffled := rand.Perm(Count)
 	for _, promptID := range shuffled {
@@ -34,7 +28,7 @@ func (p *Prompts) GenRandom(c *countries.Country, prev []*Prompt) (*Prompt, erro
 			}
 		}
 	}
-	return nil, errors.New("unable to find prompt")
+	return nil, errors.New("failed to find prompt")
 }
 
 func (p *Prompts) Gen(id int, c *countries.Country, prev []*Prompt) (*Prompt, error) {
@@ -57,19 +51,16 @@ func (p *Prompts) Gen(id int, c *countries.Country, prev []*Prompt) (*Prompt, er
 			random := rand.Intn(len(c.EthnicGroups))
 			text = formatEthnicGroup(c.EthnicGroups[random])
 		}
-		return nil, nil
 	case LanguageID:
 		if len(c.Languages) > 0 {
 			random := rand.Intn(len(c.Languages))
 			text = formatLanguage(c.Languages[random])
 		}
-		return nil, nil
 	case FunfactID:
 		if len(c.Funfacts) > 0 {
 			random := rand.Intn(len(c.Funfacts))
 			text = formatFunFact(c.Funfacts[random])
 		}
-		return nil, nil
 	case AreaID:
 		text = formatArea(c)
 	case PopulationID:

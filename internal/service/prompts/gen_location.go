@@ -24,12 +24,12 @@ func (p *Prompts) genLocationLat(c *countries.Country, prev []*Prompt) *Prompt {
 	}
 
 	if c.Southernmost > country.Northernmost { // current country is to the north
-		if hemisphere == true && country.HemisphereLat != 0 && c.HemisphereLat != 1 {
+		if hemisphere == true && country.HemisphereLat != countries.Northern && c.HemisphereLat != countries.Southern {
 			return nil
 		}
 		prompt.Text = fmt.Sprintf("This country is located north to %s", country.Name)
 	} else { // current country is to the south
-		if hemisphere == true && country.HemisphereLat != 1 && c.HemisphereLat != 0 {
+		if hemisphere == true && country.HemisphereLat != countries.Southern && c.HemisphereLat != countries.Northern {
 			return nil
 		}
 		prompt.Text = fmt.Sprintf("This country is located south to %s", country.Name)
@@ -50,12 +50,12 @@ func (p *Prompts) genLocationLong(c *countries.Country, prev []*Prompt) *Prompt 
 	}
 
 	if c.Westernmost > country.Easternmost { // current country is to the east
-		if hemisphere == true && country.HemisphereLong != 0 && c.HemisphereLong != 1 {
+		if hemisphere == true && country.HemisphereLong != countries.Eastern && c.HemisphereLong != countries.Western {
 			return nil
 		}
 		prompt.Text = fmt.Sprintf("This country is located east to %s", country.Name)
 	} else { // current country is to the west
-		if hemisphere == true && country.HemisphereLong != 1 && c.HemisphereLong != 0 {
+		if hemisphere == true && country.HemisphereLong != countries.Western && c.HemisphereLong != countries.Eastern {
 			return nil
 		}
 		prompt.Text = fmt.Sprintf("This country is located west to %s", country.Name)
