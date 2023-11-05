@@ -28,7 +28,7 @@ func (c *Countries) Init(ctx context.Context) error {
 }
 
 func (c *Countries) Get(id int) *Country {
-	if id >= 0 && id < len(c.cache) {
+	if id > 0 && id < len(c.cache) {
 		return c.cache[id-1]
 	}
 	return nil

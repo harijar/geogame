@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	// These are static prompts - prompts that don't depend on previos prompts return to the user
+	// These are static prompts - prompts that don't depend on previous prompts returned to the user
 	CapitalID            = 0
 	IndependentID        = 1
 	MonarchyID           = 2

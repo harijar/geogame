@@ -11,6 +11,8 @@ func (p *Prompts) genHemisphereLat(c *countries.Country, prev []*Prompt) *Prompt
 			return nil
 		case LocationLatID:
 			ids = append(ids, pr.AnotherCountryID)
+		default:
+			return nil
 		}
 	}
 
@@ -56,6 +58,8 @@ func (p *Prompts) genHemisphereLong(c *countries.Country, prev []*Prompt) *Promp
 			return nil
 		case LocationLongID:
 			ids = append(ids, pr.AnotherCountryID)
+		default:
+			return nil
 		}
 	}
 
