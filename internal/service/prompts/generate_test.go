@@ -73,7 +73,7 @@ func TestPrompts_GenRandom(t *testing.T) {
 	p := &Prompts{countriesRepo: countriesRepo}
 	for index, cs := range casesGenRandom {
 		t.Run(strconv.Itoa(index), func(t *testing.T) {
-			countriesRepo.EXPECT().GetAnotherRandom(cs.country).Return(&countries.Country{ID: 2})
+			countriesRepo.EXPECT().GetAnotherRandom(cs.country).Return(&countries.Country{ID: 2}).AnyTimes()
 			prompt, err := p.GenRandom(cs.country, cs.prev)
 
 			assert.Equal(t, cs.error, err)
@@ -110,6 +110,34 @@ var casesGenLocationLat = []struct {
 		[]*Prompt{}, nil},
 }
 
+var casesGenLocationLong = []struct {
+	country *countries.Country
+	another *countries.Country
+	prev    []*Prompt
+	prompt  *Prompt
+}{
+	{&countries.Country{ID: 1, Easternmost: 45, Westernmost: 35},
+		&countries.Country{ID: 2, Name: "Roman Empire", Easternmost: 30, Westernmost: 0},
+		[]*Prompt{{ID: HemisphereLongID}}, &Prompt{ID: LocationLongID, Text: "This country is located east to Roman Empire", AnotherCountryID: 2}},
+	{&countries.Country{ID: 1, Easternmost: -2, Westernmost: -12, HemisphereLong: countries.Western},
+		&countries.Country{ID: 2, Name: "Kyivan Rus'", Easternmost: 45, Westernmost: 35, HemisphereLong: countries.Eastern},
+		[]*Prompt{}, &Prompt{ID: LocationLongID, Text: "This country is located west to Kyivan Rus'", AnotherCountryID: 2}},
+
+	{&countries.Country{ID: 1, Easternmost: -2, Westernmost: -12, HemisphereLong: countries.Western},
+		&countries.Country{ID: 2, Name: "Kyivan Rus'", Easternmost: 45, Westernmost: 35, HemisphereLong: countries.Eastern},
+		[]*Prompt{{ID: HemisphereLongID}}, nil},
+	{&countries.Country{ID: 1, Easternmost: -10, Westernmost: -16, HemisphereLong: countries.Western},
+		&countries.Country{ID: 2, Easternmost: 16, Westernmost: 10, HemisphereLong: countries.Eastern},
+		[]*Prompt{{ID: HemisphereLongID}}, nil},
+
+	{&countries.Country{ID: 1, Easternmost: 12, Westernmost: -100},
+		&countries.Country{ID: 2, Easternmost: -10, Westernmost: -20},
+		[]*Prompt{}, nil},
+	{&countries.Country{ID: 1, Easternmost: 12, Westernmost: -12},
+		&countries.Country{ID: 2, Easternmost: 11, Westernmost: -13},
+		[]*Prompt{}, nil},
+}
+
 func TestPrompts_GenLocation(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
@@ -119,6 +147,13 @@ func TestPrompts_GenLocation(t *testing.T) {
 	for _, cs := range casesGenLocationLat {
 		countriesRepo.EXPECT().GetAnotherRandom(cs.country).Return(cs.another)
 		prompt, _ := p.Gen(LocationLatID, cs.country, cs.prev)
+
+		assert.Equal(t, cs.prompt, prompt)
+	}
+
+	for _, cs := range casesGenLocationLong {
+		countriesRepo.EXPECT().GetAnotherRandom(cs.country).Return(cs.another)
+		prompt, _ := p.Gen(LocationLongID, cs.country, cs.prev)
 
 		assert.Equal(t, cs.prompt, prompt)
 	}
