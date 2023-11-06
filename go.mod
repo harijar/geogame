@@ -6,6 +6,7 @@ require go.uber.org/mock v0.3.0
 
 require (
 	github.com/agnivade/levenshtein v1.1.1
+	github.com/caarlos0/env/v10 v10.0.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/golang-migrate/migrate/v4 v4.16.2
 	github.com/stretchr/testify v1.8.4
@@ -16,7 +17,6 @@ require (
 
 require (
 	github.com/bytedance/sonic v1.9.1 // indirect
-	github.com/caarlos0/env/v10 v10.0.0 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.2 // indirect

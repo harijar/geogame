@@ -8,45 +8,55 @@ import (
 	"testing"
 )
 
+// Cases for static prompt generation only (so prev is empty here)
 var casesGen = []struct {
 	id      int
 	country *countries.Country
-	prompt  string
+	prev    []*Prompt
+	prompt  *Prompt
 	error   error
 }{
-	{MonarchyID, &countries.Country{Monarchy: true}, "This country is a monarchy", nil},
-	{GDPID, &countries.Country{GDP: 228}, "GDP of this country is 228 USD", nil},
+	{MonarchyID, &countries.Country{Monarchy: true}, []*Prompt{},
+		&Prompt{ID: MonarchyID, Text: "This country is a monarchy"}, nil},
+	{GDPID, &countries.Country{GDP: 228}, []*Prompt{},
+		&Prompt{ID: GDPID, Text: "GDP of this country is 228 USD"}, nil},
 	{ReligionID,
-		&countries.Country{Religion: "Rastafarianism", ReligionPerc: 420},
-		"Major religion of this country is Rastafarianism. 420&#37; of people there practice it.", nil},
+		&countries.Country{Religion: "Rastafarianism", ReligionPerc: 420}, []*Prompt{},
+		&Prompt{ID: ReligionID, Text: "Major religion of this country is Rastafarianism. 420&#37; of people there practice it."}, nil},
 	{LanguageID,
-		&countries.Country{Languages: []*countries.Language{{Name: "Zalupa-Congolese"}}},
-		"Official language of this country is Zalupa-Congolese", nil},
-	{LanguageID, &countries.Country{}, "", nil},
-	{CapitalID, &countries.Country{}, "", nil},
-	{19, &countries.Country{}, "", fmt.Errorf("prompt ID not correct")},
+		&countries.Country{Languages: []*countries.Language{{Name: "Zalupa-Congolese"}}}, []*Prompt{},
+		&Prompt{ID: LanguageID, Text: "Official language of this country is Zalupa-Congolese"}, nil},
+	{LanguageID, &countries.Country{}, []*Prompt{}, nil, nil},
+	{CapitalID, &countries.Country{}, []*Prompt{}, nil, nil},
+	{100, &countries.Country{}, []*Prompt{}, nil, fmt.Errorf("prompt ID not correct")},
 }
 
+// Cases for static prompt generation only (so prev is empty here)
 var casesGenRandom = []struct {
 	country *countries.Country
-	prev    []int
-	id      int
-	prompt  string
+	prev    []*Prompt
+	prompt  *Prompt
 	error   error
 }{
 	{&countries.Country{Monarchy: true},
-		[]int{1, 3}, MonarchyID, "This country is a monarchy", nil},
+		[]*Prompt{{ID: 1}, {ID: 3}}, &Prompt{ID: MonarchyID, Text: "This country is a monarchy"}, nil},
 	{&countries.Country{Monarchy: true, GDP: 228},
-		[]int{1, 2, 3}, GDPID, "GDP of this country is 228 USD", nil},
+		[]*Prompt{{ID: 1}, {ID: MonarchyID}, {ID: 3}}, &Prompt{ID: GDPID, Text: "GDP of this country is 228 USD"}, nil},
 	{&countries.Country{},
-		[]int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17}, -1, "", fmt.Errorf("unable to find prompt")},
+		[]*Prompt{{ID: 1}, {ID: 2}, {ID: 3}, {ID: 4}, {ID: 5}, {ID: 6}, {ID: 7}, {ID: 8}, {ID: 9}, {ID: 10}, {ID: 11}, {ID: 12}, {ID: 13}, {ID: 14}, {ID: 15}, {ID: 16}},
+		nil, fmt.Errorf("unable to find prompt")},
 }
 
 func TestPrompts_Gen(t *testing.T) {
-	p := &Prompts{}
+	//countriesRepo := &countries.Countries{cache: []*countries.Country{
+	//	{ID: 1, Name: "Russian Empire"},
+	//	{ID: 2, Name: "Mongol Empire"},
+	//}}
+	p := &Prompts{countriesRepo: countriesRepo}
+
 	for index, cs := range casesGen {
 		t.Run(strconv.Itoa(index), func(t *testing.T) {
-			prompt, err := p.Gen(cs.id, cs.country)
+			prompt, err := p.Gen(cs.id, cs.country, cs.prev)
 
 			assert.Equal(t, cs.error, err)
 			assert.Equal(t, cs.prompt, prompt)
@@ -55,12 +65,19 @@ func TestPrompts_Gen(t *testing.T) {
 }
 
 func TestPrompts_GenRandom(t *testing.T) {
-	p := &Prompts{}
+	//ctrl := gomock.NewController(t)
+	//defer ctrl.Finish()
+	//mockCountries := mocks.NewMockCountries(ctrl)
+
+	//countriesRepo := &countries.Countries{cache: []*countries.Country{
+	//	{ID: 1, Name: "Russian Empire"},
+	//	{ID: 2, Name: "Mongol Empire"},
+	//}}
+	p := &Prompts{countriesRepo: countriesRepo}
 	for index, cs := range casesGenRandom {
 		t.Run(strconv.Itoa(index), func(t *testing.T) {
-			id, prompt, err := p.GenRandom(cs.country, cs.prev)
+			prompt, err := p.GenRandom(cs.country, cs.prev)
 
-			assert.Equal(t, cs.id, id)
 			assert.Equal(t, cs.error, err)
 			assert.Equal(t, cs.prompt, prompt)
 		})
