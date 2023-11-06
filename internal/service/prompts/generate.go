@@ -85,6 +85,10 @@ func (p *Prompts) Gen(id int, c *countries.Country, prev []*Prompt) (*Prompt, er
 		return p.genLocationLat(c, prev), nil
 	case LocationLongID:
 		return p.genLocationLong(c, prev), nil
+	case IslandID:
+		return p.genIsland(c, prev), nil
+	case LandlockedID:
+		return p.genLandlocked(c, prev), nil
 	default:
 		return nil, fmt.Errorf("prompt ID not correct")
 	}
