@@ -2,8 +2,10 @@ package prompts
 
 import (
 	"fmt"
+	"github.com/harijar/geogame/internal/mocks"
 	"github.com/harijar/geogame/internal/repo/countries"
 	"github.com/stretchr/testify/assert"
+	"go.uber.org/mock/gomock"
 	"strconv"
 	"testing"
 )
@@ -48,6 +50,20 @@ var casesGenRandom = []struct {
 }
 
 func TestPrompts_Gen(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+	countriesRepo := mocks.NewMockCountries(mockCtrl)
+	// GetAnotherRandom(&countries.Country{ID: 1}) will return &countries.Country{ID: 2}
+	// keep in mind that the argument is a struct, so you need to call this with same pointer as I understand
+	countriesRepo.EXPECT().GetAnotherRandom(&countries.Country{ID: 1}).Return(&countries.Country{ID: 2})
+	// Get(1) will return &countries.Country{ID: 1}
+	// by default the specified data will be returned once, but you can control this behaviour
+	countriesRepo.EXPECT().Get(1).Return(&countries.Country{ID: 1}).AnyTimes() // .Times(3) .MaxTimes(10) .MinTimes(2)
+	/*
+		country := countriesRepo.Get(1)
+		t.Log(country.ID)
+	*/
+
 	//countriesRepo := &countries.Countries{cache: []*countries.Country{
 	//	{ID: 1, Name: "Russian Empire"},
 	//	{ID: 2, Name: "Mongol Empire"},
