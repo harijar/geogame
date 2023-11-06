@@ -28,13 +28,17 @@ func (p *Prompts) genLocationLat(c *countries.Country, prev []*Prompt) *Prompt {
 			return nil
 		}
 		prompt.Text = fmt.Sprintf("This country is located north to %s", country.Name)
-	} else { // current country is to the south
+	} else if c.Northernmost < country.Southernmost { // current country is to the south
 		if hemisphere == true && country.HemisphereLat != countries.Southern && c.HemisphereLat != countries.Northern {
 			return nil
 		}
 		prompt.Text = fmt.Sprintf("This country is located south to %s", country.Name)
 	}
-	return prompt
+
+	if prompt.Text != "" {
+		return prompt
+	}
+	return nil
 }
 
 func (p *Prompts) genLocationLong(c *countries.Country, prev []*Prompt) *Prompt {
@@ -54,11 +58,14 @@ func (p *Prompts) genLocationLong(c *countries.Country, prev []*Prompt) *Prompt 
 			return nil
 		}
 		prompt.Text = fmt.Sprintf("This country is located east to %s", country.Name)
-	} else { // current country is to the west
+	} else if c.Easternmost < country.Westernmost { // current country is to the west
 		if hemisphere == true && country.HemisphereLong != countries.Western && c.HemisphereLong != countries.Eastern {
 			return nil
 		}
 		prompt.Text = fmt.Sprintf("This country is located west to %s", country.Name)
 	}
-	return prompt
+	if prompt.Text != "" {
+		return prompt
+	}
+	return nil
 }

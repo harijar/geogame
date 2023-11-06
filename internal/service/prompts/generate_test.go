@@ -18,58 +18,27 @@ var casesGen = []struct {
 	prompt  *Prompt
 	error   error
 }{
-	{MonarchyID, &countries.Country{Monarchy: true}, []*Prompt{},
+	{MonarchyID, &countries.Country{ID: 1, Monarchy: true}, []*Prompt{},
 		&Prompt{ID: MonarchyID, Text: "This country is a monarchy"}, nil},
-	{GDPID, &countries.Country{GDP: 228}, []*Prompt{},
+	{GDPID, &countries.Country{ID: 1, GDP: 228}, []*Prompt{},
 		&Prompt{ID: GDPID, Text: "GDP of this country is 228 USD"}, nil},
 	{ReligionID,
-		&countries.Country{Religion: "Rastafarianism", ReligionPerc: 420}, []*Prompt{},
+		&countries.Country{ID: 1, Religion: "Rastafarianism", ReligionPerc: 420}, []*Prompt{},
 		&Prompt{ID: ReligionID, Text: "Major religion of this country is Rastafarianism. 420&#37; of people there practice it."}, nil},
 	{LanguageID,
-		&countries.Country{Languages: []*countries.Language{{Name: "Zalupa-Congolese"}}}, []*Prompt{},
+		&countries.Country{ID: 1, Languages: []*countries.Language{{Name: "Zalupa-Congolese"}}}, []*Prompt{},
 		&Prompt{ID: LanguageID, Text: "Official language of this country is Zalupa-Congolese"}, nil},
-	{LanguageID, &countries.Country{}, []*Prompt{}, nil, nil},
-	{CapitalID, &countries.Country{}, []*Prompt{}, nil, nil},
-	{100, &countries.Country{}, []*Prompt{}, nil, fmt.Errorf("prompt ID not correct")},
-}
-
-// Cases for static prompt generation only (so prev is empty here)
-var casesGenRandom = []struct {
-	country *countries.Country
-	prev    []*Prompt
-	prompt  *Prompt
-	error   error
-}{
-	{&countries.Country{Monarchy: true},
-		[]*Prompt{{ID: 1}, {ID: 3}}, &Prompt{ID: MonarchyID, Text: "This country is a monarchy"}, nil},
-	{&countries.Country{Monarchy: true, GDP: 228},
-		[]*Prompt{{ID: 1}, {ID: MonarchyID}, {ID: 3}}, &Prompt{ID: GDPID, Text: "GDP of this country is 228 USD"}, nil},
-	{&countries.Country{},
-		[]*Prompt{{ID: 1}, {ID: 2}, {ID: 3}, {ID: 4}, {ID: 5}, {ID: 6}, {ID: 7}, {ID: 8}, {ID: 9}, {ID: 10}, {ID: 11}, {ID: 12}, {ID: 13}, {ID: 14}, {ID: 15}, {ID: 16}},
-		nil, fmt.Errorf("unable to find prompt")},
+	{LanguageID, &countries.Country{ID: 1}, []*Prompt{}, nil, nil},
+	{CapitalID, &countries.Country{ID: 1}, []*Prompt{}, nil, nil},
+	{100, &countries.Country{ID: 1}, []*Prompt{}, nil, fmt.Errorf("prompt ID not correct")},
 }
 
 func TestPrompts_Gen(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 	countriesRepo := mocks.NewMockCountries(mockCtrl)
-	// GetAnotherRandom(&countries.Country{ID: 1}) will return &countries.Country{ID: 2}
-	// keep in mind that the argument is a struct, so you need to call this with same pointer as I understand
-	countriesRepo.EXPECT().GetAnotherRandom(&countries.Country{ID: 1}).Return(&countries.Country{ID: 2})
-	// Get(1) will return &countries.Country{ID: 1}
-	// by default the specified data will be returned once, but you can control this behaviour
-	countriesRepo.EXPECT().Get(1).Return(&countries.Country{ID: 1}).AnyTimes() // .Times(3) .MaxTimes(10) .MinTimes(2)
-	/*
-		country := countriesRepo.Get(1)
-		t.Log(country.ID)
-	*/
 
-	//countriesRepo := &countries.Countries{cache: []*countries.Country{
-	//	{ID: 1, Name: "Russian Empire"},
-	//	{ID: 2, Name: "Mongol Empire"},
-	//}}
 	p := &Prompts{countriesRepo: countriesRepo}
-
 	for index, cs := range casesGen {
 		t.Run(strconv.Itoa(index), func(t *testing.T) {
 			prompt, err := p.Gen(cs.id, cs.country, cs.prev)
@@ -80,22 +49,77 @@ func TestPrompts_Gen(t *testing.T) {
 	}
 }
 
-func TestPrompts_GenRandom(t *testing.T) {
-	//ctrl := gomock.NewController(t)
-	//defer ctrl.Finish()
-	//mockCountries := mocks.NewMockCountries(ctrl)
+// Cases for static prompt generation only
+var casesGenRandom = []struct {
+	country *countries.Country
+	prev    []*Prompt
+	prompt  *Prompt
+	error   error
+}{
+	{&countries.Country{ID: 1, Monarchy: true},
+		[]*Prompt{{ID: 1}, {ID: 3}, {ID: 17}, {ID: 18}}, &Prompt{ID: MonarchyID, Text: "This country is a monarchy"}, nil},
+	{&countries.Country{ID: 1, Monarchy: true, GDP: 228},
+		[]*Prompt{{ID: 1}, {ID: MonarchyID}, {ID: 3}, {ID: 17}, {ID: 18}}, &Prompt{ID: GDPID, Text: "GDP of this country is 228 USD"}, nil},
+	{&countries.Country{ID: 1},
+		[]*Prompt{{ID: 1}, {ID: 2}, {ID: 3}, {ID: 4}, {ID: 5}, {ID: 6}, {ID: 7}, {ID: 8}, {ID: 9}, {ID: 10}, {ID: 11}, {ID: 12}, {ID: 13}, {ID: 14}, {ID: 15}, {ID: 16}, {ID: 17}, {ID: 18}},
+		nil, fmt.Errorf("failed to find prompt")},
+}
 
-	//countriesRepo := &countries.Countries{cache: []*countries.Country{
-	//	{ID: 1, Name: "Russian Empire"},
-	//	{ID: 2, Name: "Mongol Empire"},
-	//}}
+func TestPrompts_GenRandom(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+	countriesRepo := mocks.NewMockCountries(mockCtrl)
+
 	p := &Prompts{countriesRepo: countriesRepo}
 	for index, cs := range casesGenRandom {
 		t.Run(strconv.Itoa(index), func(t *testing.T) {
+			countriesRepo.EXPECT().GetAnotherRandom(cs.country).Return(&countries.Country{ID: 2})
 			prompt, err := p.GenRandom(cs.country, cs.prev)
 
 			assert.Equal(t, cs.error, err)
 			assert.Equal(t, cs.prompt, prompt)
 		})
+	}
+}
+
+var casesGenLocationLat = []struct {
+	country *countries.Country
+	another *countries.Country
+	prev    []*Prompt
+	prompt  *Prompt
+}{
+	{&countries.Country{ID: 1, Northernmost: 45, Southernmost: 35},
+		&countries.Country{ID: 2, Name: "Qin Empire", Northernmost: 30, Southernmost: 0},
+		[]*Prompt{{ID: HemisphereLatID}}, &Prompt{ID: LocationLatID, Text: "This country is located north to Qin Empire", AnotherCountryID: 2}},
+	{&countries.Country{ID: 1, Northernmost: -2, Southernmost: -12, HemisphereLat: countries.Southern},
+		&countries.Country{ID: 2, Name: "Mongol Empire", Northernmost: 45, Southernmost: 35, HemisphereLat: countries.Northern},
+		[]*Prompt{}, &Prompt{ID: LocationLatID, Text: "This country is located south to Mongol Empire", AnotherCountryID: 2}},
+
+	{&countries.Country{ID: 1, Northernmost: -2, Southernmost: -12, HemisphereLat: countries.Southern},
+		&countries.Country{ID: 2, Name: "Mongol Empire", Northernmost: 45, Southernmost: 35, HemisphereLat: countries.Northern},
+		[]*Prompt{{ID: HemisphereLatID}}, nil},
+	{&countries.Country{ID: 1, Northernmost: -10, Southernmost: -16, HemisphereLat: countries.Southern},
+		&countries.Country{ID: 2, Northernmost: 16, Southernmost: 10, HemisphereLat: countries.Northern},
+		[]*Prompt{{ID: HemisphereLatID}}, nil},
+
+	{&countries.Country{ID: 1, Northernmost: 12, Southernmost: -100},
+		&countries.Country{ID: 2, Northernmost: -10, Southernmost: -20},
+		[]*Prompt{}, nil},
+	{&countries.Country{ID: 1, Northernmost: 12, Southernmost: -12},
+		&countries.Country{ID: 2, Northernmost: 11, Southernmost: -13},
+		[]*Prompt{}, nil},
+}
+
+func TestPrompts_GenLocation(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+	countriesRepo := mocks.NewMockCountries(mockCtrl)
+
+	p := &Prompts{countriesRepo: countriesRepo}
+	for _, cs := range casesGenLocationLat {
+		countriesRepo.EXPECT().GetAnotherRandom(cs.country).Return(cs.another)
+		prompt, _ := p.Gen(LocationLatID, cs.country, cs.prev)
+
+		assert.Equal(t, cs.prompt, prompt)
 	}
 }
