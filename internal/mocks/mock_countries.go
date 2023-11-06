@@ -38,6 +38,20 @@ func (m *MockCountries) EXPECT() *MockCountriesMockRecorder {
 	return m.recorder
 }
 
+// Create mocks base method.
+func (m *MockCountries) Create(arg0 *countries.Country) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Create", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Create indicates an expected call of Create.
+func (mr *MockCountriesMockRecorder) Create(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockCountries)(nil).Create), arg0)
+}
+
 // Get mocks base method.
 func (m *MockCountries) Get(arg0 int) *countries.Country {
 	m.ctrl.T.Helper()
@@ -50,4 +64,32 @@ func (m *MockCountries) Get(arg0 int) *countries.Country {
 func (mr *MockCountriesMockRecorder) Get(arg0 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockCountries)(nil).Get), arg0)
+}
+
+// GetAnotherRandom mocks base method.
+func (m *MockCountries) GetAnotherRandom(arg0 *countries.Country) *countries.Country {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAnotherRandom", arg0)
+	ret0, _ := ret[0].(*countries.Country)
+	return ret0
+}
+
+// GetAnotherRandom indicates an expected call of GetAnotherRandom.
+func (mr *MockCountriesMockRecorder) GetAnotherRandom(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAnotherRandom", reflect.TypeOf((*MockCountries)(nil).GetAnotherRandom), arg0)
+}
+
+// GetRandom mocks base method.
+func (m *MockCountries) GetRandom() *countries.Country {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRandom")
+	ret0, _ := ret[0].(*countries.Country)
+	return ret0
+}
+
+// GetRandom indicates an expected call of GetRandom.
+func (mr *MockCountriesMockRecorder) GetRandom() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRandom", reflect.TypeOf((*MockCountries)(nil).GetRandom))
 }
