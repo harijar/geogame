@@ -29,9 +29,11 @@ const (
 	HemisphereLongID = 18
 	LocationLatID    = 19
 	LocationLongID   = 20
+	IslandID         = 21
+	LandlockedID     = 22
 
 	StaticCount = 17
-	Count       = 21
+	Count       = 23
 )
 
 type Prompts struct {
