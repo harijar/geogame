@@ -7,7 +7,6 @@ import (
 	"github.com/harijar/geogame/internal/service/prompts"
 	"net/http"
 	"strconv"
-	"strings"
 )
 
 type GuessResponse struct {
@@ -17,7 +16,13 @@ type GuessResponse struct {
 }
 
 func (a *V1) gameGuess(c *gin.Context) {
-	countryGot := strings.ToLower(c.PostForm("country"))
+	var countryGotByte []byte
+	_, err := c.Request.Body.Read(countryGotByte)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, &gin.H{"error": "missing country input"})
+	}
+
+	countryGot := string(countryGotByte)
 	if countryGot == "" {
 		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, &gin.H{"error": "missing country input"})
 		return
