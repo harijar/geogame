@@ -22,12 +22,13 @@ async function startGame() {
     clearPrompts();
 }
 
-async function guess(text){ // should execute on guess button clicked event
-    const data = await GuessGameRequest(text);
+async function guess(){
+    let guess = document.getElementById("country").value
+    const data = await GuessGameRequest(guess);
     if (data === null) { // game hasn't started
         await startGame();
         return;
-    } else if (data['ok']) { // country guessed
+    } else if (data['right']) { // country guessed
         prompts = [];
         showCountryGuessed(data['country']);
     } else if (data['country']) { // tries limit exceeded
