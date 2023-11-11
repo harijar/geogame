@@ -43,17 +43,25 @@ async function guess(){
 }
 
 function showPrompt(text) {
-    // TODO: implement, should add new prompt on page
+    document.append(`<p style="text-align: center">${text}</p>`)
 }
 
 function showCountryGuessed(country) {
-    // TODO: implement, should show message about successfully country guess
+    document.append(`<p style="text-align: center">You guessed the country! It was ${country}.</p>
+        <button>Play again</button>
+        <button>To the main page</button>`)
 }
 
 function showTriesExceeded(country) {
-    // TODO: implement, should show message about tries exceeded and show country
+    document.append(`<p style="text-align: center">The country was ${country}.</p>
+        <button>Play again</button>
+        <button>To the main page</button>`)
 }
 
 function clearPrompts() {
-    // TODO: implement, should delete all prompts from page
+    const fs = require('fs')
+    fs.readFile('game.html', 'utf-8', (err, data) => {
+        if (err) throw err;
+        document.write(data);
+    })
 }
