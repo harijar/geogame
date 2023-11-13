@@ -7,6 +7,7 @@ window.onload = async function() {
     await init();
     let guessButton = document.getElementById("guessButton");
     let playAgainButton = document.getElementById("playAgainButton");
+    let mainMenuButton = document.getElementById("mainMenuButton");
     guessButton.onclick = async function() {
         if (prompts.length > 0) {
             await guess();
@@ -16,6 +17,9 @@ window.onload = async function() {
     }
     playAgainButton.onclick = async function() {
         window.location.reload();
+    }
+    mainMenuButton.onclick = async function() {
+        window.location.href = 'index.html'
     }
 };
 
@@ -56,10 +60,13 @@ function showPrompt(text) {
     prompt.style.textAlign = "center";
     prompt.textContent = text;
     document.getElementById("promptsDiv").append(prompt);
+    let country = document.getElementById("country");
+    country.value = "";
+    country.autofocus = true;
 }
 
 function showCountryGuessed(country) {
-    let notify = document.createElement("p");
+    let notify = document.createElement("b");
     notify.textContent = `You guessed the country! It was ${country}.`;
     document.getElementById("promptsDiv").append(notify);
 }
@@ -73,4 +80,5 @@ function showTriesExceeded(country) {
 function gameEnded() {
     document.getElementById("guessButton").style.display = 'none';
     document.getElementById("playAgainButton").style.display = 'inline';
+    document.getElementById("mainMenuButton").style.display = 'inline';
 }
