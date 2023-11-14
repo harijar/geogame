@@ -40,6 +40,14 @@ func main() {
 
 	promptsService := prompts.New(countriesRepo)
 
-	api := v1.New(countriesRepo, promptsService, cfg.TriesLimit)
+	api := v1.New(countriesRepo, promptsService, cfg.TriesLimit, &v1.ServerConfig{
+		CookieDomain:         cfg.CookieDomain,
+		CookieSecure:         cfg.CookieSecure,
+		CORSEnabled:          cfg.CORSEnabled,
+		CORSAllowAllOrigins:  cfg.CORSAllowAllOrigins,
+		CORSOrigins:          cfg.CORSOrigins,
+		CORSAllowCredentials: cfg.CORSAllowCredentials,
+		SameSite:             cfg.SameSite,
+	})
 	panic(api.Run(cfg.ListenAddr))
 }

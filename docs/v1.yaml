@@ -47,7 +47,7 @@ paths:
             schema:
               type: object
               properties:
-                prompt:
+                guess:
                   type: string
                   description: user's guess
       responses:

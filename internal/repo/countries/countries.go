@@ -24,11 +24,17 @@ func (c *Countries) Init(ctx context.Context) error {
 		Relation("Funfacts").
 		Order("id ASC").
 		Scan(ctx)
-	return err
+	if err != nil {
+		return err
+	}
+	if len(c.cache) < 2 {
+		return errors.New("countries count in db less than 2")
+	}
+	return nil
 }
 
 func (c *Countries) Get(id int) *Country {
-	if id > 0 && id < len(c.cache) {
+	if id > 0 && id <= len(c.cache) {
 		return c.cache[id-1]
 	}
 	return nil

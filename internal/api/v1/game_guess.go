@@ -7,8 +7,11 @@ import (
 	"github.com/harijar/geogame/internal/service/prompts"
 	"net/http"
 	"strconv"
-	"strings"
 )
+
+type GuessRequest struct {
+	Guess string `json:"guess"`
+}
 
 type GuessResponse struct {
 	Right   bool   `json:"right"`
@@ -17,8 +20,9 @@ type GuessResponse struct {
 }
 
 func (a *V1) gameGuess(c *gin.Context) {
-	countryGot := strings.ToLower(c.PostForm("country"))
-	if countryGot == "" {
+	request := GuessRequest{}
+	err := c.BindJSON(&request)
+	if err != nil || request.Guess == "" {
 		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, &gin.H{"error": "missing country input"})
 		return
 	}
@@ -39,17 +43,6 @@ func (a *V1) gameGuess(c *gin.Context) {
 		return
 	}
 
-	response := GuessResponse{}
-	for _, alias := range country.Aliases {
-		if levenshtein.ComputeDistance(countryGot, alias) <= 1 {
-			response.Right = true
-			response.Country = country.Name
-			c.JSON(200, &response)
-			return
-		}
-	}
-	response.Right = false
-
 	promptsStr, err := c.Cookie("prompts")
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusNotFound, &gin.H{"error": "game has not started"})
@@ -62,8 +55,21 @@ func (a *V1) gameGuess(c *gin.Context) {
 		return
 	}
 
+	response := GuessResponse{}
+	for _, alias := range country.Aliases {
+		if levenshtein.ComputeDistance(request.Guess, alias) <= 1 {
+			response.Right = true
+			response.Country = country.Name
+			a.setCookie(c, "prompts", "", true)
+			c.JSON(200, &response)
+			return
+		}
+	}
+	response.Right = false
+
 	if a.triesLimit == len(prev) {
 		response.Country = country.Name
+		a.setCookie(c, "prompts", "", true)
 	} else {
 		prompt, err := a.prompts.GenRandom(country, prev)
 		if err != nil {
@@ -76,7 +82,7 @@ func (a *V1) gameGuess(c *gin.Context) {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
 			return
 		}
-		c.SetCookie("prompts", string(prevOut), 0, "/", c.Request.Host, false, true)
+		a.setCookie(c, "prompts", string(prevOut), false)
 		response.Prompt = prompt.Text
 	}
 	c.JSON(200, &response)

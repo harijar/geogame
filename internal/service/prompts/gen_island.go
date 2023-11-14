@@ -16,5 +16,5 @@ func (p *Prompts) genIsland(c *countries.Country, prev []*Prompt) *Prompt {
 	if c.Island {
 		return &Prompt{ID: IslandID, Text: "This country is an island country"}
 	}
-	return &Prompt{ID: IslandID, Text: "This country is on the continent"}
+	return &Prompt{ID: IslandID, Text: "This country is on continent"}
 }
