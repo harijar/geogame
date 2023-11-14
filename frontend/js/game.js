@@ -1,6 +1,6 @@
 import { StartGameRequest, GuessGameRequest} from "./api.js";
 import { GetPrompts, SavePrompts} from "./storage.js";
-import {GameEnded, ShowPrompt, ShowTriesExceeded, ShowCountryGuessed} from "./ui";
+import {GameEnded, ShowPrompt, ShowTriesExceeded, ShowCountryGuessed} from "./ui.js";
 
 let prompts;
 
@@ -11,8 +11,8 @@ window.onload = async function() {
         ShowPrompt(prompt);
     })
 
-    document.getElementById("guessButton").onclick = async function(e) {
-        const ok = await Guess(e.target.innerText);
+    document.getElementById("guessButton").onclick = async function() {
+        const ok = await Guess(document.getElementById("guessInput").value);
         if (!ok) {
             window.location.reload();
         }
@@ -40,12 +40,12 @@ async function Guess(prompt){
         return false;
     } else if (data['right']) { // country guessed
         prompts = [];
-        GameEnded();
         ShowCountryGuessed(data['country']);
+        GameEnded();
     } else if (data['country']) { // tries limit exceeded
         prompts = [];
-        GameEnded();
         ShowTriesExceeded(data['country']);
+        GameEnded();
     } else if (data['prompt']) { // wrong guess
         const prompt = data['prompt'];
         prompts.push(prompt);

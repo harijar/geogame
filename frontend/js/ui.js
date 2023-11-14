@@ -10,24 +10,26 @@ export function ShowPrompt(text) {
     let prompt = document.createElement("p");
     prompt.style.textAlign = "center";
     prompt.textContent = text;
-    promptsDiv.append(prompt);
+    document.getElementById("promptsDiv").append(prompt);
 
-    guessInput.value = "";
+    document.getElementById("guessInput").value = "";
 }
 
 export function ShowCountryGuessed(country) {
     let notify = document.createElement("b");
+    notify.style.textAlign = "center";
     notify.textContent = `You guessed the country! It was ${country}.`;
-    promptsDiv.append(notify);
+    document.getElementById("promptsDiv").append(notify);
 }
 
 export function ShowTriesExceeded(country) {
     let notify = document.createElement("b");
     notify.textContent = `The country was ${country}.`;
-    promptsDiv.append(notify);
+    notify.style.textAlign = "center";
+    document.getElementById("promptsDiv").append(notify);
 }
 
 export function GameEnded() {
     document.getElementById("guessButton").style.display = 'none';
-    document.getElementById("promptsDiv").style.display = 'inline';
+    document.getElementById("buttonsDiv").style.display = 'inline';
 }
