@@ -5,20 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Guess the country</title>
     <script type="module" src="js/game.js"></script>
+    <script type="module" src="js/ui.js"></script>
 </head>
 <body>
     <h1 style="text-align: center">Guess the country</h1>
     <form style="text-align: center">
-        <label for="country">Country:</label>
-        <input type="text" id="country" autofocus>
+        <label for="guessInput">Country:</label>
+        <input type="text" id="guessInput" autofocus>
         <button type="button" id="guessButton">Submit</button>
     </form>
     <div id="promptsDiv" style="text-align: center">
     </div>
-    <div style="text-align: center">
+    <div id="buttonsDiv" style="display: none">
         <br><br>
-        <button type="button" id="playAgainButton" style="display: none">Play again</button>
-        <button type="button" id="mainMenuButton" style="display: none">To the main menu</button>
+        <button type="button" style="text-align: center" id="playAgainButton">Play again</button>
+        <button type="button" style="text-align: center" id="mainMenuButton">To the main menu</button>
     </div>
 </body>
 </html>
