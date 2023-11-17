@@ -11,25 +11,38 @@ import (
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
 	"github.com/uptrace/bun/driver/pgdriver"
+	"go.uber.org/zap"
 )
 
 func main() {
-	cfg, err := config.New()
+	logger, err := zap.NewDevelopment()
 	if err != nil {
 		panic(err)
+	}
+	sugar := logger.Sugar()
+
+	cfg, err := config.New()
+	if err != nil {
+		sugar.Fatal(err)
 	}
 
 	err = repo.Migrate(cfg.PostgresURL)
 	if err != nil {
-		panic(err)
+		if err.Error() != "no change" {
+			sugar.Fatal(err)
+		}
+		sugar.Debug("No change to database")
+	} else {
+		sugar.Debug("Migrations carried out successfully")
 	}
 
 	conn := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(cfg.PostgresURL)))
 	db := bun.NewDB(conn, pgdialect.New())
 	err = db.Ping()
 	if err != nil {
-		panic(err)
+		sugar.Fatal("Failed to connect to database: ", err)
 	}
+	sugar.Info("Connected to database")
 
 	countriesRepo := countries.New(db)
 	ctx := context.Background()
@@ -38,8 +51,7 @@ func main() {
 		panic(err)
 	}
 
-	promptsService := prompts.New(countriesRepo)
-
+	promptsService := prompts.New(countriesRepo, sugar.With("service", "prompts"))
 	api := v1.New(countriesRepo, promptsService, cfg.TriesLimit, &v1.ServerConfig{
 		CookieDomain:         cfg.CookieDomain,
 		CookieSecure:         cfg.CookieSecure,
@@ -48,6 +60,6 @@ func main() {
 		CORSOrigins:          cfg.CORSOrigins,
 		CORSAllowCredentials: cfg.CORSAllowCredentials,
 		SameSite:             cfg.SameSite,
-	})
-	panic(api.Run(cfg.ListenAddr))
+	}, sugar.With("api", "v1"))
+	sugar.Fatal(api.Run(cfg.ListenAddr))
 }

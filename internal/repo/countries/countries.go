@@ -4,12 +4,14 @@ import (
 	"context"
 	"errors"
 	"github.com/uptrace/bun"
+	"go.uber.org/zap"
 	"math/rand"
 )
 
 type Countries struct {
-	db    *bun.DB
-	cache []*Country
+	db     *bun.DB
+	cache  []*Country
+	logger *zap.SugaredLogger
 }
 
 func New(db *bun.DB) *Countries {
@@ -46,7 +48,7 @@ func (c *Countries) GetRandom() *Country {
 
 func (c *Countries) Create(country *Country) error {
 	// TODO: implement
-	panic(errors.New("unimplemented"))
+	return errors.New("unimplemented")
 }
 
 func (c *Countries) GetAnotherRandom(country *Country) *Country {

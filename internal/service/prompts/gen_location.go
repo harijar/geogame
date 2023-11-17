@@ -25,11 +25,13 @@ func (p *Prompts) genLocationLat(c *countries.Country, prev []*Prompt) *Prompt {
 
 	if c.Southernmost > country.Northernmost { // current country is to the north
 		if hemisphere == true && country.HemisphereLat != countries.Northern && c.HemisphereLat != countries.Southern {
+			p.logger.Debugf("Already got hemisphere information about %s, aborting comparison with %s in genLocationLat", c.Name, country.Name)
 			return nil
 		}
 		prompt.Text = fmt.Sprintf("This country is located north to %s", country.Name)
 	} else if c.Northernmost < country.Southernmost { // current country is to the south
 		if hemisphere == true && country.HemisphereLat != countries.Southern && c.HemisphereLat != countries.Northern {
+			p.logger.Debugf("Already got hemisphere information about %s, aborting comparison with %s in genLocationLat", c.Name, country.Name)
 			return nil
 		}
 		prompt.Text = fmt.Sprintf("This country is located south to %s", country.Name)
@@ -55,11 +57,13 @@ func (p *Prompts) genLocationLong(c *countries.Country, prev []*Prompt) *Prompt 
 
 	if c.Westernmost > country.Easternmost { // current country is to the east
 		if hemisphere == true && country.HemisphereLong != countries.Eastern && c.HemisphereLong != countries.Western {
+			p.logger.Debugf("Already got hemisphere information about %s, aborting comparison with %s in genLocationLong", c.Name, country.Name)
 			return nil
 		}
 		prompt.Text = fmt.Sprintf("This country is located east to %s", country.Name)
 	} else if c.Easternmost < country.Westernmost { // current country is to the west
 		if hemisphere == true && country.HemisphereLong != countries.Western && c.HemisphereLong != countries.Eastern {
+			p.logger.Debugf("Already got hemisphere information about %s, aborting comparison with %s in genLocationLong", c.Name, country.Name)
 			return nil
 		}
 		prompt.Text = fmt.Sprintf("This country is located west to %s", country.Name)

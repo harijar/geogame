@@ -6,6 +6,7 @@ import (
 	"github.com/harijar/geogame/internal/repo"
 	"github.com/harijar/geogame/internal/repo/countries"
 	"github.com/harijar/geogame/internal/service/prompts"
+	"go.uber.org/zap"
 	"time"
 )
 
@@ -25,6 +26,7 @@ type V1 struct {
 	prompts      PromptsService
 	triesLimit   int
 	serverConfig *ServerConfig
+	logger       *zap.SugaredLogger
 }
 
 type PromptsService interface {
@@ -32,13 +34,14 @@ type PromptsService interface {
 	GenRandom(c *countries.Country, prev []*prompts.Prompt) (*prompts.Prompt, error)
 }
 
-func New(countries repo.Countries, prompts PromptsService, triesLimit int, serverConfig *ServerConfig) *V1 {
+func New(countries repo.Countries, prompts PromptsService, triesLimit int, serverConfig *ServerConfig, logger *zap.SugaredLogger) *V1 {
 	return &V1{
 		server:       gin.Default(),
 		countries:    countries,
 		prompts:      prompts,
 		triesLimit:   triesLimit,
 		serverConfig: serverConfig,
+		logger:       logger,
 	}
 }
 

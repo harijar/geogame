@@ -1,6 +1,8 @@
 package config
 
-import "github.com/caarlos0/env/v10"
+import (
+	"github.com/caarlos0/env/v10"
+)
 
 type Config struct {
 	PostgresURL          string   `env:"POSTGRES_URL,required"`

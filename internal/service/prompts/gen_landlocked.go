@@ -9,6 +9,7 @@ func (p *Prompts) genLandlocked(c *countries.Country, prev []*Prompt) *Prompt {
 			return nil
 		case IslandID:
 			if c.Island {
+				p.logger.Debugf("%s is already an island country, aborting genLandlocked", c.Name)
 				return nil
 			}
 		}
