@@ -7,6 +7,7 @@ import (
 	"github.com/harijar/geogame/internal/service/prompts"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 type GuessRequest struct {
@@ -28,6 +29,7 @@ func (a *V1) gameGuess(c *gin.Context) {
 		return
 	}
 	a.logger.Debugf("User's guess: %s", request.Guess)
+	request.Guess = strings.ToLower(request.Guess)
 
 	countryID, err := c.Cookie("country")
 	if err != nil {

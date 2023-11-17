@@ -11,7 +11,6 @@ export function ShowPrompt(text) {
     prompt.style.textAlign = "center";
     prompt.textContent = text;
     document.getElementById("promptsDiv").append(prompt);
-
     document.getElementById("guessInput").value = "";
 }
 
@@ -31,5 +30,6 @@ export function ShowTriesExceeded(country) {
 
 export function GameEnded() {
     document.getElementById("guessButton").style.display = 'none';
-    document.getElementById("buttonsDiv").style.display = 'inline';
+    document.getElementById("buttonsGameInterrupted").style.display = 'none';
+    document.getElementById("buttonsGameEnded").style.display = 'inline';
 }

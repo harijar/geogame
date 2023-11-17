@@ -21,7 +21,15 @@ window.onload = async function() {
         window.location.reload();
     }
     document.getElementById("mainMenuButton").onclick = async function() {
-        window.location.href = 'index.html'
+        window.location.href = 'index.html';
+    }
+    document.getElementById("newGameButton").onclick = async function() {
+        SavePrompts([]);
+        window.location.reload();
+    }
+    document.getElementById("stopGameButton").onclick = async function() {
+        SavePrompts([]);
+        window.location.href = 'index.html';
     }
 };
 
