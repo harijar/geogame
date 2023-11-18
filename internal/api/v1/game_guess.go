@@ -28,7 +28,7 @@ func (a *V1) gameGuess(c *gin.Context) {
 		a.logger.Debug("missing country input", zap.Error(err))
 		return
 	}
-	a.logger.Debug("attempt to guess", zap.String("User's guess", request.Guess))
+	a.logger.Debug("attempt to guess", zap.String("userGuess", request.Guess))
 
 	countryID, err := c.Cookie("country")
 	if err != nil {
@@ -72,7 +72,7 @@ func (a *V1) gameGuess(c *gin.Context) {
 			c.JSON(200, &response)
 			a.logger.Debug("user guessed successfully",
 				zap.Bool("userWon", true),
-				zap.Int("triesNumber", len(prev)+1))
+				zap.Int("totalTries", len(prev)+1))
 			return
 		}
 	}
@@ -82,8 +82,8 @@ func (a *V1) gameGuess(c *gin.Context) {
 		response.Country = country.Name
 		a.setCookie(c, "prompts", "", true)
 		a.logger.Debug("user didn't guess",
-			zap.Bool("user won", false),
-			zap.Int("tries number", a.triesLimit))
+			zap.Bool("userWon", false),
+			zap.Int("totalTries", a.triesLimit))
 	} else {
 		prompt, err := a.prompts.GenRandom(country, prev)
 		if err != nil {
@@ -99,7 +99,9 @@ func (a *V1) gameGuess(c *gin.Context) {
 			return
 		}
 		a.setCookie(c, "prompts", string(prevOut), false)
-		a.logger.Debug("next prompt", zap.String("next prompt", prompt.Text))
+		a.logger.Debug("next prompt",
+			zap.String("promptText", prompt.Text),
+			zap.Int("tryNumber", len(prev)))
 		response.Prompt = prompt.Text
 	}
 	c.JSON(200, &response)

@@ -1,6 +1,9 @@
 package prompts
 
-import "github.com/harijar/geogame/internal/repo/countries"
+import (
+	"github.com/harijar/geogame/internal/repo/countries"
+	"go.uber.org/zap"
+)
 
 func (p *Prompts) genIsland(c *countries.Country, prev []*Prompt) *Prompt {
 	for _, pr := range prev {
@@ -9,7 +12,9 @@ func (p *Prompts) genIsland(c *countries.Country, prev []*Prompt) *Prompt {
 			return nil
 		case LandlockedID:
 			if c.Landlocked {
-				p.logger.Debugf("%s is already a landlocked country, aborting genIsland", c.Name)
+				p.logger.Debug("already got landlocked info (true), no need in island info",
+					zap.String("problem", "promptConflict"),
+					zap.Int("promptID", IslandID))
 				return nil
 			}
 		}

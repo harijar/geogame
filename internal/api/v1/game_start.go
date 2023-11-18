@@ -25,8 +25,8 @@ func (a *V1) gameStart(c *gin.Context) {
 		}
 	}
 	a.logger.Debug("current country info",
-		zap.String("country name", country.Name),
-		zap.Int("country id", country.ID))
+		zap.String("countryName", country.Name),
+		zap.Int("countryID", country.ID))
 
 	prompt, err := a.prompts.GenRandom(country, []*prompts.Prompt{})
 	if err != nil {
@@ -34,7 +34,9 @@ func (a *V1) gameStart(c *gin.Context) {
 		a.logger.Error("prompt generation error", zap.Error(err))
 		return
 	}
-	a.logger.Debug("first prompt", zap.String("prompt text", prompt.Text))
+	a.logger.Debug("first prompt",
+		zap.String("promptText", prompt.Text),
+		zap.Int("tryNumber", 1))
 
 	promptsOut, err := json.Marshal([]*prompts.Prompt{prompt})
 	if err != nil {
