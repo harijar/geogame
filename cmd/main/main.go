@@ -22,7 +22,11 @@ func main() {
 	}
 
 	loggerConfig := zap.NewDevelopmentConfig()
-	loggerConfig.Level = zap.NewAtomicLevelAt(zapcore.Level(cfg.LogLevel))
+	level, err := zapcore.ParseLevel(cfg.LogLevel)
+	if err != nil {
+		panic(err)
+	}
+	loggerConfig.Level = zap.NewAtomicLevelAt(level)
 	logger, err := loggerConfig.Build()
 	if err != nil {
 		panic(err)
