@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/harijar/geogame/internal/repo/countries"
 	"github.com/harijar/geogame/internal/service/prompts"
+	"go.uber.org/zap"
 	"net/http"
 	"strconv"
 )
@@ -23,20 +24,22 @@ func (a *V1) gameStart(c *gin.Context) {
 			country = nil
 		}
 	}
-	a.logger.Debugf("Current country is %s with ID %v", country.Name, country.ID)
+	a.logger.Debug("current country info",
+		zap.String("country name", country.Name),
+		zap.Int("country id", country.ID))
 
 	prompt, err := a.prompts.GenRandom(country, []*prompts.Prompt{})
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
-		a.logger.Error(err)
+		a.logger.Error("prompt generation error", zap.Error(err))
 		return
 	}
-	a.logger.Debugf("First prompt: %s", prompt.Text)
+	a.logger.Debug("first prompt", zap.String("prompt text", prompt.Text))
 
 	promptsOut, err := json.Marshal([]*prompts.Prompt{prompt})
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
-		a.logger.Error(err)
+		a.logger.Error("prompt json encoding error", zap.Error(err))
 		return
 	}
 	a.setCookie(c, "country", strconv.Itoa(country.ID), false)

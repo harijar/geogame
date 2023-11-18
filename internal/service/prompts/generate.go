@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/harijar/geogame/internal/repo/countries"
+	"go.uber.org/zap"
 	"math/rand"
 )
 
@@ -13,7 +14,7 @@ func (p *Prompts) GenRandom(c *countries.Country, prev []*Prompt) (*Prompt, erro
 		if promptID < StaticCount {
 			for _, prompt := range prev {
 				if prompt.ID == promptID {
-					p.logger.Debugf("Prompt #%v is already present, generating a new one", promptID)
+					p.logger.Debug("prompt is already present", zap.Int("prompt id", promptID))
 					promptID = -1
 					break
 				}
@@ -27,7 +28,7 @@ func (p *Prompts) GenRandom(c *countries.Country, prev []*Prompt) (*Prompt, erro
 			if prompt != nil {
 				return prompt, nil
 			}
-			p.logger.Debugf("Unable to get prompt #%v for this country (Gen() returned nil), generating a new one", promptID)
+			p.logger.Debug("unable to get prompt: Gen() returned nil", zap.Int("prompt id", promptID))
 		}
 	}
 	return nil, errors.New("failed to find prompt")
@@ -53,7 +54,7 @@ func (p *Prompts) Gen(id int, c *countries.Country, prev []*Prompt) (*Prompt, er
 			random := rand.Intn(len(c.EthnicGroups))
 			text = formatEthnicGroup(c.EthnicGroups[random])
 		} else {
-			p.logger.Debugf("No ethnic groups available for this country")
+			p.logger.Debug("No ethnic groups available for this country")
 		}
 	case LanguageID:
 		if len(c.Languages) > 0 {

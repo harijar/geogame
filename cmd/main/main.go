@@ -21,35 +21,31 @@ func main() {
 		panic(err)
 	}
 
-	loggerConfig := zap.NewDevelopmentConfig()
+	loggerConfig := zap.NewProductionConfig()
 	level, err := zapcore.ParseLevel(cfg.LogLevel)
 	if err != nil {
 		panic(err)
 	}
 	loggerConfig.Level = zap.NewAtomicLevelAt(level)
-	logger, err := loggerConfig.Build()
-	if err != nil {
-		panic(err)
-	}
-	sugar := logger.Sugar()
+	logger := zap.Must(loggerConfig.Build())
 
 	err = repo.Migrate(cfg.PostgresURL)
 	if err != nil {
 		if err.Error() != "no change" {
-			sugar.Fatal(err)
+			logger.Fatal("Migration error: ", zap.Error(err))
 		}
-		sugar.Debug("No change to database")
+		logger.Debug("No change to database")
 	} else {
-		sugar.Debug("Migrations carried out successfully")
+		logger.Debug("Migrations carried out successfully")
 	}
 
 	conn := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(cfg.PostgresURL)))
 	db := bun.NewDB(conn, pgdialect.New())
 	err = db.Ping()
 	if err != nil {
-		sugar.Fatal("Failed to connect to database: ", err)
+		logger.Fatal("Failed to connect to database: ", zap.Error(err))
 	}
-	sugar.Info("Connected to database")
+	logger.Info("Connected to database")
 
 	countriesRepo := countries.New(db)
 	ctx := context.Background()
@@ -58,7 +54,7 @@ func main() {
 		panic(err)
 	}
 
-	promptsService := prompts.New(countriesRepo, sugar.With("service", "prompts"))
+	promptsService := prompts.New(countriesRepo, logger.With(zap.String("service", "prompts")))
 	api := v1.New(countriesRepo, promptsService, cfg.TriesLimit, &v1.ServerConfig{
 		CookieDomain:         cfg.CookieDomain,
 		CookieSecure:         cfg.CookieSecure,
@@ -67,6 +63,6 @@ func main() {
 		CORSOrigins:          cfg.CORSOrigins,
 		CORSAllowCredentials: cfg.CORSAllowCredentials,
 		SameSite:             cfg.SameSite,
-	}, sugar.With("api", "v1"))
-	sugar.Fatal(api.Run(cfg.ListenAddr))
+	}, logger.With(zap.String("api", "v1")))
+	logger.Fatal("Server shut down: ", zap.Error(api.Run(cfg.ListenAddr)))
 }

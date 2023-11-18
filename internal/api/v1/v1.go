@@ -26,7 +26,7 @@ type V1 struct {
 	prompts      PromptsService
 	triesLimit   int
 	serverConfig *ServerConfig
-	logger       *zap.SugaredLogger
+	logger       *zap.Logger
 }
 
 type PromptsService interface {
@@ -34,7 +34,7 @@ type PromptsService interface {
 	GenRandom(c *countries.Country, prev []*prompts.Prompt) (*prompts.Prompt, error)
 }
 
-func New(countries repo.Countries, prompts PromptsService, triesLimit int, serverConfig *ServerConfig, logger *zap.SugaredLogger) *V1 {
+func New(countries repo.Countries, prompts PromptsService, triesLimit int, serverConfig *ServerConfig, logger *zap.Logger) *V1 {
 	return &V1{
 		server:       gin.Default(),
 		countries:    countries,
