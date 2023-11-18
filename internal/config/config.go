@@ -15,6 +15,7 @@ type Config struct {
 	CORSOrigins          []string `env:"CORS_ORIGINS"`
 	CORSAllowCredentials bool     `env:"CORS_ALLOW_CREDENTIALS"`
 	SameSite             int      `env:"SAME_SITE,required"`
+	LogLevel             int      `env:"LOG_LEVEL,required"`
 }
 
 func New() (*Config, error) {

@@ -13,6 +13,7 @@ func (p *Prompts) GenRandom(c *countries.Country, prev []*Prompt) (*Prompt, erro
 		if promptID < StaticCount {
 			for _, prompt := range prev {
 				if prompt.ID == promptID {
+					p.logger.Debugf("Prompt #%v is already present, generating a new one", promptID)
 					promptID = -1
 					break
 				}
@@ -26,6 +27,7 @@ func (p *Prompts) GenRandom(c *countries.Country, prev []*Prompt) (*Prompt, erro
 			if prompt != nil {
 				return prompt, nil
 			}
+			p.logger.Debugf("Unable to get prompt #%v for this country (Gen() returned nil), generating a new one", promptID)
 		}
 	}
 	return nil, errors.New("failed to find prompt")
@@ -50,16 +52,22 @@ func (p *Prompts) Gen(id int, c *countries.Country, prev []*Prompt) (*Prompt, er
 		if len(c.EthnicGroups) > 0 {
 			random := rand.Intn(len(c.EthnicGroups))
 			text = formatEthnicGroup(c.EthnicGroups[random])
+		} else {
+			p.logger.Debugf("No ethnic groups available for this country")
 		}
 	case LanguageID:
 		if len(c.Languages) > 0 {
 			random := rand.Intn(len(c.Languages))
 			text = formatLanguage(c.Languages[random])
+		} else {
+			p.logger.Debugf("No languages available for this country")
 		}
 	case FunfactID:
 		if len(c.Funfacts) > 0 {
 			random := rand.Intn(len(c.Funfacts))
 			text = formatFunFact(c.Funfacts[random])
+		} else {
+			p.logger.Debugf("No funfacts available for this country")
 		}
 	case AreaID:
 		text = formatArea(c)

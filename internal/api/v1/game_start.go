@@ -2,7 +2,6 @@ package v1
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/harijar/geogame/internal/repo/countries"
 	"github.com/harijar/geogame/internal/service/prompts"
@@ -15,7 +14,6 @@ type StartResponse struct {
 }
 
 func (a *V1) gameStart(c *gin.Context) {
-	fmt.Println()
 	a.logger.Debug("Game started")
 	prevCountry, _ := c.Cookie("country")
 	var country *countries.Country

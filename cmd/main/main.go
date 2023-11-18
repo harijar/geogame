@@ -12,19 +12,22 @@ import (
 	"github.com/uptrace/bun/dialect/pgdialect"
 	"github.com/uptrace/bun/driver/pgdriver"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 func main() {
-	logger, err := zap.NewDevelopment()
+	cfg, err := config.New()
+	if err != nil {
+		panic(err)
+	}
+
+	loggerConfig := zap.NewDevelopmentConfig()
+	loggerConfig.Level = zap.NewAtomicLevelAt(zapcore.Level(cfg.LogLevel))
+	logger, err := loggerConfig.Build()
 	if err != nil {
 		panic(err)
 	}
 	sugar := logger.Sugar()
-
-	cfg, err := config.New()
-	if err != nil {
-		sugar.Fatal(err)
-	}
 
 	err = repo.Migrate(cfg.PostgresURL)
 	if err != nil {
