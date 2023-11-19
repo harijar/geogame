@@ -11,6 +11,8 @@ import (
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
 	"github.com/uptrace/bun/driver/pgdriver"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 func main() {
@@ -19,17 +21,31 @@ func main() {
 		panic(err)
 	}
 
-	err = repo.Migrate(cfg.PostgresURL)
+	loggerConfig := zap.NewProductionConfig()
+	level, err := zapcore.ParseLevel(cfg.LogLevel)
 	if err != nil {
 		panic(err)
+	}
+	loggerConfig.Level = zap.NewAtomicLevelAt(level)
+	logger := zap.Must(loggerConfig.Build())
+
+	err = repo.Migrate(cfg.PostgresURL)
+	if err != nil {
+		if err.Error() != "no change" {
+			logger.Fatal("Migration error: ", zap.Error(err))
+		}
+		logger.Debug("No change to database")
+	} else {
+		logger.Debug("Migrations carried out successfully")
 	}
 
 	conn := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(cfg.PostgresURL)))
 	db := bun.NewDB(conn, pgdialect.New())
 	err = db.Ping()
 	if err != nil {
-		panic(err)
+		logger.Fatal("Failed to connect to database: ", zap.Error(err))
 	}
+	logger.Info("Connected to database")
 
 	countriesRepo := countries.New(db)
 	ctx := context.Background()
@@ -38,8 +54,7 @@ func main() {
 		panic(err)
 	}
 
-	promptsService := prompts.New(countriesRepo)
-
+	promptsService := prompts.New(countriesRepo, logger.With(zap.String("service", "prompts")))
 	api := v1.New(countriesRepo, promptsService, cfg.TriesLimit, &v1.ServerConfig{
 		CookieDomain:         cfg.CookieDomain,
 		CookieSecure:         cfg.CookieSecure,
@@ -48,6 +63,6 @@ func main() {
 		CORSOrigins:          cfg.CORSOrigins,
 		CORSAllowCredentials: cfg.CORSAllowCredentials,
 		SameSite:             cfg.SameSite,
-	})
-	panic(api.Run(cfg.ListenAddr))
+	}, logger.With(zap.String("api", "v1")))
+	logger.Fatal("Server shut down: ", zap.Error(api.Run(cfg.ListenAddr)))
 }

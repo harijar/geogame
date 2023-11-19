@@ -1,6 +1,9 @@
 package prompts
 
-import "github.com/harijar/geogame/internal/repo/countries"
+import (
+	"github.com/harijar/geogame/internal/repo/countries"
+	"go.uber.org/zap"
+)
 
 func (p *Prompts) genHemisphereLat(c *countries.Country, prev []*Prompt) *Prompt {
 	prompt := &Prompt{ID: HemisphereLatID}
@@ -23,6 +26,10 @@ func (p *Prompts) genHemisphereLat(c *countries.Country, prev []*Prompt) *Prompt
 			}
 			// if current country is to the north and another country is in northern hemisphere
 			if country.HemisphereLat == countries.Northern && c.Southernmost > country.Northernmost {
+				p.logger.Debug("already compared location to another country, no need in hemisphere info",
+					zap.String("problem", "promptConflict"),
+					zap.Int("promptID", HemisphereLatID),
+					zap.String("anotherCountry", country.Name))
 				return nil
 			}
 		}
@@ -36,6 +43,10 @@ func (p *Prompts) genHemisphereLat(c *countries.Country, prev []*Prompt) *Prompt
 			}
 			// if current country is to the south and another country is in southern hemisphere
 			if country.HemisphereLat == countries.Southern && c.Northernmost < country.Southernmost {
+				p.logger.Debug("already compared location to another country, no need in hemisphere info",
+					zap.String("problem", "promptConflict"),
+					zap.Int("promptID", HemisphereLatID),
+					zap.String("anotherCountry", country.Name))
 				return nil
 			}
 		}
@@ -70,6 +81,10 @@ func (p *Prompts) genHemisphereLong(c *countries.Country, prev []*Prompt) *Promp
 			}
 			// if current country is to the east and another country is in eastern hemisphere
 			if country.HemisphereLat == countries.Eastern && c.Westernmost > country.Easternmost {
+				p.logger.Debug("already compared location to another country, no need in hemisphere info",
+					zap.String("problem", "promptConflict"),
+					zap.Int("promptID", HemisphereLongID),
+					zap.String("anotherCountry", country.Name))
 				return nil
 			}
 		}
@@ -83,6 +98,10 @@ func (p *Prompts) genHemisphereLong(c *countries.Country, prev []*Prompt) *Promp
 			}
 			// if current country is to the west and another country is in western hemisphere
 			if country.HemisphereLat == countries.Western && c.Easternmost < country.Westernmost {
+				p.logger.Debug("already compared location to another country, no need in hemisphere info",
+					zap.String("problem", "promptConflict"),
+					zap.Int("promptID", HemisphereLongID),
+					zap.String("anotherCountry", country.Name))
 				return nil
 			}
 		}

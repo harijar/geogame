@@ -1,6 +1,8 @@
 package config
 
-import "github.com/caarlos0/env/v10"
+import (
+	"github.com/caarlos0/env/v10"
+)
 
 type Config struct {
 	PostgresURL          string   `env:"POSTGRES_URL,required"`
@@ -13,6 +15,7 @@ type Config struct {
 	CORSOrigins          []string `env:"CORS_ORIGINS"`
 	CORSAllowCredentials bool     `env:"CORS_ALLOW_CREDENTIALS"`
 	SameSite             int      `env:"SAME_SITE,required"`
+	LogLevel             string   `env:"LOG_LEVEL,required"`
 }
 
 func New() (*Config, error) {

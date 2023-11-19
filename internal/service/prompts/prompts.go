@@ -2,6 +2,7 @@ package prompts
 
 import (
 	"github.com/harijar/geogame/internal/repo"
+	"go.uber.org/zap"
 )
 
 const (
@@ -38,6 +39,7 @@ const (
 
 type Prompts struct {
 	countriesRepo repo.Countries
+	logger        *zap.Logger
 }
 
 type Prompt struct {
@@ -46,6 +48,9 @@ type Prompt struct {
 	AnotherCountryID int    `json:"another_country_id"`
 }
 
-func New(countriesRepo repo.Countries) *Prompts {
-	return &Prompts{countriesRepo: countriesRepo}
+func New(countriesRepo repo.Countries, logger *zap.Logger) *Prompts {
+	return &Prompts{
+		countriesRepo: countriesRepo,
+		logger:        logger,
+	}
 }
