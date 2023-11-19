@@ -17,16 +17,22 @@ type StartResponse struct {
 func (a *V1) gameStart(c *gin.Context) {
 	a.logger.Debug("Game started")
 	prevCountry, _ := c.Cookie("country")
+	a.logger.Debug("got previous country",
+		zap.String("prevCountryID", prevCountry))
+
 	var country *countries.Country
 	for country == nil {
 		country = a.countries.GetRandom()
 		if strconv.FormatInt(int64(country.ID), 10) == prevCountry {
+			a.logger.Debug("previous country ID matched with current country ID",
+				zap.String("prevCountryID", prevCountry),
+				zap.Int("currCountryID", country.ID))
 			country = nil
 		}
 	}
 	a.logger.Debug("current country info",
-		zap.String("countryName", country.Name),
-		zap.Int("countryID", country.ID))
+		zap.String("currCountryName", country.Name),
+		zap.Int("currCountryID", country.ID))
 
 	prompt, err := a.prompts.GenRandom(country, []*prompts.Prompt{})
 	if err != nil {

@@ -25,7 +25,7 @@ func (a *V1) gameGuess(c *gin.Context) {
 	err := c.BindJSON(&request)
 	if err != nil || request.Guess == "" {
 		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, &gin.H{"error": "missing country input"})
-		a.logger.Debug("missing country input", zap.Error(err))
+		a.logger.Warn("missing country input", zap.Error(err))
 		return
 	}
 	a.logger.Debug("attempt to guess", zap.String("userGuess", request.Guess))
@@ -33,33 +33,33 @@ func (a *V1) gameGuess(c *gin.Context) {
 	countryID, err := c.Cookie("country")
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusNotFound, &gin.H{"error": "game has not started"})
-		a.logger.Debug("game has not started", zap.Error(err))
+		a.logger.Warn("game has not started", zap.Error(err))
 		return
 	}
 	countryIDi, err := strconv.Atoi(countryID)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, &gin.H{"error": "invalid country id"})
-		a.logger.Debug("invalid country id", zap.Error(err))
+		a.logger.Warn("invalid country id", zap.Error(err))
 		return
 	}
 	country := a.countries.Get(countryIDi)
 	if country == nil {
 		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, &gin.H{"error": "invalid country id"})
-		a.logger.Debug("invalid country id", zap.String("error", "could not get country id from database"))
+		a.logger.Warn("invalid country id", zap.String("error", "could not get country id from database"))
 		return
 	}
 
 	promptsStr, err := c.Cookie("prompts")
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusNotFound, &gin.H{"error": "game has not started"})
-		a.logger.Debug("game has not started", zap.Error(err))
+		a.logger.Warn("game has not started", zap.Error(err))
 		return
 	}
 	prev := make([]*prompts.Prompt, 0)
 	err = json.Unmarshal([]byte(promptsStr), &prev)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, &gin.H{"error": "invalid prompts"})
-		a.logger.Debug("invalid prompts in cookie", zap.Error(err))
+		a.logger.Warn("invalid prompts in cookie", zap.Error(err))
 		return
 	}
 
