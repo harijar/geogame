@@ -2,6 +2,7 @@ package v1
 
 import (
 	"github.com/gin-contrib/cors"
+	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
 	"github.com/harijar/geogame/internal/repo"
 	"github.com/harijar/geogame/internal/repo/countries"
@@ -26,7 +27,7 @@ type V1 struct {
 	prompts      PromptsService
 	triesLimit   int
 	serverConfig *ServerConfig
-	logger       *zap.SugaredLogger
+	logger       *zap.Logger
 }
 
 type PromptsService interface {
@@ -34,7 +35,7 @@ type PromptsService interface {
 	GenRandom(c *countries.Country, prev []*prompts.Prompt) (*prompts.Prompt, error)
 }
 
-func New(countries repo.Countries, prompts PromptsService, triesLimit int, serverConfig *ServerConfig, logger *zap.SugaredLogger) *V1 {
+func New(countries repo.Countries, prompts PromptsService, triesLimit int, serverConfig *ServerConfig, logger *zap.Logger) *V1 {
 	return &V1{
 		server:       gin.Default(),
 		countries:    countries,
@@ -60,6 +61,7 @@ func (a *V1) Run(addr string) error {
 		}
 		a.server.Use(cors.New(config))
 	}
+	a.server.Use(ginzap.Ginzap(a.logger, time.RFC3339, true))
 	a.registerRoutes()
 	return a.server.Run(addr)
 }

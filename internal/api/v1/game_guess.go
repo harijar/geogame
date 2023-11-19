@@ -5,6 +5,7 @@ import (
 	"github.com/agnivade/levenshtein"
 	"github.com/gin-gonic/gin"
 	"github.com/harijar/geogame/internal/service/prompts"
+	"go.uber.org/zap"
 	"net/http"
 	"strconv"
 	"strings"
@@ -25,42 +26,41 @@ func (a *V1) gameGuess(c *gin.Context) {
 	err := c.BindJSON(&request)
 	if err != nil || request.Guess == "" {
 		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, &gin.H{"error": "missing country input"})
-		a.logger.Debug("Client side error: missing country input", err)
+		a.logger.Warn("missing country input", zap.Error(err))
 		return
 	}
-	a.logger.Debugf("User's guess: %s", request.Guess)
-	request.Guess = strings.ToLower(request.Guess)
+	a.logger.Debug("attempt to guess", zap.String("userGuess", request.Guess))
 
 	countryID, err := c.Cookie("country")
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusNotFound, &gin.H{"error": "game has not started"})
-		a.logger.Debug("Client side error: game has not started", err)
+		a.logger.Warn("game has not started", zap.Error(err))
 		return
 	}
 	countryIDi, err := strconv.Atoi(countryID)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, &gin.H{"error": "invalid country id"})
-		a.logger.Debug("Client side error: invalid country id", err)
+		a.logger.Warn("invalid country id", zap.Error(err))
 		return
 	}
 	country := a.countries.Get(countryIDi)
 	if country == nil {
 		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, &gin.H{"error": "invalid country id"})
-		a.logger.Debug("Client side error: invalid country id, could not get it from database")
+		a.logger.Warn("invalid country id", zap.String("error", "could not get country id from database"))
 		return
 	}
 
 	promptsStr, err := c.Cookie("prompts")
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusNotFound, &gin.H{"error": "game has not started"})
-		a.logger.Debug("Client side error: game has not started", err)
+		a.logger.Warn("game has not started", zap.Error(err))
 		return
 	}
 	prev := make([]*prompts.Prompt, 0)
 	err = json.Unmarshal([]byte(promptsStr), &prev)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, &gin.H{"error": "invalid prompts"})
-		a.logger.Debug("Client side error: invalid prompts in cookie", err)
+		a.logger.Warn("invalid prompts in cookie", zap.Error(err))
 		return
 	}
 
@@ -71,7 +71,9 @@ func (a *V1) gameGuess(c *gin.Context) {
 			response.Country = country.Name
 			a.setCookie(c, "prompts", "", true)
 			c.JSON(200, &response)
-			a.logger.Debugf("User guessed the country in %v tries", len(prev)+1)
+			a.logger.Debug("user guessed successfully",
+				zap.Bool("userWon", true),
+				zap.Int("totalTries", len(prev)+1))
 			return
 		}
 	}
@@ -80,23 +82,27 @@ func (a *V1) gameGuess(c *gin.Context) {
 	if a.triesLimit == len(prev) {
 		response.Country = country.Name
 		a.setCookie(c, "prompts", "", true)
-		a.logger.Debugf("User didn't guess the country in %v tries", a.triesLimit)
+		a.logger.Debug("user didn't guess",
+			zap.Bool("userWon", false),
+			zap.Int("totalTries", a.triesLimit))
 	} else {
 		prompt, err := a.prompts.GenRandom(country, prev)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
-			a.logger.Error(err)
+			a.logger.Error("prompt generation error", zap.Error(err))
 			return
 		}
 		prev = append(prev, prompt)
 		prevOut, err := json.Marshal(&prev)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
-			a.logger.Error(err)
+			a.logger.Error("prompt json encoding error", zap.Error(err))
 			return
 		}
 		a.setCookie(c, "prompts", string(prevOut), false)
-		a.logger.Debugf("Next prompt: %s", prompt.Text)
+		a.logger.Debug("next prompt",
+			zap.String("promptText", prompt.Text),
+			zap.Int("tryNumber", len(prev)))
 		response.Prompt = prompt.Text
 	}
 	c.JSON(200, &response)

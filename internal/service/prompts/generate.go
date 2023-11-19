@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/harijar/geogame/internal/repo/countries"
+	"go.uber.org/zap"
 	"math/rand"
 )
 
@@ -13,6 +14,10 @@ func (p *Prompts) GenRandom(c *countries.Country, prev []*Prompt) (*Prompt, erro
 		if promptID < StaticCount {
 			for _, prompt := range prev {
 				if prompt.ID == promptID {
+					p.logger.Debug("prompt is already present",
+						zap.String("problem", "invalidPrompt"),
+						zap.String("cause", "present"),
+						zap.Int("promptID", promptID))
 					promptID = -1
 					break
 				}
@@ -26,6 +31,10 @@ func (p *Prompts) GenRandom(c *countries.Country, prev []*Prompt) (*Prompt, erro
 			if prompt != nil {
 				return prompt, nil
 			}
+			p.logger.Debug("unable to get prompt: Gen() returned nil",
+				zap.String("problem", "invalidPrompt"),
+				zap.String("cause", "nil"),
+				zap.Int("promptID", promptID))
 		}
 	}
 	return nil, errors.New("failed to find prompt")

@@ -39,7 +39,7 @@ const (
 
 type Prompts struct {
 	countriesRepo repo.Countries
-	logger        *zap.SugaredLogger
+	logger        *zap.Logger
 }
 
 type Prompt struct {
@@ -48,7 +48,7 @@ type Prompt struct {
 	AnotherCountryID int    `json:"another_country_id"`
 }
 
-func New(countriesRepo repo.Countries, logger *zap.SugaredLogger) *Prompts {
+func New(countriesRepo repo.Countries, logger *zap.Logger) *Prompts {
 	return &Prompts{
 		countriesRepo: countriesRepo,
 		logger:        logger,
