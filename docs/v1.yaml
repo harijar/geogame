@@ -1,0 +1,107 @@
+openapi: 3.0.0
+info:
+  title: GeoGame V1 API
+  version: 0.1.0
+paths:
+  /game/start:
+    post:
+      summary: Start a new game
+      description: If there is already a started game, it will be restarted. 
+                   If we have information about last(or ongoing) game we should ensure that the new country is different from the previous one.
+      responses:
+        '200':
+          description: First prompt
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  prompt:
+                    type: string
+                    description: first hint
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  /game/guess:
+    post:
+      summary: Guess the country
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                guess:
+                  type: string
+                  description: user's guess
+      responses:
+        '200':
+          description: Guess check result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  right:
+                    type: boolean
+                    description: is the guess right
+                  country:
+                    type: string
+                    nullable: true
+                    description: present when the guess is right or tries limit is exceeded
+                  prompt:
+                    type: string
+                    nullable: true
+                    description: next prompt, present only if the guess is wrong and tries limit is not exceeded
+        '404':
+          description: Endpoint accessed without the game being started
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '422':
+          description: Unable to get previous prompts, missing form input or the country guessed by the game is invalid.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
