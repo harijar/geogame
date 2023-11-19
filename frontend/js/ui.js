@@ -1,17 +1,8 @@
-let promptsDiv;
-let guessInput;
-
-window.onload = async function() {
-    promptsDiv = document.getElementById("promptsDiv");
-    guessInput = document.getElementById("guessInput");
-}
-
 export function ShowPrompt(text) {
     let prompt = document.createElement("p");
     prompt.style.textAlign = "center";
     prompt.textContent = text;
     document.getElementById("promptsDiv").append(prompt);
-
     document.getElementById("guessInput").value = "";
 }
 
@@ -31,5 +22,6 @@ export function ShowTriesExceeded(country) {
 
 export function GameEnded() {
     document.getElementById("guessButton").style.display = 'none';
-    document.getElementById("buttonsDiv").style.display = 'inline';
+    document.getElementById("buttonsGame").style.display = 'none';
+    document.getElementById("buttonsGameEnded").style.display = 'inline';
 }
