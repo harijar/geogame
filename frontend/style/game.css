@@ -1,0 +1,11 @@
+* {
+    text-align: center;
+}
+
+#buttonsGame {
+    text-align: left;
+}
+
+#buttonsGameEnded {
+    display: none;
+}

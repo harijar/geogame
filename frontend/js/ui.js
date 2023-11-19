@@ -1,11 +1,3 @@
-let promptsDiv;
-let guessInput;
-
-window.onload = async function() {
-    promptsDiv = document.getElementById("promptsDiv");
-    guessInput = document.getElementById("guessInput");
-}
-
 export function ShowPrompt(text) {
     let prompt = document.createElement("p");
     prompt.style.textAlign = "center";
@@ -30,6 +22,6 @@ export function ShowTriesExceeded(country) {
 
 export function GameEnded() {
     document.getElementById("guessButton").style.display = 'none';
-    document.getElementById("buttonsGameInterrupted").style.display = 'none';
+    document.getElementById("buttonsGame").style.display = 'none';
     document.getElementById("buttonsGameEnded").style.display = 'inline';
 }

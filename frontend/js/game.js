@@ -11,12 +11,14 @@ window.onload = async function() {
         ShowPrompt(prompt);
     })
 
-    document.getElementById("guessButton").onclick = async function() {
+    document.getElementById("guessForm").onsubmit = async function(event) {
+        event.preventDefault();
         const ok = await Guess(document.getElementById("guessInput").value);
         if (!ok) {
             window.location.reload();
         }
-    }
+    };
+
     document.getElementById("playAgainButton").onclick = async function() {
         window.location.reload();
     }
@@ -60,5 +62,5 @@ async function Guess(prompt){
         ShowPrompt(prompt);
     }
     await SavePrompts(prompts);
-    return true;
+    return true
 }
