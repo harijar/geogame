@@ -37,7 +37,7 @@ type PromptsService interface {
 
 func New(countries repo.Countries, prompts PromptsService, triesLimit int, serverConfig *ServerConfig, logger *zap.Logger) *V1 {
 	return &V1{
-		server:       gin.Default(),
+		server:       gin.New(),
 		countries:    countries,
 		prompts:      prompts,
 		triesLimit:   triesLimit,
@@ -62,6 +62,7 @@ func (a *V1) Run(addr string) error {
 		a.server.Use(cors.New(config))
 	}
 	a.server.Use(ginzap.Ginzap(a.logger, time.RFC3339, true))
+	a.server.Use(ginzap.RecoveryWithZap(a.logger, true))
 	a.registerRoutes()
 	return a.server.Run(addr)
 }

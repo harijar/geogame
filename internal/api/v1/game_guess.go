@@ -8,7 +8,6 @@ import (
 	"go.uber.org/zap"
 	"net/http"
 	"strconv"
-	"strings"
 )
 
 type GuessRequest struct {
