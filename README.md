@@ -1,5 +1,5 @@
 # GeoGame
-Online geographical game where you need to guess a randomly picked country by hints the game displays on screen
+[Online geographical game](http://stashtruck.online/) where you need to guess a randomly picked country by hints the game displays on screen
 
 ## Configuration (env)
 - TRIES_LIMIT (integer) how many hints will be given to the user to guess the country
