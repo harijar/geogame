@@ -33,7 +33,7 @@ func (u *Users) Get(id int) *User {
 	return u.cache[id]
 }
 
-func (u *Users) Set(id int, firstName string, lastName string, username string) error {
+func (u *Users) Save(id int, firstName string, lastName string, username string) error {
 	user := &User{
 		ID:        id,
 		FirstName: firstName,

@@ -85,5 +85,5 @@ func main() {
 		CORSAllowCredentials: cfg.CORSAllowCredentials,
 		SameSite:             cfg.SameSite,
 	}, logger.With(zap.String("api", "v1")))
-	logger.Fatal("Server shut down: ", zap.Error(api.Run(cfg.ListenAddr)))
+	logger.Fatal("Server shut down", zap.Error(api.Run(cfg.ListenAddr)))
 }

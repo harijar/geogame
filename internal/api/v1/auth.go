@@ -10,7 +10,6 @@ import (
 	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 	"net/http"
-	"strconv"
 )
 
 type authRequest struct {
@@ -32,7 +31,7 @@ func (a *V1) auth(c *gin.Context) {
 		return
 	}
 
-	var createNewToken = false
+	createNewToken := false
 	cookieToken, err := c.Cookie("token")
 	if err != nil {
 		// token for this user is not found in cookie
@@ -55,22 +54,22 @@ func (a *V1) auth(c *gin.Context) {
 		}
 	}
 
-	// ВЕРНУТЬСЯ С ЭТОГО МОМЕНТА!
-
-	idStr := strconv.Itoa(int(user.ID))
-	userToken := make([]byte, 64)
-	if token, err := a.tokens.Get(idStr); err != nil {
-		userToken = []byte(token)
-	} else {
-		_, err = rand.Read(userToken)
+	if createNewToken {
+		token := make([]byte, 64)
+		_, err = rand.Read(token)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
 			a.logger.Error("user token generation error", zap.Error(err))
 			return
 		}
-		err = a.tokens.Set(strconv.Itoa(int(user.ID)), string(userToken))
+		a.setCookie(c, "token", string(token), false)
+		err = a.tokens.Set(string(token), user.ID)
 		if err != nil {
-			a.logger.Error("failed to set token to redis database", zap.Error(err))
+			a.logger.Error("failed to save token to redis database", zap.Error(err))
+		}
+		err = a.users.Save(user.ID, user.FirstName, user.LastName, user.Username)
+		if err != nil {
+			a.logger.Error("failed to save user to postgres database")
 		}
 	}
 
@@ -88,6 +87,5 @@ func (a *V1) auth(c *gin.Context) {
 	a.logger.Debug("user authorized",
 		zap.Int("userID", int(user.ID)),
 		zap.String("username", user.Username))
-	a.setCookie(c, "userID", idStr, false)
-	c.Status(200)
+	c.Status(http.StatusOK)
 }

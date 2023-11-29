@@ -15,6 +15,6 @@ type Countries interface {
 
 type Users interface {
 	Get(id int) *users.User
-	Set(id int, firstName string, lastName string, username string) error
+	Save(id int, firstName string, lastName string, username string) error
 	Delete(id int) error
 }
