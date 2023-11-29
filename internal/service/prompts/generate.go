@@ -3,7 +3,7 @@ package prompts
 import (
 	"errors"
 	"fmt"
-	"github.com/harijar/geogame/internal/repo/countries"
+	"github.com/harijar/geogame/internal/repo/postgres/countries"
 	"go.uber.org/zap"
 	"math/rand"
 )

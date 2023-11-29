@@ -4,8 +4,9 @@ import (
 	"github.com/gin-contrib/cors"
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
-	"github.com/harijar/geogame/internal/repo"
-	"github.com/harijar/geogame/internal/repo/countries"
+	"github.com/harijar/geogame/internal/repo/postgres"
+	"github.com/harijar/geogame/internal/repo/postgres/countries"
+	"github.com/harijar/geogame/internal/repo/redis"
 	"github.com/harijar/geogame/internal/service/prompts"
 	"go.uber.org/zap"
 	"time"
@@ -23,8 +24,11 @@ type ServerConfig struct {
 
 type V1 struct {
 	server       *gin.Engine
-	countries    repo.Countries
+	countries    postgres.Countries
 	prompts      PromptsService
+	tokens       redis.Tokens
+	users        postgres.Users
+	botToken     string
 	triesLimit   int
 	serverConfig *ServerConfig
 	logger       *zap.Logger
@@ -35,11 +39,21 @@ type PromptsService interface {
 	GenRandom(c *countries.Country, prev []*prompts.Prompt) (*prompts.Prompt, error)
 }
 
-func New(countries repo.Countries, prompts PromptsService, triesLimit int, serverConfig *ServerConfig, logger *zap.Logger) *V1 {
+func New(countries postgres.Countries,
+	prompts PromptsService,
+	tokens redis.Tokens,
+	users postgres.Users,
+	botToken string,
+	triesLimit int,
+	serverConfig *ServerConfig,
+	logger *zap.Logger) *V1 {
 	return &V1{
 		server:       gin.New(),
 		countries:    countries,
 		prompts:      prompts,
+		tokens:       tokens,
+		users:        users,
+		botToken:     botToken,
 		triesLimit:   triesLimit,
 		serverConfig: serverConfig,
 		logger:       logger,

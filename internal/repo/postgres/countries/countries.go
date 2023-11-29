@@ -4,14 +4,12 @@ import (
 	"context"
 	"errors"
 	"github.com/uptrace/bun"
-	"go.uber.org/zap"
 	"math/rand"
 )
 
 type Countries struct {
-	db     *bun.DB
-	cache  []*Country
-	logger *zap.SugaredLogger
+	db    *bun.DB
+	cache []*Country
 }
 
 func New(db *bun.DB) *Countries {

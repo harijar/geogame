@@ -3,7 +3,7 @@ package v1
 import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
-	"github.com/harijar/geogame/internal/repo/countries"
+	"github.com/harijar/geogame/internal/repo/postgres/countries"
 	"github.com/harijar/geogame/internal/service/prompts"
 	"go.uber.org/zap"
 	"net/http"

@@ -6,8 +6,10 @@ import (
 
 type Config struct {
 	PostgresURL          string   `env:"POSTGRES_URL,required"`
+	RedisURL             string   `env:"REDIS_URL,required"`
 	ListenAddr           string   `env:"LISTEN_ADDR,required"`
 	TriesLimit           int      `env:"TRIES_LIMIT,required"`
+	BotToken             string   `env:"BOT_TOKEN,required"`
 	CookieDomain         string   `env:"COOKIE_DOMAIN,required"`
 	CookieSecure         bool     `env:"COOKIE_SECURE,required"`
 	CORSEnabled          bool     `env:"CORS_ENABLED,required"`

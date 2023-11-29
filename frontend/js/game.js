@@ -1,5 +1,5 @@
-import { StartGameRequest, GuessGameRequest} from "./api.js";
-import { GetPrompts, SavePrompts} from "./storage.js";
+import {StartGameRequest, GuessGameRequest} from "./api.js";
+import {GetPrompts, SavePrompts} from "./storage.js";
 import {GameEnded, ShowPrompt, ShowTriesExceeded, ShowCountryGuessed} from "./ui.js";
 
 let prompts;
