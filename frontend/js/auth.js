@@ -1,6 +1,8 @@
-import {AuthRequest} from "./api";
+import {AuthRequest} from "./api.js";
 
-async function onTelegramAuth(user) {
+window.auth = auth
+
+async function auth(user) {
     try {
         await AuthRequest(user);
     } catch (error) {

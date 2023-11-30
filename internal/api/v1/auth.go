@@ -13,12 +13,12 @@ import (
 )
 
 type authRequest struct {
-	ID        int    `json:"id"`
+	ID        int32  `json:"id"`
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
 	Username  string `json:"username"`
 	PhotoUrl  string `json:"photo_url"`
-	AuthDate  string `json:"auth_date"`
+	AuthDate  int32  `json:"auth_date"`
 	Hash      string `json:"hash"`
 }
 
@@ -47,7 +47,7 @@ func (a *V1) auth(c *gin.Context) {
 			// err == redis.Nil e.g. token was not found in database
 			createNewToken = true
 		} else {
-			if redisId != user.ID {
+			if redisId != int(user.ID) {
 				// another user was logged in
 				createNewToken = true
 			}
@@ -63,22 +63,31 @@ func (a *V1) auth(c *gin.Context) {
 			return
 		}
 		a.setCookie(c, "token", string(token), false)
-		err = a.tokens.Set(string(token), user.ID)
+		err = a.tokens.Set(string(token), int(user.ID))
 		if err != nil {
 			a.logger.Error("failed to save token to redis database", zap.Error(err))
 		}
-		err = a.users.Save(user.ID, user.FirstName, user.LastName, user.Username)
+		err = a.users.Save(int(user.ID), user.FirstName, user.LastName, user.Username)
 		if err != nil {
 			a.logger.Error("failed to save user to postgres database")
 		}
 	}
 
-	checkString := []byte(fmt.Sprintf("auth_date=%s\nfirst_name=%s\nid=%v\nusername=%s",
-		user.AuthDate, user.FirstName, user.ID, user.Username))
+	checkString := fmt.Sprintf("auth_date=%v\n", user.AuthDate)
+	if user.FirstName != "" {
+		checkString += fmt.Sprintf("first_name=%s\n", user.FirstName)
+	}
+	checkString += fmt.Sprintf("id=%v\n", user.ID)
+	if user.LastName != "" {
+		checkString += fmt.Sprintf("last_name=%s\n", user.LastName)
+	}
+	checkString += fmt.Sprintf("photo_url=%s\nusername=%s", user.PhotoUrl, user.Username)
+
+	checkStringByte := []byte(checkString)
 	botHash := sha256.New()
 	botHash.Write([]byte(a.botToken))
 	h := hmac.New(sha256.New, botHash.Sum(nil))
-	h.Write(checkString)
+	h.Write(checkStringByte)
 
 	if hex.EncodeToString(h.Sum(nil)) != user.Hash {
 		c.AbortWithStatusJSON(http.StatusForbidden, &gin.H{"error": "invalid authorization data"})

@@ -41,7 +41,7 @@ export async function GuessGameRequest(guess) {
 
 export async function AuthRequest(user) {
     const response = await fetch(AUTH_URL, {
-        method: 'GET',
+        method: 'POST',
         headers: {'Content-Type': 'application/json'},
         credentials: 'include',
         body: JSON.stringify(user)
