@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"context"
 	"crypto/hmac"
 	"crypto/rand"
 	"crypto/sha256"
@@ -31,13 +32,41 @@ func (a *V1) auth(c *gin.Context) {
 		return
 	}
 
+	checkString := fmt.Sprintf("auth_date=%v\n", user.AuthDate)
+	if user.FirstName != "" {
+		checkString += fmt.Sprintf("first_name=%s\n", user.FirstName)
+	}
+	checkString += fmt.Sprintf("id=%v\n", user.ID)
+	if user.LastName != "" {
+		checkString += fmt.Sprintf("last_name=%s\n", user.LastName)
+	}
+	if user.PhotoUrl != "" {
+		checkString += fmt.Sprintf("photo_url=%s\n", user.PhotoUrl)
+	}
+	checkString += fmt.Sprintf("username=%s", user.Username)
+
+	checkStringByte := []byte(checkString)
+	botHash := sha256.New()
+	botHash.Write([]byte(a.botToken))
+	h := hmac.New(sha256.New, botHash.Sum(nil))
+	h.Write(checkStringByte)
+
+	if hex.EncodeToString(h.Sum(nil)) != user.Hash {
+		c.AbortWithStatusJSON(http.StatusForbidden, &gin.H{"error": "invalid authorization data"})
+		a.logger.Warn("invalid authorization data")
+		return
+	}
+	a.logger.Debug("user authorized",
+		zap.Int("userID", int(user.ID)),
+		zap.String("username", user.Username))
+
 	createNewToken := false
 	cookieToken, err := c.Cookie("token")
 	if err != nil {
 		// token for this user is not found in cookie
 		createNewToken = true
 	} else {
-		redisId, err := a.tokens.Get(cookieToken)
+		redisId, err := a.tokens.Get(context.Background(), cookieToken)
 		if err != nil {
 			if err != redis.Nil {
 				c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
@@ -63,38 +92,18 @@ func (a *V1) auth(c *gin.Context) {
 			return
 		}
 		a.setCookie(c, "token", string(token), false)
-		err = a.tokens.Set(string(token), int(user.ID))
+		err = a.tokens.Set(context.Background(), int(user.ID), string(token))
 		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
 			a.logger.Error("failed to save token to redis database", zap.Error(err))
+			return
 		}
-		err = a.users.Save(int(user.ID), user.FirstName, user.LastName, user.Username)
+		err = a.users.Save(context.Background(), int(user.ID), user.FirstName, user.LastName, user.Username)
 		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
 			a.logger.Error("failed to save user to postgres database")
+			return
 		}
 	}
-
-	checkString := fmt.Sprintf("auth_date=%v\n", user.AuthDate)
-	if user.FirstName != "" {
-		checkString += fmt.Sprintf("first_name=%s\n", user.FirstName)
-	}
-	checkString += fmt.Sprintf("id=%v\n", user.ID)
-	if user.LastName != "" {
-		checkString += fmt.Sprintf("last_name=%s\n", user.LastName)
-	}
-	checkString += fmt.Sprintf("photo_url=%s\nusername=%s", user.PhotoUrl, user.Username)
-
-	checkStringByte := []byte(checkString)
-	botHash := sha256.New()
-	botHash.Write([]byte(a.botToken))
-	h := hmac.New(sha256.New, botHash.Sum(nil))
-	h.Write(checkStringByte)
-
-	if hex.EncodeToString(h.Sum(nil)) != user.Hash {
-		c.AbortWithStatusJSON(http.StatusForbidden, &gin.H{"error": "invalid authorization data"})
-		a.logger.Warn("invalid authorization data")
-	}
-	a.logger.Debug("user authorized",
-		zap.Int("userID", int(user.ID)),
-		zap.String("username", user.Username))
 	c.Status(http.StatusOK)
 }

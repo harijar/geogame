@@ -1,6 +1,7 @@
-package postgres
+package repo
 
 import (
+	"context"
 	"github.com/harijar/geogame/internal/repo/postgres/countries"
 	"github.com/harijar/geogame/internal/repo/postgres/users"
 )
@@ -14,7 +15,13 @@ type Countries interface {
 }
 
 type Users interface {
-	Get(id int) *users.User
-	Save(id int, firstName string, lastName string, username string) error
-	Delete(id int) error
+	Get(ctx context.Context, id int) (*users.User, error)
+	Save(ctx context.Context, id int, firstName string, lastName string, username string) error
+	Delete(ctx context.Context, id int) error
+}
+
+type Tokens interface {
+	Get(ctx context.Context, token string) (int, error)
+	Set(ctx context.Context, id int, token string) error
+	Delete(ctx context.Context, token string) error
 }

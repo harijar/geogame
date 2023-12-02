@@ -4,9 +4,8 @@ import (
 	"github.com/gin-contrib/cors"
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
-	"github.com/harijar/geogame/internal/repo/postgres"
+	"github.com/harijar/geogame/internal/repo"
 	"github.com/harijar/geogame/internal/repo/postgres/countries"
-	"github.com/harijar/geogame/internal/repo/redis"
 	"github.com/harijar/geogame/internal/service/prompts"
 	"go.uber.org/zap"
 	"time"
@@ -24,10 +23,10 @@ type ServerConfig struct {
 
 type V1 struct {
 	server       *gin.Engine
-	countries    postgres.Countries
+	countries    repo.Countries
 	prompts      PromptsService
-	tokens       redis.Tokens
-	users        postgres.Users
+	tokens       repo.Tokens
+	users        repo.Users
 	botToken     string
 	triesLimit   int
 	serverConfig *ServerConfig
@@ -39,10 +38,10 @@ type PromptsService interface {
 	GenRandom(c *countries.Country, prev []*prompts.Prompt) (*prompts.Prompt, error)
 }
 
-func New(countries postgres.Countries,
+func New(countries repo.Countries,
 	prompts PromptsService,
-	tokens redis.Tokens,
-	users postgres.Users,
+	tokens repo.Tokens,
+	users repo.Users,
 	botToken string,
 	triesLimit int,
 	serverConfig *ServerConfig,

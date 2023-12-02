@@ -69,12 +69,8 @@ func main() {
 	}
 	promptsService := prompts.New(countriesRepo, logger.With(zap.String("service", "prompts")))
 
-	usersRepo := users.New(postgresDB, ctx)
-	err = usersRepo.Init()
-	if err != nil {
-		logger.Fatal("Failed to initialize users repository", zap.Error(err))
-	}
-	tokensRepo := tokens.New(redisDB, ctx)
+	usersRepo := users.New(postgresDB)
+	tokensRepo := tokens.New(redisDB)
 
 	api := v1.New(countriesRepo, promptsService, tokensRepo, usersRepo, cfg.BotToken, cfg.TriesLimit, &v1.ServerConfig{
 		CookieDomain:         cfg.CookieDomain,

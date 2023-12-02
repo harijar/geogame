@@ -6,34 +6,26 @@ import (
 )
 
 type Users struct {
-	db    *bun.DB
-	cache map[int]*User
-	ctx   context.Context
+	db *bun.DB
 }
 
-func New(db *bun.DB, ctx context.Context) *Users {
-	return &Users{db: db, cache: make(map[int]*User), ctx: ctx}
+func New(db *bun.DB) *Users {
+	return &Users{db: db}
 }
 
-func (u *Users) Init() error {
-	users := make([]*User, 0)
+func (u *Users) Get(ctx context.Context, id int) (*User, error) {
+	user := &User{}
 	err := u.db.NewSelect().
-		Model(&users).
-		Scan(u.ctx)
+		Model(user).
+		Where("id = $1", id).
+		Scan(ctx)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	for _, user := range users {
-		u.cache[user.ID] = user
-	}
-	return nil
+	return user, nil
 }
 
-func (u *Users) Get(id int) *User {
-	return u.cache[id]
-}
-
-func (u *Users) Save(id int, firstName string, lastName string, username string) error {
+func (u *Users) Save(ctx context.Context, id int, lastName string, firstName string, username string) error {
 	user := &User{
 		ID:        id,
 		FirstName: firstName,
@@ -42,22 +34,13 @@ func (u *Users) Save(id int, firstName string, lastName string, username string)
 	}
 	_, err := u.db.NewInsert().
 		Model(user).
-		Exec(u.ctx)
-	if err != nil {
-		return err
-	}
-	u.cache[id] = user
-	return nil
+		Exec(ctx)
+	return err
 }
 
-func (u *Users) Delete(id int) error {
+func (u *Users) Delete(ctx context.Context, id int) error {
 	_, err := u.db.NewDelete().
-		Model(u.cache[id]).
-		WherePK().
-		Exec(u.ctx)
-	if err != nil {
-		return err
-	}
-	delete(u.cache, id)
-	return nil
+		Where("id = $1", id).
+		Exec(ctx)
+	return err
 }
