@@ -8,10 +8,14 @@ import (
 
 //go:generate mockgen -destination=../mocks/mock_countries.go -package=mocks . Countries
 type Countries interface {
-	Create(country *countries.Country) error
 	Get(id int) *countries.Country
 	GetRandom() *countries.Country
 	GetAnotherRandom(country *countries.Country) *countries.Country
+	GetPlaceArea(country *countries.Country) int
+	GetPlacePopulation(country *countries.Country) int
+	GetPlaceGDP(country *countries.Country) int
+	GetPlaceGDPPerCapita(country *countries.Country) int
+	GetPlaceHDI(country *countries.Country) int
 }
 
 type Users interface {
