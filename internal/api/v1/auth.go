@@ -2,11 +2,6 @@ package v1
 
 import (
 	"context"
-	"crypto/hmac"
-	"crypto/rand"
-	"crypto/sha256"
-	"encoding/hex"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
@@ -27,31 +22,11 @@ func (a *V1) auth(c *gin.Context) {
 	user := &authRequest{}
 	err := c.BindJSON(user)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, &gin.H{"error": "invalid user information"})
-		a.logger.Warn("invalid user information", zap.Error(err))
+		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, &gin.H{"error": "invalid data"})
+		a.logger.Warn("invalid data", zap.Error(err))
 		return
 	}
-
-	checkString := fmt.Sprintf("auth_date=%v\n", user.AuthDate)
-	if user.FirstName != "" {
-		checkString += fmt.Sprintf("first_name=%s\n", user.FirstName)
-	}
-	checkString += fmt.Sprintf("id=%v\n", user.ID)
-	if user.LastName != "" {
-		checkString += fmt.Sprintf("last_name=%s\n", user.LastName)
-	}
-	if user.PhotoUrl != "" {
-		checkString += fmt.Sprintf("photo_url=%s\n", user.PhotoUrl)
-	}
-	checkString += fmt.Sprintf("username=%s", user.Username)
-
-	checkStringByte := []byte(checkString)
-	botHash := sha256.New()
-	botHash.Write([]byte(a.botToken))
-	h := hmac.New(sha256.New, botHash.Sum(nil))
-	h.Write(checkStringByte)
-
-	if hex.EncodeToString(h.Sum(nil)) != user.Hash {
+	if a.checkAuth(user) == false {
 		c.AbortWithStatusJSON(http.StatusForbidden, &gin.H{"error": "invalid authorization data"})
 		a.logger.Warn("invalid authorization data")
 		return
@@ -84,24 +59,13 @@ func (a *V1) auth(c *gin.Context) {
 	}
 
 	if createNewToken {
-		token := make([]byte, 64)
-		_, err = rand.Read(token)
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
-			a.logger.Error("user token generation error", zap.Error(err))
-			return
+		token, err := a.authService.GetTokenAndSave(int(user.ID), user.FirstName, user.LastName, user.Username)
+		if token != "" {
+			a.setCookie(c, "token", token, false)
 		}
-		a.setCookie(c, "token", string(token), false)
-		err = a.tokens.Set(context.Background(), int(user.ID), string(token))
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
-			a.logger.Error("failed to save token to redis database", zap.Error(err))
-			return
-		}
-		err = a.users.Save(context.Background(), int(user.ID), user.FirstName, user.LastName, user.Username)
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
-			a.logger.Error("failed to save user to postgres database")
+			a.logger.Error("failed to perform auth work with database", zap.Error(err))
 			return
 		}
 	}

@@ -9,6 +9,7 @@ import (
 	"github.com/harijar/geogame/internal/repo/postgres/countries"
 	"github.com/harijar/geogame/internal/repo/postgres/users"
 	"github.com/harijar/geogame/internal/repo/redis/tokens"
+	"github.com/harijar/geogame/internal/service/auth"
 	"github.com/harijar/geogame/internal/service/prompts"
 	"github.com/redis/go-redis/v9"
 	"github.com/uptrace/bun"
@@ -71,8 +72,9 @@ func main() {
 
 	usersRepo := users.New(postgresDB)
 	tokensRepo := tokens.New(redisDB)
+	authService := auth.New(tokensRepo, usersRepo, logger.With(zap.String("service", "auth")))
 
-	api := v1.New(countriesRepo, promptsService, tokensRepo, usersRepo, cfg.BotToken, cfg.TriesLimit, &v1.ServerConfig{
+	api := v1.New(countriesRepo, promptsService, tokensRepo, usersRepo, authService, cfg.BotToken, cfg.TriesLimit, &v1.ServerConfig{
 		CookieDomain:         cfg.CookieDomain,
 		CookieSecure:         cfg.CookieSecure,
 		CORSEnabled:          cfg.CORSEnabled,

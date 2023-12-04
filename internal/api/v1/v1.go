@@ -21,27 +21,33 @@ type ServerConfig struct {
 	SameSite             int
 }
 
+type PromptsService interface {
+	Gen(id int, c *countries.Country, prev []*prompts.Prompt) (*prompts.Prompt, error)
+	GenRandom(c *countries.Country, prev []*prompts.Prompt) (*prompts.Prompt, error)
+}
+
+type AuthService interface {
+	GetTokenAndSave(id int, firstName, lastName, username string) (string, error)
+}
+
 type V1 struct {
 	server       *gin.Engine
 	countries    repo.Countries
 	prompts      PromptsService
 	tokens       repo.Tokens
 	users        repo.Users
+	authService  AuthService
 	botToken     string
 	triesLimit   int
 	serverConfig *ServerConfig
 	logger       *zap.Logger
 }
 
-type PromptsService interface {
-	Gen(id int, c *countries.Country, prev []*prompts.Prompt) (*prompts.Prompt, error)
-	GenRandom(c *countries.Country, prev []*prompts.Prompt) (*prompts.Prompt, error)
-}
-
 func New(countries repo.Countries,
 	prompts PromptsService,
 	tokens repo.Tokens,
 	users repo.Users,
+	authService AuthService,
 	botToken string,
 	triesLimit int,
 	serverConfig *ServerConfig,
@@ -52,6 +58,7 @@ func New(countries repo.Countries,
 		prompts:      prompts,
 		tokens:       tokens,
 		users:        users,
+		authService:  authService,
 		botToken:     botToken,
 		triesLimit:   triesLimit,
 		serverConfig: serverConfig,
