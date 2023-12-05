@@ -2,7 +2,7 @@ package prompts
 
 import (
 	"fmt"
-	"github.com/harijar/geogame/internal/repo/countries"
+	"github.com/harijar/geogame/internal/repo/postgres/countries"
 	"slices"
 	"strconv"
 )
