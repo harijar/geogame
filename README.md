@@ -3,9 +3,7 @@
 
 ## Configuration (env)
 - TRIES_LIMIT (integer) how many hints will be given to the user to guess the country
-- BOT_TOKEN (string) Telegram bot token, for user authorization
 - POSTGRES_URL (postgres://user:password@host:port/database)
-- REDIS_URL (redis://user:password@host:port/database)
 - LISTEN_ADDR (0.0.0.0:8080)
 - COOKIE_DOMAIN (example.com)
 - COOKIE_SECURE (boolean)

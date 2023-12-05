@@ -193,7 +193,7 @@ COPY public.countries (id, name, aliases, un_not_member, unrecognised, capital, 
 81	El Salvador	{"el salvador",salvador}			San Salvador	Christianity	84.1	6884888	20721	28737	4551	0.675	Spanish Empire	12	27.7	60.3	14.26	13.09	-87.42	-90.15	0	1	f	f	f
 82	Gabon	{gabon}			Libreville	Christianity	82.2	2233272	257667	18521	7911	0.706	France	5	44.7	50.4	2.19	-3.59	14.3	8.42	2	0	f	f	f
 83	Bhutan	{bhutan}			Thimphu	Buddhism	84.3	770276	38394	2381	3063	0.666		16.2	41.8	42	28.2	26.43	92.05	88.45	0	0	t	t	f
-84	Colombia	{colombia}			Bogotá	Christianity	87	52215503	1038700	314464	6104	0.752	Spanish Empire	7.2	30.8	62.1	12.27	-4.14	-67	-79	2	1	f	f	f
+84	Colombia	{colombia}			Bogotá	Christianity	87	52215503	1038700	314464	6104	0.752	Colombia	7.2	30.8	62.1	12.27	-4.14	-67	-79	2	1	f	f	f
 85	Greece	{greece}			Athens	Christianity	93	10482487	130647	214874	20571	0.887	Ottoman Empire	4.1	16.9	79.1	41.43	36.23	26.38	19.59	0	0	f	f	f
 86	Montenegro	{montenegro}			Podgorica	Christianity	76	616695	13452	5809	9252	0.832	Serbia and Montenegro	7.5	15.9	76.6	43.32	41.51	20.21	18.26	0	0	f	f	f
 87	Samoa	{samoa}			Apia	Christianity	97.9	205557	2821	857	3919	0.707	New Zealand	10.4	23.6	66	-13.25	-14.04	-171.2	-172.48	1	1	f	f	t

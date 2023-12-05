@@ -1,7 +1,7 @@
 package prompts
 
 import (
-	"github.com/harijar/geogame/internal/repo/postgres/countries"
+	"github.com/harijar/geogame/internal/repo/countries"
 	"github.com/stretchr/testify/assert"
 	"strconv"
 	"testing"

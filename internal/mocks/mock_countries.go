@@ -9,9 +9,9 @@
 package mocks
 
 import (
-	"github.com/harijar/geogame/internal/repo/postgres/countries"
 	reflect "reflect"
 
+	countries "github.com/harijar/geogame/internal/repo/countries"
 	gomock "go.uber.org/mock/gomock"
 )
 

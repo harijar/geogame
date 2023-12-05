@@ -1,7 +1,6 @@
 const API_URL = 'http://localhost:8080/v1/';
 const GAME_START_URL = API_URL + 'game/start';
 const GAME_GUESS_URL = API_URL + 'game/guess';
-const AUTH_URL = API_URL + 'auth/login'
 
 export async function StartGameRequest() {
     const response= await fetch(GAME_START_URL, {
@@ -37,16 +36,4 @@ export async function GuessGameRequest(guess) {
         return null;
     }
     throw Error('Failed to guess: ' + response.status);
-}
-
-export async function AuthRequest(user) {
-    const response = await fetch(AUTH_URL, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        credentials: 'include',
-        body: JSON.stringify(user)
-    });
-    if (!response.ok) {
-        throw Error("Failed to authorize: " + response.status)
-    }
 }
