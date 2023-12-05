@@ -23,7 +23,8 @@ func (c *Countries) Init(ctx context.Context) error {
 	placesArea := make([]int, 0)
 	err = c.db.NewSelect().
 		Model(&placesArea).
-		Column("country_id").
+		Table("countries").
+		Column("id").
 		Order("area DESC").
 		Scan(ctx)
 	if err != nil {
@@ -36,7 +37,8 @@ func (c *Countries) Init(ctx context.Context) error {
 	placesPopulation := make([]int, 0)
 	err = c.db.NewSelect().
 		Model(&placesPopulation).
-		Column("country_id").
+		Table("countries").
+		Column("id").
 		Order("population DESC").
 		Scan(ctx)
 	if err != nil {
@@ -49,7 +51,8 @@ func (c *Countries) Init(ctx context.Context) error {
 	placesGDP := make([]int, 0)
 	err = c.db.NewSelect().
 		Model(&placesGDP).
-		Column("country_id").
+		Table("countries").
+		Column("id").
 		Order("gdp DESC").
 		Scan(ctx)
 	if err != nil {
@@ -62,7 +65,8 @@ func (c *Countries) Init(ctx context.Context) error {
 	placesGDPPerCapita := make([]int, 0)
 	err = c.db.NewSelect().
 		Model(&placesGDPPerCapita).
-		Column("country_id").
+		Table("countries").
+		Column("id").
 		Order("gdp_per_capita DESC").
 		Scan(ctx)
 	if err != nil {
@@ -75,7 +79,8 @@ func (c *Countries) Init(ctx context.Context) error {
 	placesHDI := make([]int, 0)
 	err = c.db.NewSelect().
 		Model(&placesHDI).
-		Column("country_id").
+		Table("countries").
+		Column("id").
 		Order("hdi DESC").
 		Scan(ctx)
 	if err != nil {

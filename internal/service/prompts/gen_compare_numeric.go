@@ -5,6 +5,12 @@ import (
 	"github.com/harijar/geogame/internal/repo/postgres/countries"
 )
 
+// these numbers are to avoid comparison with countries that are in top ten by any of the numeric parameters
+const (
+	topDesc = 10
+	topAsc  = 172
+)
+
 func (p *Prompts) genCompareArea(c *countries.Country, prev []*Prompt) *Prompt {
 	prevCompared := make([]int, 0)
 	if c.Area == 0 {
@@ -13,29 +19,14 @@ func (p *Prompts) genCompareArea(c *countries.Country, prev []*Prompt) *Prompt {
 	for _, prompt := range prev {
 		switch prompt.ID {
 		case AreaID:
-			// if country is very small or very big, prompt would be either obvious or too informative for the user
-			if pl := p.countriesRepo.GetPlaceArea(c); pl < 10 || pl > 172 {
-				return nil
-			}
+			// comparison is useless if we already know the exact value of the parameter
+			return nil
 		case CompareAreaID:
 			prevCompared = append(prevCompared, prompt.AnotherCountryID)
 		}
 	}
 	prompt := &Prompt{ID: CompareAreaID}
-	var country *countries.Country
-	for country == nil {
-		country = p.countriesRepo.GetAnotherRandom(c)
-		if pl := p.countriesRepo.GetPlaceArea(country); pl < 10 || pl > 172 {
-			country = nil
-			continue
-		}
-		for _, pr := range prevCompared {
-			if pr == country.ID {
-				country = nil
-				break
-			}
-		}
-	}
+	country := p.getAnotherCountry(c, p.countriesRepo.GetPlaceArea, prevCompared)
 	if c.Area > country.Area {
 		prompt.Text = fmt.Sprintf("Area of this country is bigger than that of %s", country.Name)
 	} else {
@@ -53,29 +44,13 @@ func (p *Prompts) genComparePopulation(c *countries.Country, prev []*Prompt) *Pr
 	for _, prompt := range prev {
 		switch prompt.ID {
 		case PopulationID:
-			// if country's population is very small or very big, prompt would be either obvious or too informative for the user
-			if pl := p.countriesRepo.GetPlacePopulation(c); pl < 10 || pl > 172 {
-				return nil
-			}
+			return nil
 		case ComparePopulationID:
 			prevCompared = append(prevCompared, prompt.AnotherCountryID)
 		}
 	}
 	prompt := &Prompt{ID: ComparePopulationID}
-	var country *countries.Country
-	for country == nil {
-		country = p.countriesRepo.GetAnotherRandom(c)
-		if pl := p.countriesRepo.GetPlacePopulation(country); pl < 10 || pl > 172 {
-			country = nil
-			continue
-		}
-		for _, pr := range prevCompared {
-			if pr == country.ID {
-				country = nil
-				break
-			}
-		}
-	}
+	country := p.getAnotherCountry(c, p.countriesRepo.GetPlacePopulation, prevCompared)
 	if c.Population > country.Population {
 		prompt.Text = fmt.Sprintf("Population of this country is bigger than that of %s", country.Name)
 	} else {
@@ -93,29 +68,13 @@ func (p *Prompts) genCompareGDP(c *countries.Country, prev []*Prompt) *Prompt {
 	for _, prompt := range prev {
 		switch prompt.ID {
 		case GDPID:
-			// if country is very rich or very poor, prompt would be either obvious or too informative for the user
-			if pl := p.countriesRepo.GetPlaceGDP(c); pl < 10 || pl > 172 {
-				return nil
-			}
+			return nil
 		case CompareGDPID:
 			prevCompared = append(prevCompared, prompt.AnotherCountryID)
 		}
 	}
 	prompt := &Prompt{ID: CompareGDPID}
-	var country *countries.Country
-	for country == nil {
-		country = p.countriesRepo.GetAnotherRandom(c)
-		if pl := p.countriesRepo.GetPlaceGDP(country); pl < 10 || pl > 172 {
-			country = nil
-			continue
-		}
-		for _, pr := range prevCompared {
-			if pr == country.ID {
-				country = nil
-				break
-			}
-		}
-	}
+	country := p.getAnotherCountry(c, p.countriesRepo.GetPlaceGDP, prevCompared)
 	if c.GDP > country.GDP {
 		prompt.Text = fmt.Sprintf("GDP of this country is bigger than that of %s", country.Name)
 	} else {
@@ -133,29 +92,13 @@ func (p *Prompts) genCompareGDPPerCapita(c *countries.Country, prev []*Prompt) *
 	for _, prompt := range prev {
 		switch prompt.ID {
 		case GDPPerCapitaID:
-			// if country is very rich or very poor, prompt would be either obvious or too informative for the user
-			if pl := p.countriesRepo.GetPlaceGDPPerCapita(c); pl < 10 || pl > 172 {
-				return nil
-			}
+			return nil
 		case CompareGDPPerCapitaID:
 			prevCompared = append(prevCompared, prompt.AnotherCountryID)
 		}
 	}
 	prompt := &Prompt{ID: CompareGDPPerCapitaID}
-	var country *countries.Country
-	for country == nil {
-		country = p.countriesRepo.GetAnotherRandom(c)
-		if pl := p.countriesRepo.GetPlaceGDPPerCapita(country); pl < 10 || pl > 172 {
-			country = nil
-			continue
-		}
-		for _, pr := range prevCompared {
-			if pr == country.ID {
-				country = nil
-				break
-			}
-		}
-	}
+	country := p.getAnotherCountry(c, p.countriesRepo.GetPlaceGDPPerCapita, prevCompared)
 	if c.GDPPerCapita > country.GDPPerCapita {
 		prompt.Text = fmt.Sprintf("GDP per capita of this country is bigger than that of %s", country.Name)
 	} else {
@@ -173,29 +116,13 @@ func (p *Prompts) genCompareHDI(c *countries.Country, prev []*Prompt) *Prompt {
 	for _, prompt := range prev {
 		switch prompt.ID {
 		case HDIID:
-			// if country is very well or badly developed, prompt would be either obvious or too informative for the user
-			if pl := p.countriesRepo.GetPlaceHDI(c); pl < 10 || pl > 172 {
-				return nil
-			}
+			return nil
 		case CompareHDIID:
 			prevCompared = append(prevCompared, prompt.AnotherCountryID)
 		}
 	}
 	prompt := &Prompt{ID: CompareHDIID}
-	var country *countries.Country
-	for country == nil {
-		country = p.countriesRepo.GetAnotherRandom(c)
-		if pl := p.countriesRepo.GetPlaceHDI(country); pl < 10 || pl > 172 {
-			country = nil
-			continue
-		}
-		for _, pr := range prevCompared {
-			if pr == country.ID {
-				country = nil
-				break
-			}
-		}
-	}
+	country := p.getAnotherCountry(c, p.countriesRepo.GetPlaceHDI, prevCompared)
 	if c.HDI > country.HDI {
 		prompt.Text = fmt.Sprintf("HDI of this country is bigger than that of %s", country.Name)
 	} else if c.HDI < country.HDI {
@@ -205,4 +132,31 @@ func (p *Prompts) genCompareHDI(c *countries.Country, prev []*Prompt) *Prompt {
 	}
 	prompt.AnotherCountryID = country.ID
 	return prompt
+}
+
+// function only for these prompts
+func (p *Prompts) getAnotherCountry(c *countries.Country, getPlace func(country *countries.Country) int, prevCompared []int) *countries.Country {
+	var country *countries.Country
+	for country == nil {
+		country = p.countriesRepo.GetAnotherRandom(c)
+		// if country is too high or too low in the rating table, comparison result would be either obvious or not informative
+		if pl := getPlace(country); pl < topDesc || pl > topAsc {
+			country = nil
+			continue
+		}
+		for _, pr := range prevCompared {
+			if pr == country.ID {
+				country = nil
+				break
+			} else {
+				prevCountry := p.countriesRepo.Get(pr)
+				// if previously compared country (prevCountry) is between guessed country (c) and currently selected country (country) in the rating table, comparison result is obvious
+				if pl := getPlace(prevCountry); (pl > getPlace(c)) != (pl > getPlace(country)) {
+					country = nil
+					break
+				}
+			}
+		}
+	}
+	return country
 }
