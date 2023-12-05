@@ -43,8 +43,6 @@ func (u *Users) UpdateOrSave(ctx context.Context, user *User) error {
 	_, err := u.db.NewInsert().
 		Model(user).
 		On("CONFLICT (id) DO UPDATE").
-		//Set("first_name=?, last_name=?, username=?",
-		//	user.FirstName, user.LastName, user.Username).
 		Exec(ctx)
 	return err
 }
