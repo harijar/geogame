@@ -16,8 +16,9 @@ type Countries interface {
 
 type Users interface {
 	Get(ctx context.Context, id int) (*users.User, error)
-	Save(ctx context.Context, id int, firstName string, lastName string, username string) error
+	Save(ctx context.Context, user *users.User) error
 	Delete(ctx context.Context, id int) error
+	UpdateOrSave(ctx context.Context, user *users.User) error
 }
 
 type Tokens interface {
