@@ -32,7 +32,6 @@ func (a *Auth) GenerateToken(user *users.User) (string, error) {
 	return string(token), err
 }
 
-func (a *Auth) Register(ctx context.Context, user *users.User) error {
-	err := a.usersRepo.UpdateOrSave(ctx, user)
-	return err
+func (a *Auth) RegisterOrUpdate(ctx context.Context, user *users.User) error {
+	return a.usersRepo.UpdateOrSave(ctx, user)
 }
