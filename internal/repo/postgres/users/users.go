@@ -17,7 +17,7 @@ func (u *Users) Get(ctx context.Context, id int) (*User, error) {
 	user := &User{}
 	err := u.db.NewSelect().
 		Model(user).
-		Where("id = $1", id).
+		Where("id=?", id).
 		Scan(ctx)
 	if err != nil {
 		return nil, err
@@ -34,7 +34,7 @@ func (u *Users) Save(ctx context.Context, user *User) error {
 
 func (u *Users) Delete(ctx context.Context, id int) error {
 	_, err := u.db.NewDelete().
-		Where("id = $1", id).
+		Where("id=?", id).
 		Exec(ctx)
 	return err
 }
