@@ -30,7 +30,7 @@ type PromptsService interface {
 
 type AuthService interface {
 	GenerateToken(user *users.User) (string, error)
-	Register(ctx context.Context, user *users.User) error
+	RegisterOrUpdate(ctx context.Context, user *users.User) error
 }
 
 type V1 struct {

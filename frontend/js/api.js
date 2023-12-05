@@ -1,7 +1,7 @@
 const API_URL = 'http://localhost:8080/v1/';
 const GAME_START_URL = API_URL + 'game/start';
 const GAME_GUESS_URL = API_URL + 'game/guess';
-const AUTH_URL = API_URL + 'auth/login'
+const AUTH_URL = API_URL + 'auth'
 
 export async function StartGameRequest() {
     const response= await fetch(GAME_START_URL, {

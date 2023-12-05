@@ -68,7 +68,7 @@ func (a *V1) auth(c *gin.Context) {
 			LastName:  request.LastName,
 			Username:  request.Username}
 
-		err = a.authService.Register(context.Background(), user)
+		err = a.authService.RegisterOrUpdate(context.Background(), user)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
 			a.logger.Error("failed to register request in postgres database", zap.Error(err))
@@ -105,8 +105,5 @@ func (a *V1) checkSign(user *authRequest) bool {
 	h := hmac.New(sha256.New, botHash.Sum(nil))
 	h.Write(checkStringByte)
 
-	if hex.EncodeToString(h.Sum(nil)) != user.Hash {
-		return false
-	}
-	return true
+	return hex.EncodeToString(h.Sum(nil)) == user.Hash
 }
