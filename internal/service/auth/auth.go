@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/rand"
 	"github.com/harijar/geogame/internal/repo"
+	"github.com/harijar/geogame/internal/repo/postgres/users"
 	"go.uber.org/zap"
 )
 
@@ -21,16 +22,17 @@ func New(tokensRepo repo.Tokens, usersRepo repo.Users, logger *zap.Logger) *Auth
 	}
 }
 
-func (a *Auth) GetTokenAndSave(id int, firstName, lastName, username string) (string, error) {
+func (a *Auth) GenerateToken(user *users.User) (string, error) {
 	token := make([]byte, 64)
 	_, err := rand.Read(token)
 	if err != nil {
 		return "", err
 	}
-	err = a.tokensRepo.Set(context.Background(), id, string(token))
-	if err != nil {
-		return "", err
-	}
-	err = a.usersRepo.Save(context.Background(), id, firstName, lastName, username)
+	err = a.tokensRepo.Set(context.Background(), user.ID, string(token))
 	return string(token), err
+}
+
+func (a *Auth) Register(ctx context.Context, user *users.User) error {
+	err := a.usersRepo.UpdateOrSave(ctx, user)
+	return err
 }

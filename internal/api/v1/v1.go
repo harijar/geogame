@@ -1,11 +1,13 @@
 package v1
 
 import (
+	"context"
 	"github.com/gin-contrib/cors"
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
 	"github.com/harijar/geogame/internal/repo"
 	"github.com/harijar/geogame/internal/repo/postgres/countries"
+	"github.com/harijar/geogame/internal/repo/postgres/users"
 	"github.com/harijar/geogame/internal/service/prompts"
 	"go.uber.org/zap"
 	"time"
@@ -27,7 +29,8 @@ type PromptsService interface {
 }
 
 type AuthService interface {
-	GetTokenAndSave(id int, firstName, lastName, username string) (string, error)
+	GenerateToken(user *users.User) (string, error)
+	Register(ctx context.Context, user *users.User) error
 }
 
 type V1 struct {
