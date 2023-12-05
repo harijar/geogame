@@ -40,24 +40,6 @@ func (u *Users) Delete(ctx context.Context, id int) error {
 }
 
 func (u *Users) UpdateOrSave(ctx context.Context, user *User) error {
-	//userFromDB, err := u.Get(ctx, user.ID)
-	//if err != nil {
-	//	if errors.Is(err, sql.ErrNoRows) {
-	//		err = u.Save(ctx, user)
-	//		return err
-	//	}
-	//	return err
-	//}
-	//if userFromDB != user {
-	//	err = u.Delete(ctx, user.ID)
-	//	if err != nil {
-	//		return err
-	//	}
-	//	err = u.Save(ctx, user)
-	//	if err != nil {
-	//		return err
-	//	}
-	//}
 	_, err := u.db.NewInsert().
 		Model(user).
 		On("CONFLICT (id) DO UPDATE").
