@@ -26,7 +26,7 @@ func (p *Prompts) genCompareArea(c *countries.Country, prev []*Prompt) *Prompt {
 		}
 	}
 	prompt := &Prompt{ID: CompareAreaID}
-	country := p.getAnotherCountry(c, p.countriesRepo.GetPlaceArea, prevCompared)
+	country := p.getAnotherCompareNumeric(c, p.countriesRepo.GetPlaceArea, prevCompared)
 	if c.Area > country.Area {
 		prompt.Text = fmt.Sprintf("Area of this country is bigger than that of %s", country.Name)
 	} else {
@@ -50,7 +50,7 @@ func (p *Prompts) genComparePopulation(c *countries.Country, prev []*Prompt) *Pr
 		}
 	}
 	prompt := &Prompt{ID: ComparePopulationID}
-	country := p.getAnotherCountry(c, p.countriesRepo.GetPlacePopulation, prevCompared)
+	country := p.getAnotherCompareNumeric(c, p.countriesRepo.GetPlacePopulation, prevCompared)
 	if c.Population > country.Population {
 		prompt.Text = fmt.Sprintf("Population of this country is bigger than that of %s", country.Name)
 	} else {
@@ -74,7 +74,7 @@ func (p *Prompts) genCompareGDP(c *countries.Country, prev []*Prompt) *Prompt {
 		}
 	}
 	prompt := &Prompt{ID: CompareGDPID}
-	country := p.getAnotherCountry(c, p.countriesRepo.GetPlaceGDP, prevCompared)
+	country := p.getAnotherCompareNumeric(c, p.countriesRepo.GetPlaceGDP, prevCompared)
 	if c.GDP > country.GDP {
 		prompt.Text = fmt.Sprintf("GDP of this country is bigger than that of %s", country.Name)
 	} else {
@@ -98,7 +98,7 @@ func (p *Prompts) genCompareGDPPerCapita(c *countries.Country, prev []*Prompt) *
 		}
 	}
 	prompt := &Prompt{ID: CompareGDPPerCapitaID}
-	country := p.getAnotherCountry(c, p.countriesRepo.GetPlaceGDPPerCapita, prevCompared)
+	country := p.getAnotherCompareNumeric(c, p.countriesRepo.GetPlaceGDPPerCapita, prevCompared)
 	if c.GDPPerCapita > country.GDPPerCapita {
 		prompt.Text = fmt.Sprintf("GDP per capita of this country is bigger than that of %s", country.Name)
 	} else {
@@ -122,7 +122,7 @@ func (p *Prompts) genCompareHDI(c *countries.Country, prev []*Prompt) *Prompt {
 		}
 	}
 	prompt := &Prompt{ID: CompareHDIID}
-	country := p.getAnotherCountry(c, p.countriesRepo.GetPlaceHDI, prevCompared)
+	country := p.getAnotherCompareNumeric(c, p.countriesRepo.GetPlaceHDI, prevCompared)
 	if c.HDI > country.HDI {
 		prompt.Text = fmt.Sprintf("HDI of this country is bigger than that of %s", country.Name)
 	} else if c.HDI < country.HDI {
@@ -135,7 +135,7 @@ func (p *Prompts) genCompareHDI(c *countries.Country, prev []*Prompt) *Prompt {
 }
 
 // function only for these prompts
-func (p *Prompts) getAnotherCountry(c *countries.Country, getPlace func(country *countries.Country) int, prevCompared []int) *countries.Country {
+func (p *Prompts) getAnotherCompareNumeric(c *countries.Country, getPlace func(country *countries.Country) int, prevCompared []int) *countries.Country {
 	var country *countries.Country
 	for country == nil {
 		country = p.countriesRepo.GetAnotherRandom(c)

@@ -8,9 +8,10 @@ import (
 func (p *Prompts) genAgriculturalSector(c *countries.Country, prev []*Prompt) *Prompt {
 	count := 0
 	for _, prompt := range prev {
-		if prompt.ID == AgriculturalSectorID {
+		switch {
+		case prompt.ID == AgriculturalSectorID:
 			return nil
-		} else if prompt.ID == IndustrialSectorID || prompt.ID == ServiceSectorID {
+		case prompt.ID == IndustrialSectorID || prompt.ID == ServiceSectorID:
 			count++
 		}
 	}
@@ -23,9 +24,10 @@ func (p *Prompts) genAgriculturalSector(c *countries.Country, prev []*Prompt) *P
 func (p *Prompts) genIndustrialSector(c *countries.Country, prev []*Prompt) *Prompt {
 	count := 0
 	for _, prompt := range prev {
-		if prompt.ID == IndustrialSectorID {
+		switch {
+		case prompt.ID == IndustrialSectorID:
 			return nil
-		} else if prompt.ID == AgriculturalSectorID || prompt.ID == ServiceSectorID {
+		case prompt.ID == AgriculturalSectorID || prompt.ID == ServiceSectorID:
 			count++
 		}
 	}
@@ -38,9 +40,10 @@ func (p *Prompts) genIndustrialSector(c *countries.Country, prev []*Prompt) *Pro
 func (p *Prompts) genServiceSector(c *countries.Country, prev []*Prompt) *Prompt {
 	count := 0
 	for _, prompt := range prev {
-		if prompt.ID == ServiceSectorID {
+		switch {
+		case prompt.ID == ServiceSectorID:
 			return nil
-		} else if prompt.ID == AgriculturalSectorID || prompt.ID == IndustrialSectorID {
+		case prompt.ID == AgriculturalSectorID || prompt.ID == IndustrialSectorID:
 			count++
 		}
 	}
