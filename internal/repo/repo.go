@@ -11,6 +11,7 @@ type Countries interface {
 	Get(id int) *countries.Country
 	GetRandom() *countries.Country
 	GetAnotherRandom(country *countries.Country) *countries.Country
+	GetCountriesCount() int
 	GetPlaceArea(country *countries.Country) int
 	GetPlacePopulation(country *countries.Country) int
 	GetPlaceGDP(country *countries.Country) int

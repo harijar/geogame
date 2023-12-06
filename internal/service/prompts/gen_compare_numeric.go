@@ -6,10 +6,7 @@ import (
 )
 
 // these numbers are to avoid comparison with countries that are in top ten by any of the numeric parameters
-const (
-	topDesc = 10
-	topAsc  = 172
-)
+const ratingOffset = 10
 
 func (p *Prompts) genCompareArea(c *countries.Country, prev []*Prompt) *Prompt {
 	prevCompared := make([]int, 0)
@@ -140,7 +137,7 @@ func (p *Prompts) getAnotherCompareNumeric(c *countries.Country, getPlace func(c
 	for country == nil {
 		country = p.countriesRepo.GetAnotherRandom(c)
 		// if country is too high or too low in the rating table, comparison result would be either obvious or not informative
-		if pl := getPlace(country); pl < topDesc || pl > topAsc {
+		if pl := getPlace(country); pl < ratingOffset || pl > p.countriesRepo.GetCountriesCount()-ratingOffset {
 			country = nil
 			continue
 		}

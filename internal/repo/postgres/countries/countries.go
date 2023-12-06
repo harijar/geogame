@@ -49,6 +49,10 @@ func (c *Countries) GetAnotherRandom(country *Country) *Country {
 	return newCountry
 }
 
+func (c *Countries) GetCountriesCount() int {
+	return len(c.cache)
+}
+
 func (c *Countries) GetPlaceArea(country *Country) int {
 	return c.placesArea[country.ID]
 }

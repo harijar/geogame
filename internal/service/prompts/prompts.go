@@ -56,8 +56,9 @@ type Prompt struct {
 }
 
 func New(countriesRepo repo.Countries, logger *zap.Logger) *Prompts {
-	return &Prompts{
+	prompts := &Prompts{
 		countriesRepo: countriesRepo,
 		logger:        logger,
 	}
+	return prompts
 }

@@ -3,7 +3,10 @@ package countries
 import (
 	"context"
 	"errors"
+	"strconv"
 )
+
+const minCountriesCount = 10
 
 func (c *Countries) Init(ctx context.Context) error {
 	err := c.db.NewSelect().
@@ -16,8 +19,8 @@ func (c *Countries) Init(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	if len(c.cache) < 2 {
-		return errors.New("countries count in db less than 2")
+	if len(c.cache) < minCountriesCount {
+		return errors.New("countries count in db less than " + strconv.Itoa(minCountriesCount))
 	}
 
 	placesArea := make([]int, 0)
