@@ -33,6 +33,14 @@ func main() {
 	loggerConfig.Level = zap.NewAtomicLevelAt(level)
 	logger := zap.Must(loggerConfig.Build())
 
+	postgresConn := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(cfg.PostgresURL)))
+	postgresDB := bun.NewDB(postgresConn, pgdialect.New())
+	err = postgresDB.Ping()
+	if err != nil {
+		logger.Fatal("Failed to connect to postgres database", zap.Error(err))
+	}
+	logger.Info("Connected to postgres database")
+
 	err = postgres.Migrate(cfg.PostgresURL)
 	if err != nil {
 		if err.Error() != "no change" {
@@ -42,14 +50,6 @@ func main() {
 	} else {
 		logger.Debug("Migrations carried out successfully")
 	}
-
-	postgresConn := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(cfg.PostgresURL)))
-	postgresDB := bun.NewDB(postgresConn, pgdialect.New())
-	err = postgresDB.Ping()
-	if err != nil {
-		logger.Fatal("Failed to connect to postgres database", zap.Error(err))
-	}
-	logger.Info("Connected to postgres database")
 
 	redisOpt, err := redis.ParseURL(cfg.RedisURL)
 	if err != nil {

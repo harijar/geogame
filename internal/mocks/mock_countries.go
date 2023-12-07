@@ -9,9 +9,9 @@
 package mocks
 
 import (
-	"github.com/harijar/geogame/internal/repo/postgres/countries"
 	reflect "reflect"
 
+	countries "github.com/harijar/geogame/internal/repo/postgres/countries"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -36,20 +36,6 @@ func NewMockCountries(ctrl *gomock.Controller) *MockCountries {
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockCountries) EXPECT() *MockCountriesMockRecorder {
 	return m.recorder
-}
-
-// Create mocks base method.
-func (m *MockCountries) Create(arg0 *countries.Country) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Create", arg0)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// Create indicates an expected call of Create.
-func (mr *MockCountriesMockRecorder) Create(arg0 any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockCountries)(nil).Create), arg0)
 }
 
 // Get mocks base method.
@@ -78,6 +64,90 @@ func (m *MockCountries) GetAnotherRandom(arg0 *countries.Country) *countries.Cou
 func (mr *MockCountriesMockRecorder) GetAnotherRandom(arg0 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAnotherRandom", reflect.TypeOf((*MockCountries)(nil).GetAnotherRandom), arg0)
+}
+
+// GetCountriesCount mocks base method.
+func (m *MockCountries) GetCountriesCount() int {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCountriesCount")
+	ret0, _ := ret[0].(int)
+	return ret0
+}
+
+// GetCountriesCount indicates an expected call of GetCountriesCount.
+func (mr *MockCountriesMockRecorder) GetCountriesCount() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCountriesCount", reflect.TypeOf((*MockCountries)(nil).GetCountriesCount))
+}
+
+// GetPlaceArea mocks base method.
+func (m *MockCountries) GetPlaceArea(arg0 *countries.Country) int {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPlaceArea", arg0)
+	ret0, _ := ret[0].(int)
+	return ret0
+}
+
+// GetPlaceArea indicates an expected call of GetPlaceArea.
+func (mr *MockCountriesMockRecorder) GetPlaceArea(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPlaceArea", reflect.TypeOf((*MockCountries)(nil).GetPlaceArea), arg0)
+}
+
+// GetPlaceGDP mocks base method.
+func (m *MockCountries) GetPlaceGDP(arg0 *countries.Country) int {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPlaceGDP", arg0)
+	ret0, _ := ret[0].(int)
+	return ret0
+}
+
+// GetPlaceGDP indicates an expected call of GetPlaceGDP.
+func (mr *MockCountriesMockRecorder) GetPlaceGDP(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPlaceGDP", reflect.TypeOf((*MockCountries)(nil).GetPlaceGDP), arg0)
+}
+
+// GetPlaceGDPPerCapita mocks base method.
+func (m *MockCountries) GetPlaceGDPPerCapita(arg0 *countries.Country) int {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPlaceGDPPerCapita", arg0)
+	ret0, _ := ret[0].(int)
+	return ret0
+}
+
+// GetPlaceGDPPerCapita indicates an expected call of GetPlaceGDPPerCapita.
+func (mr *MockCountriesMockRecorder) GetPlaceGDPPerCapita(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPlaceGDPPerCapita", reflect.TypeOf((*MockCountries)(nil).GetPlaceGDPPerCapita), arg0)
+}
+
+// GetPlaceHDI mocks base method.
+func (m *MockCountries) GetPlaceHDI(arg0 *countries.Country) int {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPlaceHDI", arg0)
+	ret0, _ := ret[0].(int)
+	return ret0
+}
+
+// GetPlaceHDI indicates an expected call of GetPlaceHDI.
+func (mr *MockCountriesMockRecorder) GetPlaceHDI(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPlaceHDI", reflect.TypeOf((*MockCountries)(nil).GetPlaceHDI), arg0)
+}
+
+// GetPlacePopulation mocks base method.
+func (m *MockCountries) GetPlacePopulation(arg0 *countries.Country) int {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPlacePopulation", arg0)
+	ret0, _ := ret[0].(int)
+	return ret0
+}
+
+// GetPlacePopulation indicates an expected call of GetPlacePopulation.
+func (mr *MockCountriesMockRecorder) GetPlacePopulation(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPlacePopulation", reflect.TypeOf((*MockCountries)(nil).GetPlacePopulation), arg0)
 }
 
 // GetRandom mocks base method.

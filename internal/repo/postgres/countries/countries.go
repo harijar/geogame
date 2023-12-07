@@ -1,36 +1,30 @@
 package countries
 
 import (
-	"context"
-	"errors"
 	"github.com/uptrace/bun"
 	"math/rand"
 )
 
 type Countries struct {
-	db    *bun.DB
-	cache []*Country
+	db                 *bun.DB
+	cache              []*Country
+	placesArea         map[int]int
+	placesPopulation   map[int]int
+	placesGDP          map[int]int
+	placesGDPPerCapita map[int]int
+	placesHDI          map[int]int
 }
 
 func New(db *bun.DB) *Countries {
-	return &Countries{db: db, cache: make([]*Country, 0)}
-}
-
-func (c *Countries) Init(ctx context.Context) error {
-	err := c.db.NewSelect().
-		Model(&c.cache).
-		Relation("EthnicGroups").
-		Relation("Languages").
-		Relation("Funfacts").
-		Order("id ASC").
-		Scan(ctx)
-	if err != nil {
-		return err
+	return &Countries{
+		db:                 db,
+		cache:              make([]*Country, 0),
+		placesArea:         make(map[int]int),
+		placesPopulation:   make(map[int]int),
+		placesGDP:          make(map[int]int),
+		placesGDPPerCapita: make(map[int]int),
+		placesHDI:          make(map[int]int),
 	}
-	if len(c.cache) < 2 {
-		return errors.New("countries count in db less than 2")
-	}
-	return nil
 }
 
 func (c *Countries) Get(id int) *Country {
@@ -44,11 +38,6 @@ func (c *Countries) GetRandom() *Country {
 	return c.cache[rand.Intn(len(c.cache))]
 }
 
-func (c *Countries) Create(country *Country) error {
-	// TODO: implement
-	return errors.New("unimplemented")
-}
-
 func (c *Countries) GetAnotherRandom(country *Country) *Country {
 	var newCountry *Country
 	for newCountry == nil {
@@ -58,4 +47,28 @@ func (c *Countries) GetAnotherRandom(country *Country) *Country {
 		}
 	}
 	return newCountry
+}
+
+func (c *Countries) GetCountriesCount() int {
+	return len(c.cache)
+}
+
+func (c *Countries) GetPlaceArea(country *Country) int {
+	return c.placesArea[country.ID]
+}
+
+func (c *Countries) GetPlacePopulation(country *Country) int {
+	return c.placesPopulation[country.ID]
+}
+
+func (c *Countries) GetPlaceGDP(country *Country) int {
+	return c.placesGDP[country.ID]
+}
+
+func (c *Countries) GetPlaceGDPPerCapita(country *Country) int {
+	return c.placesGDPPerCapita[country.ID]
+}
+
+func (c *Countries) GetPlaceHDI(country *Country) int {
+	return c.placesHDI[country.ID]
 }
