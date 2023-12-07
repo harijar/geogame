@@ -3,10 +3,16 @@ package countries
 import (
 	"context"
 	"errors"
+	"github.com/uptrace/bun"
 	"strconv"
 )
 
 const minCountriesCount = 10
+
+type place struct {
+	bun.BaseModel `bun:"table:countries"`
+	ID            int `bun:"id,pk,autoincrement"`
+}
 
 func (c *Countries) Init(ctx context.Context) error {
 	err := c.db.NewSelect().
@@ -14,7 +20,7 @@ func (c *Countries) Init(ctx context.Context) error {
 		Relation("EthnicGroups").
 		Relation("Languages").
 		Relation("Funfacts").
-		Order("id DESC").
+		Order("id ASC").
 		Scan(ctx)
 	if err != nil {
 		return err
@@ -23,74 +29,64 @@ func (c *Countries) Init(ctx context.Context) error {
 		return errors.New("countries count in db less than " + strconv.Itoa(minCountriesCount))
 	}
 
-	placesArea := make([]int, 0)
+	placesArea := make([]*place, 0)
 	err = c.db.NewSelect().
 		Model(&placesArea).
-		Table("countries").
-		Column("id").
 		Order("area DESC").
 		Scan(ctx)
 	if err != nil {
 		return err
 	}
-	for place, id := range placesArea {
-		c.placesArea[id] = place + 1
+	for pl, country := range placesArea {
+		c.placesArea[country.ID] = pl + 1
 	}
 
-	placesPopulation := make([]int, 0)
+	placesPopulation := make([]*place, 0)
 	err = c.db.NewSelect().
 		Model(&placesPopulation).
-		Table("countries").
-		Column("id").
 		Order("population DESC").
 		Scan(ctx)
 	if err != nil {
 		return err
 	}
-	for place, id := range placesPopulation {
-		c.placesPopulation[id] = place + 1
+	for pl, country := range placesPopulation {
+		c.placesPopulation[country.ID] = pl + 1
 	}
 
-	placesGDP := make([]int, 0)
+	placesGDP := make([]*place, 0)
 	err = c.db.NewSelect().
 		Model(&placesGDP).
-		Table("countries").
-		Column("id").
 		Order("gdp DESC").
 		Scan(ctx)
 	if err != nil {
 		return err
 	}
-	for place, id := range placesGDP {
-		c.placesGDP[id] = place + 1
+	for pl, country := range placesGDP {
+		c.placesGDP[country.ID] = pl + 1
 	}
 
-	placesGDPPerCapita := make([]int, 0)
+	placesGDPPerCapita := make([]*place, 0)
 	err = c.db.NewSelect().
 		Model(&placesGDPPerCapita).
-		Table("countries").
-		Column("id").
 		Order("gdp_per_capita DESC").
 		Scan(ctx)
 	if err != nil {
 		return err
 	}
-	for place, id := range placesGDPPerCapita {
-		c.placesGDPPerCapita[id] = place + 1
+	for pl, country := range placesGDPPerCapita {
+		c.placesGDPPerCapita[country.ID] = pl + 1
 	}
 
-	placesHDI := make([]int, 0)
+	placesHDI := make([]*place, 0)
 	err = c.db.NewSelect().
 		Model(&placesHDI).
-		Table("countries").
-		Column("id").
 		Order("hdi DESC").
 		Scan(ctx)
 	if err != nil {
 		return err
 	}
-	for place, id := range placesHDI {
-		c.placesHDI[id] = place + 1
+	for pl, country := range placesHDI {
+		c.placesHDI[country.ID] = pl + 1
 	}
 	return nil
 }

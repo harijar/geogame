@@ -213,7 +213,7 @@ COPY public.countries (id, name, aliases, un_not_member, unrecognised, capital, 
 101	Lithuania	{lithuania}			Vilnius	Christianity	79.4	2866965	62680	66445	23844	0.875	Soviet Union	3.5	29.4	67.2	56.27	53.54	26.5	20.58	0	0	f	f	f
 102	Niger	{niger}			Niamey	Islam	99.3	25369415	1266700	14915	591	0.4	France	41.6	19.5	38.7	23.31	11.42	16	0.07	0	0	f	t	f
 103	Belarus	{belarus}			Minsk	Christianity	91	9200617	202900	68206	7121	0.808	Soviet Union	8.1	40.8	51.1	56.08	51.15	32.46	23.1	0	0	f	t	f
-104	Georgia	{"georgia (country)"}			Tbilisi	Christianity	88.1	3736400	69700	18696	4975	0.802	Soviet Union	8.2	23.7	67.9	43.35	41.03	46.4	41.3	0	0	f	f	f
+104	Georgia	{georgia}			Tbilisi	Christianity	88.1	3736400	69700	18696	4975	0.802	Soviet Union	8.2	23.7	67.9	43.35	41.03	46.4	41.3	0	0	f	f	f
 105	Madagascar	{madagascar}			Antananarivo	Christianity	84.7	26923353	581540	14450	500	0.501	France	24	19.5	56.4	-11.57	-25.37	50.4	43.3	1	0	f	f	t
 106	Paraguay	{paraguay}			Asunción	Christianity	96.1	6109644	397302	40458	6035	0.717	Spanish Empire	17.9	27.7	54.5	-19.17	-27.43	-54.15	-62.35	1	1	f	t	f
 107	Venezuela	{venezuela}			Caracas	Christianity	92.6	28302000	882050	111813	3965	0.691	Spanish Empire	4.7	40.4	54.9	12.11	0.4	-59.45	-73.2	0	1	f	f	f
@@ -320,7 +320,6 @@ COPY public.ethnic_groups (country_id, name, percentage) FROM stdin;
 130	Ladino	56.01
 130	Maya	41.66
 133	Belgians	66.6
-133	other	33.4
 138	Arabs	53.2
 138	Asians	43.4
 140	Mestizo	69
@@ -428,8 +427,8 @@ COPY public.funfacts (country_id, text) FROM stdin;
 97	This country can be treated as one of the countries which had the most historical significance to the world as we know it now
 97	There are a lot of weird religious movements in this country
 97	This country is extremely diverse in terms of everything: cultures, languages, ethnicities, serial killers, etc.
-97	Fentanyl, crack, crystal meth. This country is known for using this things a lot.
-97	There was one programmer in this country that created his own OS because God told him to do so
+97	Fentanyl, crack, crystal meth. This country is known for using these things a lot.
+97	There was one programmer in this country that created his own operating system because God told him to do so
 113	This country has been under the communist rule
 113	Yoghurt was invented in this country
 85	Almost no one is interested in this country now, but its former glory fascinates a lot of people around the world
@@ -438,11 +437,11 @@ COPY public.funfacts (country_id, text) FROM stdin;
 161	This country is one of the most fragile states (failed states)
 161	The colonial name of this country starts with B
 26	This country is the most linguistically dense place in the world
-26	They eat human flesh there. Even ChatGPT says it's true
+26	They eat human flesh there. Even ChatGPT says it's true.
 90	If you want to connect to spirits, talk to you ancestors and get lost in your ego in an authentic way, you should visit this country
 38	On the island that now belongs to this country, large rock discs with holes in the middle of them were used as money by its inhabitants.The ownership of these rocks was recorded in oral history. Some people claim that this system was a prototype of blockchain.
 38	This country depends hardly on the economic help from the US
-124	The most stereotypical image of this country is a certain wild animal drinking a certain alcoholic drink and playing a curtain musical instrument
+124	The most stereotypical image of this country is a wild animal drinking an alcoholic drink and playing a musical instrument
 124	This country's population used a lot of desomorphine in the beginning of the 21st century
 124	It seems this country's government is paranoid, which is kinda dangerous for the world
 124	This country has been under the communist rule
@@ -478,7 +477,7 @@ COPY public.funfacts (country_id, text) FROM stdin;
 151	Flag of this country illustrates its typical landscape with reference to its black soil wealth
 151	This country is home to the creators of some snuff videos that were really popular in 2007
 151	This country has been under the communist rule
-180	One of stereotypical images of this country is a single man living with his parents, never leaving his room, playing computer games all the time and thinking about suicude
+180	One of stereotypical images of this country is a single man living with his parents, never leaving his room, playing computer games all the time and thinking about suicide
 180	The term meaning "little girl" that is going from this country's language is originally a name of an American girl from a novel by a Russian writer
 111	One of promoters of psychedelics was caught in this country's capital and sent to prison in the US
 111	There is a huge debate in the world whether women feel happy in this country
@@ -550,7 +549,7 @@ COPY public.funfacts (country_id, text) FROM stdin;
 175	This country has been under the communist rule
 132	The president of this country prohibited all cars that are not white. Also he wants his portait to be hung in every room, even in front of a toilet. Classic never gets old.
 132	This country has been under the communist rule
-135	In this country people practice vodoo religion and eat human flesh (though ChatGPT thinks there is no cannibalism)!!! Aaaa!!!
+135	In this country people practice vodoo religion and eat human flesh!!! (though ChatGPT thinks there is no cannibalism). Aaaa!!!
 \.
 
 
@@ -668,9 +667,9 @@ COPY public.languages (country_id, name) FROM stdin;
 37	Russian
 39	English
 39	French
-126	Geneva
-126	Aargau
-126	Ticino
+126	German
+126	French
+126	Italian
 126	Romansh
 62	French
 62	Sango
