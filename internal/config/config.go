@@ -7,6 +7,7 @@ import (
 type Config struct {
 	PostgresURL          string   `env:"POSTGRES_URL,required"`
 	RedisURL             string   `env:"REDIS_URL,required"`
+	ClickhouseURL        string   `env:"CLICKHOUSE_URL,required"`
 	ListenAddr           string   `env:"LISTEN_ADDR,required"`
 	TriesLimit           int      `env:"TRIES_LIMIT,required"`
 	BotToken             string   `env:"BOT_TOKEN,required"`

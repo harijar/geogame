@@ -2,6 +2,8 @@ package repo
 
 import (
 	"context"
+	"github.com/google/uuid"
+	"github.com/harijar/geogame/internal/repo/clickhouse/guesses"
 	"github.com/harijar/geogame/internal/repo/postgres/countries"
 	"github.com/harijar/geogame/internal/repo/postgres/users"
 )
@@ -27,7 +29,13 @@ type Users interface {
 }
 
 type Tokens interface {
-	Get(ctx context.Context, token string) (int, error)
-	Set(ctx context.Context, id int, token string) error
+	GetUserID(ctx context.Context, token string) (int, error)
+	GetGameID(ctx context.Context, token string) (uuid.UUID, error)
+	SetUserID(ctx context.Context, token string, id int) error
+	SetGameID(ctx context.Context, token string, id uuid.UUID) error
 	Delete(ctx context.Context, token string) error
+}
+
+type Guesses interface {
+	Save(ctx context.Context, game *guesses.Guess) error
 }

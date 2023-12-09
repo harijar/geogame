@@ -2,19 +2,16 @@ package main
 
 import (
 	"context"
-	"database/sql"
 	"github.com/harijar/geogame/internal/api/v1"
 	"github.com/harijar/geogame/internal/config"
+	"github.com/harijar/geogame/internal/repo/clickhouse/guesses"
 	"github.com/harijar/geogame/internal/repo/postgres"
 	"github.com/harijar/geogame/internal/repo/postgres/countries"
 	"github.com/harijar/geogame/internal/repo/postgres/users"
 	"github.com/harijar/geogame/internal/repo/redis/tokens"
 	"github.com/harijar/geogame/internal/service/auth"
 	"github.com/harijar/geogame/internal/service/prompts"
-	"github.com/redis/go-redis/v9"
-	"github.com/uptrace/bun"
-	"github.com/uptrace/bun/dialect/pgdialect"
-	"github.com/uptrace/bun/driver/pgdriver"
+	"github.com/harijar/geogame/internal/service/statistics"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -24,7 +21,6 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
 	loggerConfig := zap.NewProductionConfig()
 	level, err := zapcore.ParseLevel(cfg.LogLevel)
 	if err != nil {
@@ -33,14 +29,8 @@ func main() {
 	loggerConfig.Level = zap.NewAtomicLevelAt(level)
 	logger := zap.Must(loggerConfig.Build())
 
-	postgresConn := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(cfg.PostgresURL)))
-	postgresDB := bun.NewDB(postgresConn, pgdialect.New())
-	err = postgresDB.Ping()
-	if err != nil {
-		logger.Fatal("Failed to connect to postgres database", zap.Error(err))
-	}
-	logger.Info("Connected to postgres database")
-
+	ctx := context.Background()
+	postgresDB, redisDB, clickhouseDB := connectToDBs(ctx, cfg, logger)
 	err = postgres.Migrate(cfg.PostgresURL)
 	if err != nil {
 		if err.Error() != "no change" {
@@ -50,18 +40,6 @@ func main() {
 	} else {
 		logger.Debug("Migrations carried out successfully")
 	}
-
-	redisOpt, err := redis.ParseURL(cfg.RedisURL)
-	if err != nil {
-		logger.Fatal("Failed to parse redis URL", zap.Error(err))
-	}
-	redisDB := redis.NewClient(redisOpt)
-	ctx := context.Background()
-	err = redisDB.Ping(ctx).Err()
-	if err != nil {
-		logger.Fatal("Failed to connect to redis database", zap.Error(err))
-	}
-	logger.Info("Connected to redis database")
 
 	countriesRepo := countries.New(postgresDB)
 	err = countriesRepo.Init(ctx)
@@ -74,7 +52,10 @@ func main() {
 	tokensRepo := tokens.New(redisDB)
 	authService := auth.New(tokensRepo, usersRepo, logger.With(zap.String("service", "auth")))
 
-	api := v1.New(countriesRepo, promptsService, tokensRepo, usersRepo, authService, cfg.BotToken, cfg.TriesLimit, &v1.ServerConfig{
+	guessesRepo := guesses.New(clickhouseDB)
+	statisticsService := statistics.New(guessesRepo)
+
+	api := v1.New(countriesRepo, promptsService, tokensRepo, usersRepo, authService, statisticsService, cfg.BotToken, cfg.TriesLimit, &v1.ServerConfig{
 		CookieDomain:         cfg.CookieDomain,
 		CookieSecure:         cfg.CookieSecure,
 		CORSEnabled:          cfg.CORSEnabled,

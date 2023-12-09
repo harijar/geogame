@@ -14,7 +14,7 @@ import (
 )
 
 type authRequest struct {
-	ID        int32  `json:"id"`
+	ID        int    `json:"id"`
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
 	Username  string `json:"username"`
@@ -46,7 +46,7 @@ func (a *V1) auth(c *gin.Context) {
 		// token for this request is not found in cookie
 		createNewToken = true
 	} else {
-		redisId, err := a.tokens.Get(context.Background(), cookieToken)
+		redisId, err := a.tokens.GetUserID(context.Background(), cookieToken)
 		if err != nil {
 			if err != redis.Nil {
 				c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
@@ -74,10 +74,16 @@ func (a *V1) auth(c *gin.Context) {
 			a.logger.Error("failed to register request in postgres database", zap.Error(err))
 			return
 		}
-		token, err := a.authService.GenerateToken(user)
+		token, err := a.authService.GenerateToken()
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
 			a.logger.Error("failed to generate token", zap.Error(err))
+			return
+		}
+		err = a.tokens.SetUserID(c, token, user.ID)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
+			a.logger.Error("failed to save token to redis DB", zap.Error(err))
 			return
 		}
 		a.setCookie(c, "token", token, false)

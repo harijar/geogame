@@ -22,13 +22,12 @@ func New(tokensRepo repo.Tokens, usersRepo repo.Users, logger *zap.Logger) *Auth
 	}
 }
 
-func (a *Auth) GenerateToken(user *users.User) (string, error) {
+func (a *Auth) GenerateToken() (string, error) {
 	token := make([]byte, 64)
 	_, err := rand.Read(token)
 	if err != nil {
 		return "", err
 	}
-	err = a.tokensRepo.Set(context.Background(), user.ID, string(token))
 	return string(token), err
 }
 
