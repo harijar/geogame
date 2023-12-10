@@ -14,6 +14,8 @@ type Auth struct {
 	logger     *zap.Logger
 }
 
+const tokenLenght = 64
+
 func New(tokensRepo repo.Tokens, usersRepo repo.Users, logger *zap.Logger) *Auth {
 	return &Auth{
 		tokensRepo: tokensRepo,
@@ -23,7 +25,7 @@ func New(tokensRepo repo.Tokens, usersRepo repo.Users, logger *zap.Logger) *Auth
 }
 
 func (a *Auth) GenerateToken() (string, error) {
-	token := make([]byte, 64)
+	token := make([]byte, tokenLenght)
 	_, err := rand.Read(token)
 	if err != nil {
 		return "", err

@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"context"
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
@@ -37,7 +36,7 @@ func (a *V1) auth(c *gin.Context) {
 		return
 	}
 	a.logger.Debug("request authorized",
-		zap.Int("userID", int(request.ID)),
+		zap.Int("userID", request.ID),
 		zap.String("username", request.Username))
 
 	createNewToken := false
@@ -46,7 +45,7 @@ func (a *V1) auth(c *gin.Context) {
 		// token for this request is not found in cookie
 		createNewToken = true
 	} else {
-		redisId, err := a.tokens.GetUserID(context.Background(), cookieToken)
+		redisId, err := a.tokens.GetUserID(c, cookieToken)
 		if err != nil {
 			if err != redis.Nil {
 				c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
@@ -55,7 +54,7 @@ func (a *V1) auth(c *gin.Context) {
 			}
 			// err == redis.Nil e.g. token was not found in database
 			createNewToken = true
-		} else if redisId != int(request.ID) {
+		} else if redisId != request.ID {
 			// another request was logged in
 			createNewToken = true
 		}
@@ -63,12 +62,12 @@ func (a *V1) auth(c *gin.Context) {
 
 	if createNewToken {
 		user := &users.User{
-			ID:        int(request.ID),
+			ID:        request.ID,
 			FirstName: request.FirstName,
 			LastName:  request.LastName,
 			Username:  request.Username}
 
-		err = a.authService.RegisterOrUpdate(context.Background(), user)
+		err = a.authService.RegisterOrUpdate(c, user)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
 			a.logger.Error("failed to register request in postgres database", zap.Error(err))

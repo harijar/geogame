@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/harijar/geogame/internal/api/v1"
 	"github.com/harijar/geogame/internal/config"
+	"github.com/harijar/geogame/internal/repo/clickhouse"
 	"github.com/harijar/geogame/internal/repo/clickhouse/guesses"
 	"github.com/harijar/geogame/internal/repo/postgres"
 	"github.com/harijar/geogame/internal/repo/postgres/countries"
@@ -31,20 +32,30 @@ func main() {
 
 	ctx := context.Background()
 	postgresDB, redisDB, clickhouseDB := connectToDBs(ctx, cfg, logger)
+
 	err = postgres.Migrate(cfg.PostgresURL)
 	if err != nil {
 		if err.Error() != "no change" {
-			logger.Fatal("Migration error", zap.Error(err))
+			logger.Fatal("postgres migration error", zap.Error(err))
 		}
-		logger.Debug("No change to database")
+		logger.Debug("no change to postgres database")
 	} else {
-		logger.Debug("Migrations carried out successfully")
+		logger.Debug("postgres migrations carried out successfully")
+	}
+	err = clickhouse.Migrate(cfg.ClickhouseURL)
+	if err != nil {
+		if err.Error() != "no change" {
+			logger.Fatal("clickhouse migration error", zap.Error(err))
+		}
+		logger.Debug("no change to clickhouse database")
+	} else {
+		logger.Debug("clickhouse migrations carried out successfully")
 	}
 
 	countriesRepo := countries.New(postgresDB)
 	err = countriesRepo.Init(ctx)
 	if err != nil {
-		logger.Fatal("Failed to initialize countries repository", zap.Error(err))
+		logger.Fatal("failed to initialize countries repository", zap.Error(err))
 	}
 	promptsService := prompts.New(countriesRepo, logger.With(zap.String("service", "prompts")))
 
@@ -64,5 +75,5 @@ func main() {
 		CORSAllowCredentials: cfg.CORSAllowCredentials,
 		SameSite:             cfg.SameSite,
 	}, logger.With(zap.String("api", "v1")))
-	logger.Fatal("Server shut down", zap.Error(api.Run(cfg.ListenAddr)))
+	logger.Fatal("server shut down", zap.Error(api.Run(cfg.ListenAddr)))
 }

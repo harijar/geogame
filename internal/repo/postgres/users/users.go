@@ -13,11 +13,12 @@ func New(db *bun.DB) *Users {
 	return &Users{db: db}
 }
 
-func (u *Users) Get(ctx context.Context, id int) (*User, error) {
+func (u *Users) Get(ctx context.Context, id int, columns ...string) (*User, error) {
 	user := &User{}
 	err := u.db.NewSelect().
 		Model(user).
 		Where("id=?", id).
+		Column(columns...).
 		Scan(ctx)
 	if err != nil {
 		return nil, err

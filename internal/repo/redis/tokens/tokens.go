@@ -7,6 +7,11 @@ import (
 	"time"
 )
 
+const (
+	userIDTTL = 720
+	gameIDTTL = 24
+)
+
 type Tokens struct {
 	db *redis.Client
 }
@@ -36,7 +41,7 @@ func (t *Tokens) GetGameID(ctx context.Context, token string) (uuid.UUID, error)
 }
 
 func (t *Tokens) SetUserID(ctx context.Context, token string, id int) error {
-	return t.db.Set(ctx, "userID:"+token, id, 720*time.Hour).Err()
+	return t.db.Set(ctx, "userID:"+token, id, userIDTTL*time.Hour).Err()
 }
 
 func (t *Tokens) SetGameID(ctx context.Context, token string, id uuid.UUID) error {
@@ -44,7 +49,7 @@ func (t *Tokens) SetGameID(ctx context.Context, token string, id uuid.UUID) erro
 	if err != nil {
 		return err
 	}
-	return t.db.Set(ctx, "gameID:"+token, idBytes, 24*time.Hour).Err()
+	return t.db.Set(ctx, "gameID:"+token, idBytes, gameIDTTL*time.Hour).Err()
 }
 
 func (t *Tokens) Delete(ctx context.Context, token string) error {

@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/harijar/geogame/internal/repo/postgres/users"
 	"github.com/redis/go-redis/v9"
@@ -17,21 +16,21 @@ func (a *V1) setCookie(c *gin.Context, name string, value string, expired bool) 
 	c.SetCookie(name, value, maxAge, "/", a.serverConfig.CookieDomain, a.serverConfig.CookieSecure, true)
 }
 
-func (a *V1) getUser(c *gin.Context) (*users.User, error) {
+func (a *V1) getUser(c *gin.Context, columns ...string) (*users.User, error) {
 	token, err := c.Cookie("token")
 	if err != nil {
-		return nil, err
+		a.logger.Debug("user is playing as guest")
+		return nil, nil
 	}
-	ctx := context.Background()
-	userID, err := a.tokens.GetUserID(ctx, token)
+	userID, err := a.tokens.GetUserID(c, token)
 	if err != nil {
 		if err != redis.Nil {
 			return nil, err
 		}
-		a.logger.Warn("incorrect token in cookies or token has expired")
+		a.setCookie(c, "token", "", true)
 		return nil, nil
 	}
-	user, err := a.users.Get(ctx, userID)
+	user, err := a.users.Get(c, userID, columns...)
 	if err != nil {
 		return nil, err
 	}

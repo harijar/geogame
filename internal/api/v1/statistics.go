@@ -6,20 +6,12 @@ import (
 	"github.com/google/uuid"
 	"github.com/harijar/geogame/internal/repo/clickhouse/guesses"
 	"github.com/redis/go-redis/v9"
-	"net/http"
 )
 
 func (a *V1) recordStatistics(c *gin.Context, guess *guesses.Guess) error {
-	user, err := a.getUser(c)
+	user, err := a.getUser(c, "*")
 	if err != nil {
-		if errors.Is(err, http.ErrNoCookie) {
-			a.logger.Debug("user is playing as guest")
-		} else if errors.Is(err, redis.Nil) {
-			a.logger.Warn("token not found in redis DB: it is incorrect or has expired")
-			a.setCookie(c, "token", "", true)
-		} else {
-			return err
-		}
+		return err
 	}
 	if user != nil {
 		guess.UserID = user.ID
