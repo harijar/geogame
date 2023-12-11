@@ -1,0 +1,27 @@
+body {
+    background: darkslategray;
+}
+
+#mainPage {
+    background: darkseagreen;
+    border: 3px darkslategray;
+    padding: 20px;
+    height: auto;
+}
+
+#upperPanel {
+    text-align: right;
+    border: 3px darkslategray;
+    padding: 10px;
+    width: 100%;
+    height: 30px;
+    background: darkolivegreen;
+}
+
+#auth {
+    display: none;
+}
+
+#userProfile {
+    display: none;
+}

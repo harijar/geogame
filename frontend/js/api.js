@@ -50,3 +50,18 @@ export async function AuthRequest(user) {
         throw Error("Failed to authorize: " + response.status)
     }
 }
+
+export async function CheckAuthRequest() {
+    const response = await fetch(AUTH_URL, {
+        method: 'GET',
+        credentials: 'include'
+    });
+    if (response.ok) {
+        const data = await response.json()
+        if (!data) {
+            throw Error('Failed to check auth: ' + await response.text());
+        }
+        return data;
+    }
+    throw Error('Failed to check auth: ' + response.status)
+}
