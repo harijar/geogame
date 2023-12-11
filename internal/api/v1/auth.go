@@ -13,7 +13,7 @@ import (
 )
 
 type authRequest struct {
-	ID        int    `json:"id"`
+	ID        int64  `json:"id"`
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
 	Username  string `json:"username"`
@@ -36,7 +36,7 @@ func (a *V1) auth(c *gin.Context) {
 		return
 	}
 	a.logger.Debug("request authorized",
-		zap.Int("userID", request.ID),
+		zap.Int("userID", int(request.ID)),
 		zap.String("username", request.Username))
 
 	createNewToken := false
@@ -54,7 +54,7 @@ func (a *V1) auth(c *gin.Context) {
 			}
 			// err == redis.Nil e.g. token was not found in database
 			createNewToken = true
-		} else if redisId != request.ID {
+		} else if redisId != int(request.ID) {
 			// another request was logged in
 			createNewToken = true
 		}
@@ -62,7 +62,7 @@ func (a *V1) auth(c *gin.Context) {
 
 	if createNewToken {
 		user := &users.User{
-			ID:        request.ID,
+			ID:        int(request.ID),
 			FirstName: request.FirstName,
 			LastName:  request.LastName,
 			Username:  request.Username}

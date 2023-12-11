@@ -9,7 +9,7 @@ import (
 )
 
 func (a *V1) recordStatistics(c *gin.Context, guess *guesses.Guess) error {
-	user, err := a.getUser(c, "*")
+	user, err := a.getUser(c, "id")
 	if err != nil {
 		return err
 	}

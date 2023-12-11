@@ -2,10 +2,12 @@ package v1
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/agnivade/levenshtein"
 	"github.com/gin-gonic/gin"
 	"github.com/harijar/geogame/internal/repo/clickhouse/guesses"
 	"github.com/harijar/geogame/internal/service/prompts"
+	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 	"net/http"
 	"strconv"
@@ -74,8 +76,13 @@ func (a *V1) gameGuess(c *gin.Context) {
 	}
 	gameID, err := a.tokens.GetGameID(c, token)
 	if err != nil {
+		if errors.Is(err, redis.Nil) {
+			c.AbortWithStatusJSON(http.StatusNotFound, &gin.H{"error": "no game ID provided"})
+			a.logger.Warn("no game ID in redis DB", zap.Error(err))
+			return
+		}
 		c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
-		a.logger.Warn("could not get gameID from redis DB", zap.Error(err))
+		a.logger.Error("could not get gameID from redis DB", zap.Error(err))
 		return
 	}
 	guess := &guesses.Guess{
