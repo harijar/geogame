@@ -7,7 +7,7 @@ import (
 )
 
 type Guess struct {
-	UserID      int
+	UserID      int64
 	GameID      uuid.UUID
 	CountryID   int
 	Text        string

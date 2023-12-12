@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="style/style.css">
 </head>
 <body>
-    <div id="upperPanel">
+    <div id="pagetop">
         <div id="buttonsGame">
             <button type="button" id="newGameButton">New game</button>
             <button type="button" id="stopGameButton">To the main menu</button>
@@ -27,18 +27,21 @@
         </div>
     </div>
     <div id="mainPage">
-        <h1 style="text-align: center">Guess the country</h1>
-        <form id="guessForm">
-            <label for="guessInput">Country:</label>
-            <input type="text" id="guessInput" autofocus>
-            <button type="submit" id="guessButton">Submit</button>
-        </form>
-        <div id="promptsDiv">
-        </div>
-        <div id="buttonsGameEnded">
-            <br><br>
-            <button type="button" id="playAgainButton">Play again</button>
-            <button type="button" id="mainMenuButton">To the main menu</button>
+        <div id="info">
+            <br>
+            <h1>Guess the country</h1>
+            <form id="guessForm">
+                <label for="guessInput">Country:</label>
+                <input type="text" id="guessInput" autofocus>
+                <button type="submit" id="guessButton">Submit</button>
+            </form>
+            <div id="promptsDiv">
+            </div>
+            <div id="buttonsGameEnded">
+                <br><br>
+                <button type="button" id="playAgainButton">Play again</button>
+                <button type="button" id="mainMenuButton">To the main menu</button>
+            </div>
         </div>
     </div>
 </body>

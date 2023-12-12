@@ -1,27 +1,41 @@
 body {
     background: darkslategray;
+    height: 100vh;
+}
+
+#pagetop {
+    border: 3px darkslategray;
+    padding: 10px;
+    width: auto;
+    height: 30px;
+    background: darkolivegreen;
 }
 
 #mainPage {
     background: darkseagreen;
     border: 3px darkslategray;
     padding: 20px;
-    height: auto;
+    height: 100%;
 }
 
-#upperPanel {
-    text-align: right;
-    border: 3px darkslategray;
-    padding: 10px;
-    width: 100%;
-    height: 30px;
-    background: darkolivegreen;
+#info {
+    text-align: center;
+    width: 50%;
+    height: 100%;
+    background: khaki;
+    position: absolute;
+    top: 58px;
+    left: 25%;
 }
 
 #auth {
+    position: relative;
+    float: right;
     display: none;
 }
 
 #userProfile {
+    position: relative;
+    float: right;
     display: none;
 }

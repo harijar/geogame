@@ -14,7 +14,7 @@ func (a *V1) recordStatistics(c *gin.Context, guess *guesses.Guess) error {
 		return err
 	}
 	if user != nil {
-		guess.UserID = user.ID
+		guess.UserID = int64(user.ID)
 	}
 	return a.statistics.SaveRecord(c, guess)
 }
