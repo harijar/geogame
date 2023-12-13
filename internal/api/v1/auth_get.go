@@ -2,6 +2,7 @@ package v1
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/harijar/geogame/internal/repo/postgres/users"
 	"net/http"
 )
 
@@ -12,7 +13,7 @@ type AuthResponse struct {
 }
 
 func (a *V1) checkAuth(c *gin.Context) {
-	user, err := a.getUser(c, "first_name", "last_name")
+	user, err := a.getUser(c, users.FirstName, users.LastName)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
 		a.logger.Error("could not get user data")

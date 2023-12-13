@@ -20,4 +20,5 @@ type AuthService interface {
 
 type StatisticsService interface {
 	SaveRecord(ctx context.Context, g *guesses.Guess) error
+	GetStatistics(ctx context.Context, id int) (int, int, error)
 }

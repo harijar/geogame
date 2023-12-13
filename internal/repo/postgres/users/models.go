@@ -2,6 +2,13 @@ package users
 
 import "github.com/uptrace/bun"
 
+const (
+	ID        = "id"
+	FirstName = "first_name"
+	LastName  = "last_name"
+	Username  = "username"
+)
+
 type User struct {
 	bun.BaseModel `bun:"table:users"`
 

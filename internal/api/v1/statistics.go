@@ -5,11 +5,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/harijar/geogame/internal/repo/clickhouse/guesses"
+	"github.com/harijar/geogame/internal/repo/postgres/users"
 	"github.com/redis/go-redis/v9"
 )
 
 func (a *V1) recordStatistics(c *gin.Context, guess *guesses.Guess) error {
-	user, err := a.getUser(c, "id")
+	user, err := a.getUser(c, users.ID)
 	if err != nil {
 		return err
 	}

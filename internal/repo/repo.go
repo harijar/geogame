@@ -38,4 +38,5 @@ type Tokens interface {
 
 type Guesses interface {
 	Save(ctx context.Context, game *guesses.Guess) error
+	GetProfileStatistics(ctx context.Context, id int) (int, int, error)
 }

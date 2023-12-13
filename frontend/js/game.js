@@ -34,6 +34,9 @@ window.onload = async function() {
         SavePrompts([]);
         window.location.href = 'index.html';
     }
+    document.getElementById("userProfileButton").onclick = async function() {
+        window.location.href = '/user/'
+    }
 
     window.auth = auth;
     await CheckAuth();

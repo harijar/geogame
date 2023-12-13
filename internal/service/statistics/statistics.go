@@ -17,3 +17,7 @@ func New(gamesRepo repo.Guesses) *Statistics {
 func (s *Statistics) SaveRecord(ctx context.Context, g *guesses.Guess) error {
 	return s.guessesRepo.Save(ctx, g)
 }
+
+func (s *Statistics) GetStatistics(ctx context.Context, id int) (int, int, error) {
+	return s.guessesRepo.GetProfileStatistics(ctx, id)
+}

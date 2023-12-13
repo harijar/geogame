@@ -4,6 +4,7 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/harijar/geogame/internal/repo/postgres/users"
@@ -47,7 +48,7 @@ func (a *V1) auth(c *gin.Context) {
 	} else {
 		redisId, err := a.tokens.GetUserID(c, cookieToken)
 		if err != nil {
-			if err != redis.Nil {
+			if !errors.Is(err, redis.Nil) {
 				c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
 				a.logger.Warn("could not get token from redis database", zap.Error(err))
 				return
