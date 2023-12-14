@@ -13,11 +13,17 @@ type Guess struct {
 	Text        string
 	GuessNumber int
 	Right       bool
-	Timestamp   int32
+	Timestamp   int64
 }
 
 type Guesses struct {
 	db driver.Conn
+}
+
+type Statistics struct {
+	TotalGames     uint64  `ch:"total_games"`
+	GamesWon       uint64  `ch:"games_won"`
+	AverageGuesses float64 `ch:"average_guesses"`
 }
 
 func New(db driver.Conn) *Guesses {
@@ -31,16 +37,21 @@ func (g *Guesses) Save(ctx context.Context, guess *Guess) error {
 		guess.UserID, guess.GameID, guess.CountryID, guess.Text, guess.GuessNumber, guess.Right, guess.Timestamp)
 }
 
-func (g *Guesses) GetProfileStatistics(ctx context.Context, id int) (int, int, error) {
-	var result []struct {
-		TotalGames uint64 `ch:"total_games"`
-		GamesWon   uint64 `ch:"games_won"`
-	}
+func (g *Guesses) GetProfileStatistics(ctx context.Context, id int) (*Statistics, error) {
+	var result []Statistics
 	err := g.db.Select(ctx, &result, `
-		SELECT COUNT(DISTINCT(game_id)) AS total_games, countIf(right) AS games_won
-		FROM guesses WHERE user_id  = ?`, id)
+	WITH games AS (
+    	SELECT count(*) AS number
+    	FROM guesses
+    	WHERE user_id = ?
+    	GROUP BY game_id
+    ) SELECT 
+		avg(number) AS average_guesses, 
+		count(*) AS total_games, 
+		countIf(number < 10) AS games_won
+    FROM games`, id)
 	if err != nil {
-		return 0, 0, err
+		return nil, err
 	}
-	return int(result[0].TotalGames), int(result[0].GamesWon), nil
+	return &result[0], nil
 }

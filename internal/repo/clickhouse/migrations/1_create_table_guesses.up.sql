@@ -9,4 +9,4 @@ CREATE TABLE IF NOT EXISTS guesses
     `timestamp` DateTime
 )
 ENGINE = MergeTree
-ORDER BY (user_id, timestamp);
+ORDER BY (user_id, game_id);

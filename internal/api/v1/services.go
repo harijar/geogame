@@ -2,6 +2,7 @@ package v1
 
 import (
 	"context"
+	"github.com/google/uuid"
 	"github.com/harijar/geogame/internal/repo/clickhouse/guesses"
 	"github.com/harijar/geogame/internal/repo/postgres/countries"
 	"github.com/harijar/geogame/internal/repo/postgres/users"
@@ -16,9 +17,13 @@ type PromptsService interface {
 type AuthService interface {
 	GenerateToken() (string, error)
 	RegisterOrUpdate(ctx context.Context, user *users.User) error
+	GetUserID(ctx context.Context, token string) (int, error)
+	GetGameID(ctx context.Context, token string) (uuid.UUID, error)
+	SetUserID(ctx context.Context, token string, id int) error
+	SetGameID(ctx context.Context, token string, id uuid.UUID) error
 }
 
 type StatisticsService interface {
 	SaveRecord(ctx context.Context, g *guesses.Guess) error
-	GetStatistics(ctx context.Context, id int) (int, int, error)
+	GetStatistics(ctx context.Context, id int) (*guesses.Statistics, error)
 }

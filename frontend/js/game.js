@@ -34,7 +34,7 @@ window.onload = async function() {
         SavePrompts([]);
         window.location.href = 'index.html';
     }
-    document.getElementById("userProfileButton").onclick = async function() {
+    document.getElementById("profileButton").onclick = async function() {
         window.location.href = '/user/'
     }
 

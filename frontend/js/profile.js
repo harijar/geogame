@@ -13,4 +13,5 @@ async function loadProfile() {
     document.getElementById("greetings").textContent = `Greetings, ${data['name']}!`
     document.getElementById("totalGames").textContent = data['total_games']
     document.getElementById("gamesWon").textContent = data['games_won']
+    document.getElementById("averageGuesses").textContent = data['average_guesses']
 }

@@ -8,8 +8,10 @@ import (
 )
 
 const (
-	userIDTTL = 720
-	gameIDTTL = 24
+	userIDTTL    = 720
+	userIDPrefix = "userID:"
+	gameIDTTL    = 24
+	gameIDPrefix = "gameID:"
 )
 
 type Tokens struct {
@@ -21,7 +23,7 @@ func New(db *redis.Client) *Tokens {
 }
 
 func (t *Tokens) GetUserID(ctx context.Context, token string) (int, error) {
-	result := t.db.Get(ctx, "userID:"+token)
+	result := t.db.Get(ctx, userIDPrefix+token)
 	if result.Err() != nil {
 		return 0, result.Err()
 	}
@@ -29,7 +31,7 @@ func (t *Tokens) GetUserID(ctx context.Context, token string) (int, error) {
 }
 
 func (t *Tokens) GetGameID(ctx context.Context, token string) (uuid.UUID, error) {
-	result := t.db.Get(ctx, "gameID:"+token)
+	result := t.db.Get(ctx, gameIDPrefix+token)
 	if result.Err() != nil {
 		return uuid.Nil, result.Err()
 	}
@@ -41,7 +43,7 @@ func (t *Tokens) GetGameID(ctx context.Context, token string) (uuid.UUID, error)
 }
 
 func (t *Tokens) SetUserID(ctx context.Context, token string, id int) error {
-	return t.db.Set(ctx, "userID:"+token, id, userIDTTL*time.Hour).Err()
+	return t.db.Set(ctx, userIDPrefix+token, id, userIDTTL*time.Hour).Err()
 }
 
 func (t *Tokens) SetGameID(ctx context.Context, token string, id uuid.UUID) error {
@@ -49,7 +51,7 @@ func (t *Tokens) SetGameID(ctx context.Context, token string, id uuid.UUID) erro
 	if err != nil {
 		return err
 	}
-	return t.db.Set(ctx, "gameID:"+token, idBytes, gameIDTTL*time.Hour).Err()
+	return t.db.Set(ctx, gameIDPrefix+token, idBytes, gameIDTTL*time.Hour).Err()
 }
 
 func (t *Tokens) Delete(ctx context.Context, token string) error {

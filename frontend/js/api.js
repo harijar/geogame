@@ -15,7 +15,7 @@ export async function StartGameRequest() {
         if (!data) {
             throw Error('Failed to start: ' + await response.text());
         }
-        return data
+        return data;
     }
     throw Error('Failed to start: ' + response.status);
 }
@@ -32,12 +32,12 @@ export async function GuessGameRequest(guess) {
         if (!data) {
             throw Error('Failed to guess: ' + await response.text());
         }
-        return data
+        return data;
     }
     if (response.status === 404) { // game hasn't started
-        return null
+        return null;
     }
-    throw Error('Failed to guess: ' + response.status)
+    throw Error('Failed to guess: ' + response.status);
 }
 
 export async function AuthRequest(user) {
@@ -62,7 +62,7 @@ export async function CheckAuthRequest() {
         if (!data) {
             throw Error('Failed to check auth: ' + await response.text());
         }
-        return data
+        return data;
     }
     throw Error('Failed to check auth: ' + response.status);
 }
@@ -77,7 +77,10 @@ export async function ProfileRequest() {
         if (!data) {
             throw Error('Failed to get profile info: ' + await response.text());
         }
-        return data
+        return data;
+    }
+    if (response.status === 403) {
+        return null;
     }
     throw Error('Failed to get profile info: ' + response.status);
 }

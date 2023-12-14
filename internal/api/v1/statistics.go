@@ -22,7 +22,7 @@ func (a *V1) recordStatistics(c *gin.Context, guess *guesses.Guess) error {
 
 func (a *V1) setGameID(c *gin.Context) error {
 	token, _ := c.Cookie("token")
-	_, err := a.tokens.GetUserID(c, token)
+	_, err := a.authService.GetUserID(c, token)
 	if err != nil {
 		if !errors.Is(err, redis.Nil) {
 			return err
@@ -34,7 +34,7 @@ func (a *V1) setGameID(c *gin.Context) error {
 			return err
 		}
 		a.setCookie(c, "token", token, false)
-		return a.tokens.SetGameID(c, token, uuid.New())
+		return a.authService.SetGameID(c, token, uuid.New())
 	}
-	return a.tokens.SetGameID(c, token, uuid.New())
+	return a.authService.SetGameID(c, token, uuid.New())
 }

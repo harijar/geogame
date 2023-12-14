@@ -7,4 +7,5 @@ table {
 
 tr, th {
     border: 1px solid #404040;
+    padding: 7px;
 }

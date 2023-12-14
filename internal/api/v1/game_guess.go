@@ -70,14 +70,14 @@ func (a *V1) gameGuess(c *gin.Context) {
 	response := GuessResponse{}
 	token, err := c.Cookie("token")
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusNotFound, &gin.H{"error": "no game ID provided"})
+		c.AbortWithStatusJSON(http.StatusNotFound, &gin.H{"error": "game has not started"})
 		a.logger.Warn("no game ID in cookie", zap.Error(err))
 		return
 	}
 	gameID, err := a.tokens.GetGameID(c, token)
 	if err != nil {
 		if errors.Is(err, redis.Nil) {
-			c.AbortWithStatusJSON(http.StatusNotFound, &gin.H{"error": "no game ID provided"})
+			c.AbortWithStatusJSON(http.StatusNotFound, &gin.H{"error": "game has not started"})
 			a.logger.Warn("no game ID in redis DB", zap.Error(err))
 			return
 		}
@@ -89,8 +89,8 @@ func (a *V1) gameGuess(c *gin.Context) {
 		GameID:      gameID,
 		CountryID:   countryIDi,
 		Text:        request.Guess,
-		GuessNumber: len(prev) + 1,
-		Timestamp:   int32(time.Now().Unix()),
+		GuessNumber: len(prev),
+		Timestamp:   time.Now().Unix(),
 	}
 	for _, alias := range country.Aliases {
 		if levenshtein.ComputeDistance(request.Guess, alias) <= 1 {
