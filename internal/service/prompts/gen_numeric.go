@@ -92,11 +92,7 @@ func (p *Prompts) genHDI(c *countries.Country) *Prompt {
 	place := p.countriesRepo.GetPlaceHDI(c)
 	promptVariant := rand.Intn(2)
 	if promptVariant == 0 {
-		hdi := []byte(strconv.FormatFloat(c.HDI, 'f', -1, 64))
-		for i := len(hdi) - 3; i > 0; i -= 3 {
-			hdi = slices.Insert(hdi, i, ' ')
-		}
-		prompt.Text = fmt.Sprintf("HDI of this country is %v km²", string(hdi))
+		prompt.Text = fmt.Sprintf("HDI of this country is %v", c.HDI)
 	} else {
 		prompt.Text = fmt.Sprintf("This country is number %v in terms of HDI", place)
 	}

@@ -1,14 +1,14 @@
 export function GetPrompts() {
-    let prompts = localStorage.getItem('prompts');
+    let prompts = localStorage.getItem('prompts')
     if (prompts) {
-        const decoded = JSON.parse(prompts);
+        const decoded = JSON.parse(prompts)
         if (decoded) {
-            return decoded;
+            return decoded
         }
     }
-    return [];
+    return []
 }
 
 export function SavePrompts(prompts) {
-    localStorage.setItem('prompts', JSON.stringify(prompts));
+    localStorage.setItem('prompts', JSON.stringify(prompts))
 }

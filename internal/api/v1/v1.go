@@ -1,14 +1,10 @@
 package v1
 
 import (
-	"context"
 	"github.com/gin-contrib/cors"
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
 	"github.com/harijar/geogame/internal/repo"
-	"github.com/harijar/geogame/internal/repo/postgres/countries"
-	"github.com/harijar/geogame/internal/repo/postgres/users"
-	"github.com/harijar/geogame/internal/service/prompts"
 	"go.uber.org/zap"
 	"time"
 )
@@ -23,16 +19,6 @@ type ServerConfig struct {
 	SameSite             int
 }
 
-type PromptsService interface {
-	Gen(id int, c *countries.Country, prev []*prompts.Prompt) (*prompts.Prompt, error)
-	GenRandom(c *countries.Country, prev []*prompts.Prompt) (*prompts.Prompt, error)
-}
-
-type AuthService interface {
-	GenerateToken(user *users.User) (string, error)
-	RegisterOrUpdate(ctx context.Context, user *users.User) error
-}
-
 type V1 struct {
 	server       *gin.Engine
 	countries    repo.Countries
@@ -40,6 +26,7 @@ type V1 struct {
 	tokens       repo.Tokens
 	users        repo.Users
 	authService  AuthService
+	statistics   StatisticsService
 	botToken     string
 	triesLimit   int
 	serverConfig *ServerConfig
@@ -51,6 +38,7 @@ func New(countries repo.Countries,
 	tokens repo.Tokens,
 	users repo.Users,
 	authService AuthService,
+	statistics StatisticsService,
 	botToken string,
 	triesLimit int,
 	serverConfig *ServerConfig,
@@ -62,6 +50,7 @@ func New(countries repo.Countries,
 		tokens:       tokens,
 		users:        users,
 		authService:  authService,
+		statistics:   statistics,
 		botToken:     botToken,
 		triesLimit:   triesLimit,
 		serverConfig: serverConfig,

@@ -52,5 +52,12 @@ func (a *V1) gameStart(c *gin.Context) {
 	}
 	a.setCookie(c, "country", strconv.Itoa(country.ID), false)
 	a.setCookie(c, "prompts", string(promptsOut), false)
+	err = a.setGameID(c)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
+		a.logger.Error("could not set game id", zap.Error(err))
+		return
+	}
+	a.logger.Debug("game ID set")
 	c.JSON(200, &StartResponse{prompt.Text})
 }

@@ -1,10 +1,10 @@
 package v1
 
 import (
-	"context"
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/harijar/geogame/internal/repo/postgres/users"
@@ -13,8 +13,8 @@ import (
 	"net/http"
 )
 
-type authRequest struct {
-	ID        int32  `json:"id"`
+type AuthRequest struct {
+	ID        int64  `json:"id"`
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
 	Username  string `json:"username"`
@@ -24,7 +24,7 @@ type authRequest struct {
 }
 
 func (a *V1) auth(c *gin.Context) {
-	request := &authRequest{}
+	request := &AuthRequest{}
 	err := c.BindJSON(request)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, &gin.H{"error": "invalid data"})
@@ -46,9 +46,9 @@ func (a *V1) auth(c *gin.Context) {
 		// token for this request is not found in cookie
 		createNewToken = true
 	} else {
-		redisId, err := a.tokens.Get(context.Background(), cookieToken)
+		redisId, err := a.tokens.GetUserID(c, cookieToken)
 		if err != nil {
-			if err != redis.Nil {
+			if !errors.Is(err, redis.Nil) {
 				c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
 				a.logger.Warn("could not get token from redis database", zap.Error(err))
 				return
@@ -68,16 +68,22 @@ func (a *V1) auth(c *gin.Context) {
 			LastName:  request.LastName,
 			Username:  request.Username}
 
-		err = a.authService.RegisterOrUpdate(context.Background(), user)
+		err = a.authService.RegisterOrUpdate(c, user)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
 			a.logger.Error("failed to register request in postgres database", zap.Error(err))
 			return
 		}
-		token, err := a.authService.GenerateToken(user)
+		token, err := a.authService.GenerateToken()
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
 			a.logger.Error("failed to generate token", zap.Error(err))
+			return
+		}
+		err = a.tokens.SetUserID(c, token, user.ID)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
+			a.logger.Error("failed to save token to redis DB", zap.Error(err))
 			return
 		}
 		a.setCookie(c, "token", token, false)
@@ -85,7 +91,7 @@ func (a *V1) auth(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
-func (a *V1) checkSign(user *authRequest) bool {
+func (a *V1) checkSign(user *AuthRequest) bool {
 	checkString := fmt.Sprintf("auth_date=%v\n", user.AuthDate)
 	if user.FirstName != "" {
 		checkString += fmt.Sprintf("first_name=%s\n", user.FirstName)

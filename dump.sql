@@ -206,7 +206,7 @@ COPY public.countries (id, name, aliases, un_not_member, unrecognised, capital, 
 94	Tajikistan	{tajikistan}			Dushanbe	Islam	96.4	10077600	141510	8746	897	0.685	Soviet Union	28.6	25.5	45.9	41.02	36.4	75.05	67.25	0	0	f	t	f
 95	Tuvalu	{tuvalu}			Funafuti	Christianity	94.8	10679	26	60	5370	0.641	United Kingdom	24.5	5.6	70	-5.39	-10.48	179.51	176.03	1	0	t	f	t
 96	Oman	{oman}			Muscat	Islam	88.9	5113071	309500	88192	19509	0.816	Portugal	1.8	46.4	51.8	26.3	16.39	59.5	52	0	0	t	f	f
-97	United States	{"united states",us,"the us",usa}			Washington, D.C.	Christianity	63	335623000	9147593	23315081	69185	0.921	Kingdom of Great Britain	0.9	19.1	80	49.23	25.07	-66.56	-124.43	0	1	f	f	f
+97	United States	{"united states","the united states",us,"the us",usa}			Washington, D.C.	Christianity	63	335623000	9147593	23315081	69185	0.921	Kingdom of Great Britain	0.9	19.1	80	49.23	25.07	-66.56	-124.43	0	1	f	f	f
 98	Chad	{chad}			N'Djamena	Islam	55.1	17414717	1259200	16410	955	0.394	France	52.3	14.7	33.1	23.29	7.27	24	13.4	0	0	f	t	f
 99	Iraq	{iraq}			Baghdad	Islam	95	43324000	437367	204004	4686	0.686	United Kingdom	3.3	51	45.8	37.23	29.04	48.32	38.5	0	0	f	f	f
 100	Lebanon	{lebanon}			Beirut	Islam	0	5490000	10230	37945	6785	0.706	France	3.9	13.1	83	34.43	33.03	36.37	35.06	0	0	f	f	f
@@ -265,7 +265,7 @@ COPY public.countries (id, name, aliases, un_not_member, unrecognised, capital, 
 153	Syria	{syria}			Damascus	Islam	87	22923000	183630	19719	925	0.577	France	20	19.5	60.8	37.19	32.19	42.25	35.3	0	0	f	f	f
 154	Togo	{togo}			Lomé	Christianity	47.8	8095498	54385	8160	944	0.539	France	28.8	21.8	49.8	11.08	6.07	1.46	-0.09	0	2	f	f	f
 155	United Arab Emirates	{"united arab emirates",uae}			Abu Dhabi	Islam	76	9282410	83600	405468	43295	0.911	United Kingdom	0.9	49.8	49.2	26.05	22.38	56.24	51.33	0	0	t	f	f
-156	Democratic Republic of the Congo	{"democratic republic of the congo"}			Kinshasa	Christianity	95.4	95370000	2267048	0	551	0.479	Belgium	19.7	43.6	36.7	5.22	-13.27	31.3	12.2	2	0	f	f	f
+156	Democratic Republic of the Congo	{"democratic republic of the congo",drc}			Kinshasa	Christianity	95.4	95370000	2267048	0	551	0.479	Belgium	19.7	43.6	36.7	5.22	-13.27	31.3	12.2	2	0	f	f	f
 157	Liechtenstein	{liechtenstein}			Vaduz	Christianity	83.2	39680	160	6608	169260	0.935	German Confederation	7	41	52	47.14	47.03	9.33	9.28	0	0	t	t	f
 158	Luxembourg	{luxembourg}			Luxembourg City	Christianity	73.2	660809	2586	85506	133745	0.93		0.3	12.8	86.9	50.11	49.27	6.32	5.44	0	0	t	t	f
 159	Mauritius	{mauritius}			Port Louis	Hinduism	48.54	1261041	2030	11525	8873	0.803	United Kingdom	4	21.8	74.1	-10.25	-20.32	63.3	56.35	1	0	f	f	t
