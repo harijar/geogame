@@ -12,7 +12,7 @@ type AuthResponse struct {
 	LastName  string `json:"last_name"`
 }
 
-func (a *V1) checkAuth(c *gin.Context) {
+func (a *V1) authCheck(c *gin.Context) {
 	user, err := a.getUser(c, users.FirstName, users.LastName)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
