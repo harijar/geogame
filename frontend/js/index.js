@@ -1,14 +1,14 @@
 import {Auth, CheckAuth} from "./auth.js"
 
 window.onload = async function() {
-    await CheckAuth();
+    await CheckAuth()
     document.getElementById("profileButton").onclick = async function() {
-        window.location.href = '/user';
+        window.location.href = '/user'
     }
     document.getElementById("playButton").onclick = async function() {
-        window.location.href = 'game.html';
+        window.location.href = 'game.html'
     }
 }
 async function auth(user) {
-    await Auth(user);
+    await Auth(user)
 }

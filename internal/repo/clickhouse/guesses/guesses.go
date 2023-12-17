@@ -40,16 +40,16 @@ func (g *Guesses) Save(ctx context.Context, guess *Guess) error {
 func (g *Guesses) GetProfileStatistics(ctx context.Context, id int) (*Statistics, error) {
 	var result []Statistics
 	err := g.db.Select(ctx, &result, `
-	WITH games AS (
-    	SELECT count(*) AS number
+	SELECT
+    	avg(guesses_per_game) AS average_guesses,
+    	count() AS total_games,
+    	countIf(guesses_per_game < 10) AS games_won
+	FROM (
+    	SELECT count() AS guesses_per_game
     	FROM guesses
-    	WHERE user_id = ?
+   	 	WHERE user_id = 421058263
     	GROUP BY game_id
-    ) SELECT 
-		avg(number) AS average_guesses, 
-		count(*) AS total_games, 
-		countIf(number < 10) AS games_won
-    FROM games`, id)
+	)`, id)
 	if err != nil {
 		return nil, err
 	}

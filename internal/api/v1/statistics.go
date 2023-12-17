@@ -25,9 +25,9 @@ func (a *V1) setGameID(c *gin.Context) error {
 	_, err := a.authService.GetUserID(c, token)
 	if err != nil {
 		if !errors.Is(err, redis.Nil) {
+			a.logger.Warn("no token, incorrect token in cookies or token has expired")
 			return err
 		}
-		a.logger.Warn("no token, incorrect token in cookies or token has expired")
 		a.logger.Debug("user is playing as guest")
 		token, err = a.authService.GenerateToken()
 		if err != nil {

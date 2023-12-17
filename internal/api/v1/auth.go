@@ -13,7 +13,7 @@ import (
 	"net/http"
 )
 
-type authRequest struct {
+type AuthRequest struct {
 	ID        int64  `json:"id"`
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
@@ -24,7 +24,7 @@ type authRequest struct {
 }
 
 func (a *V1) auth(c *gin.Context) {
-	request := &authRequest{}
+	request := &AuthRequest{}
 	err := c.BindJSON(request)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, &gin.H{"error": "invalid data"})
@@ -91,7 +91,7 @@ func (a *V1) auth(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
-func (a *V1) checkSign(user *authRequest) bool {
+func (a *V1) checkSign(user *AuthRequest) bool {
 	checkString := fmt.Sprintf("auth_date=%v\n", user.AuthDate)
 	if user.FirstName != "" {
 		checkString += fmt.Sprintf("first_name=%s\n", user.FirstName)
