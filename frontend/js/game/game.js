@@ -1,7 +1,7 @@
-import {StartGameRequest, GuessGameRequest} from "./api.js";
+import {StartGameRequest, GuessGameRequest} from "../api.js";
 import {GetPrompts, SavePrompts} from "./storage.js";
 import {GameEnded, ShowPrompt, ShowTriesExceeded, ShowCountryGuessed} from "./game_ui.js";
-import {Auth, CheckAuth} from "./auth.js";
+import {Auth, CheckAuth} from "../auth.js";
 
 let prompts;
 
@@ -34,12 +34,12 @@ window.onload = async function() {
         SavePrompts([])
         window.location.href = 'index.html'
     }
+    await CheckAuth()
     document.getElementById("profileButton").onclick = async function() {
-        window.location.href = '/user'
+        window.location.href = '/profile'
     }
 
     window.auth = auth
-    await CheckAuth()
 }
 
 async function ContinueOrStartGame() {

@@ -5,7 +5,7 @@ table {
     left: 25%;
 }
 
-tr, th {
+tr, th, td {
     border: 1px solid #404040;
     padding: 7px;
 }

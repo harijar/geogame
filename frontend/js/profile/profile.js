@@ -1,8 +1,11 @@
-import {ProfileRequest} from "./api.js"
+import {ProfileRequest} from "../api.js"
 
 window.onload = async function() {
     document.getElementById("mainMenuButton").onclick = async function() {
         window.location.href = '/index.html'
+    }
+    document.getElementById("settingsButton").onclick = async function() {
+        window.location.href = '/profile/settings'
     }
     await loadProfile()
 }
