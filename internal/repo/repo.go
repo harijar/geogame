@@ -26,6 +26,7 @@ type Users interface {
 	Save(ctx context.Context, user *users.User) error
 	Delete(ctx context.Context, id int) error
 	UpdateOrSave(ctx context.Context, user *users.User) error
+	Update(ctx context.Context, user *users.User) error
 }
 
 type Tokens interface {

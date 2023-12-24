@@ -7,6 +7,7 @@ const (
 	FirstName = "first_name"
 	LastName  = "last_name"
 	Username  = "username"
+	Public    = "public"
 )
 
 type User struct {
@@ -16,4 +17,5 @@ type User struct {
 	FirstName string `bun:"first_name"`
 	LastName  string `bun:"last_name"`
 	Username  string `bun:"username"`
+	Public    bool   `bun:"public"`
 }

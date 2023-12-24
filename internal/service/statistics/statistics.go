@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/harijar/geogame/internal/repo"
 	"github.com/harijar/geogame/internal/repo/clickhouse/guesses"
+	"math"
 )
 
 type Statistics struct {
@@ -19,5 +20,10 @@ func (s *Statistics) SaveRecord(ctx context.Context, g *guesses.Guess) error {
 }
 
 func (s *Statistics) GetStatistics(ctx context.Context, id int) (*guesses.Statistics, error) {
-	return s.guessesRepo.GetProfileStatistics(ctx, id)
+	statistics, err := s.guessesRepo.GetProfileStatistics(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	statistics.AverageGuesses = math.Round(statistics.AverageGuesses*100) / 100
+	return statistics, nil
 }

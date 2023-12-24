@@ -13,8 +13,8 @@ type SettingsRequest struct {
 	Public    bool   `json:"public"`
 }
 
-func (a *V1) updateProfile(c *gin.Context) {
-	request := SettingsRequest{}
+func (a *V1) updateProfileSettings(c *gin.Context) {
+	request := &SettingsRequest{}
 	err := c.BindJSON(request)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, &gin.H{"error": "invalid data"})

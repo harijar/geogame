@@ -21,6 +21,7 @@ type AuthService interface {
 	GetGameID(ctx context.Context, token string) (uuid.UUID, error)
 	SetUserID(ctx context.Context, token string, id int) error
 	SetGameID(ctx context.Context, token string, id uuid.UUID) error
+	UpdateUser(ctx context.Context, user *users.User) error
 }
 
 type StatisticsService interface {
