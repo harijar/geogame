@@ -8,14 +8,14 @@ import (
 )
 
 type profileResponse struct {
-	Name           string  `json:"name"`
+	Nickname       string  `json:"nickname"`
 	TotalGames     int     `json:"total_games"`
 	GamesWon       int     `json:"games_won"`
 	AverageGuesses float64 `json:"average_guesses"`
 }
 
 func (a *V1) profile(c *gin.Context) {
-	user, err := a.getUser(c, users.ID, users.FirstName, users.LastName)
+	user, err := a.getUser(c, users.ID, users.Nickname)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
 		a.logger.Error("could not get user data", zap.Error(err))
@@ -26,7 +26,7 @@ func (a *V1) profile(c *gin.Context) {
 		a.logger.Warn("user not found in database", zap.Error(err))
 		return
 	}
-	response := &profileResponse{Name: user.FirstName + " " + user.LastName}
+	response := &profileResponse{Nickname: user.Nickname}
 	statistics, err := a.statistics.GetStatistics(c, user.ID)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})

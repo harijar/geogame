@@ -21,10 +21,13 @@ type AuthService interface {
 	GetGameID(ctx context.Context, token string) (uuid.UUID, error)
 	SetUserID(ctx context.Context, token string, id int) error
 	SetGameID(ctx context.Context, token string, id uuid.UUID) error
-	UpdateUser(ctx context.Context, user *users.User) error
 }
 
 type StatisticsService interface {
 	SaveRecord(ctx context.Context, g *guesses.Guess) error
 	GetStatistics(ctx context.Context, id int) (*guesses.Statistics, error)
+}
+
+type ProfileService interface {
+	UpdateUser(ctx context.Context, user *users.User) error
 }

@@ -51,7 +51,7 @@ func (u *Users) UpdateOrSave(ctx context.Context, user *User) error {
 func (u *Users) Update(ctx context.Context, user *User) error {
 	_, err := u.db.NewUpdate().
 		Model(user).
-		Column(FirstName, LastName, Public).
+		Column(Nickname, Public).
 		Where("id=?", user.ID).
 		Exec(ctx)
 	return err

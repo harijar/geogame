@@ -12,8 +12,8 @@ window.onload = async function() {
 
 async function loadProfile() {
     const data = await ProfileRequest()
-    document.getElementById("title").textContent = data['name']
-    document.getElementById("greetings").textContent = `Greetings, ${data['name']}!`
+    document.getElementById("title").textContent = data['nickname']
+    document.getElementById("greetings").textContent = `Greetings, ${data['nickname']}!`
     document.getElementById("totalGames").textContent = data['total_games']
     document.getElementById("gamesWon").textContent = data['games_won']
     document.getElementById("averageGuesses").textContent = data['average_guesses']

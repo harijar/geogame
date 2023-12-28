@@ -53,7 +53,3 @@ func (a *Auth) SetUserID(ctx context.Context, token string, id int) error {
 func (a *Auth) SetGameID(ctx context.Context, token string, id uuid.UUID) error {
 	return a.tokensRepo.SetGameID(ctx, token, id)
 }
-
-func (a *Auth) UpdateUser(ctx context.Context, user *users.User) error {
-	return a.usersRepo.Update(ctx, user)
-}

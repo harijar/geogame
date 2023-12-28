@@ -16,9 +16,8 @@ window.onload = async function() {
 
 async function getInfo() {
     let data = await GetProfileSettingsRequest()
-    document.getElementById("profileButton").textContent = data['first_name'] + ' ' + data['last_name']
-    document.getElementById("firstName").value = data['first_name']
-    document.getElementById("lastName").value = data['last_name']
+    document.getElementById("profileButton").textContent = data['nickname']
+    document.getElementById("nickname").value = data['nickname']
     if (data['public']) {
         document.getElementById("public").checked = true
     } else {
@@ -28,9 +27,11 @@ async function getInfo() {
 
 async function update() {
     let data = {
-        first_name: document.getElementById("firstName").value,
-        last_name: document.getElementById("lastName").value,
+        nickname: document.getElementById("nickname").value,
         public: document.getElementById("public").checked
     }
-    await UpdateProfileSettingsRequest(data)
+    let err = await UpdateProfileSettingsRequest(data)
+    if (err != null) {
+        alert(err['msg'])
+    }
 }

@@ -63,10 +63,10 @@ func (a *V1) auth(c *gin.Context) {
 
 	if createNewToken {
 		user := &users.User{
-			ID:        int(request.ID),
-			FirstName: request.FirstName,
-			LastName:  request.LastName,
-			Username:  request.Username}
+			ID:               int(request.ID),
+			Nickname:         request.Username,
+			TelegramUsername: request.Username,
+			Public:           false}
 
 		err = a.authService.RegisterOrUpdate(c, user)
 		if err != nil {

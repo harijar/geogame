@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/ClickHouse/clickhouse-go/v2/lib/driver"
 	"github.com/google/uuid"
+	"math"
 )
 
 type Guess struct {
@@ -53,5 +54,6 @@ func (g *Guesses) GetProfileStatistics(ctx context.Context, id int) (*Statistics
 	if err != nil {
 		return nil, err
 	}
+	result[0].AverageGuesses = math.Round(result[0].AverageGuesses*100) / 100
 	return &result[0], nil
 }

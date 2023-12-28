@@ -65,6 +65,9 @@ export async function CheckAuthRequest() {
         }
         return data
     }
+    if (response.status === 403) {
+        return null
+    }
     throw Error('Failed to check auth: ' + response.status)
 }
 
@@ -109,6 +112,14 @@ export async function UpdateProfileSettingsRequest(settings) {
         body: JSON.stringify(settings)
     })
     if (!response.ok) {
+        if (response.status < 500) {
+            const data = await response.json()
+            if (!data) {
+                throw Error('Failed to update: ' + await response.text())
+            }
+            return data
+        }
         throw Error('Failed to update: ' + response.status)
     }
+    return null
 }

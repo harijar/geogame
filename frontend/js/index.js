@@ -8,6 +8,7 @@ window.onload = async function() {
     document.getElementById("playButton").onclick = async function() {
         window.location.href = 'game.html'
     }
+    window.auth = auth
 }
 async function auth(user) {
     await Auth(user)
