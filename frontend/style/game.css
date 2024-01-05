@@ -4,6 +4,8 @@
 
 #buttonsGame {
     text-align: left;
+    position: relative;
+    float: left;
 }
 
 #buttonsGameEnded {

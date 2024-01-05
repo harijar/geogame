@@ -26,6 +26,13 @@ func (u *Users) Get(ctx context.Context, id int, columns ...string) (*User, erro
 	return user, nil
 }
 
+func (u *Users) Exists(ctx context.Context, id int) (bool, error) {
+	return u.db.NewSelect().
+		Model((*User)(nil)).
+		Where("id=?", id).
+		Exists(ctx)
+}
+
 func (u *Users) Save(ctx context.Context, user *User) error {
 	_, err := u.db.NewInsert().
 		Model(user).
@@ -44,6 +51,15 @@ func (u *Users) UpdateOrSave(ctx context.Context, user *User) error {
 	_, err := u.db.NewInsert().
 		Model(user).
 		On("CONFLICT (id) DO UPDATE").
+		Exec(ctx)
+	return err
+}
+
+func (u *Users) Update(ctx context.Context, user *User) error {
+	_, err := u.db.NewUpdate().
+		Model(user).
+		Column(Nickname, Public).
+		Where("id=?", user.ID).
 		Exec(ctx)
 	return err
 }

@@ -8,12 +8,11 @@ import (
 )
 
 type AuthResponse struct {
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
+	Nickname string `json:"nickname"`
 }
 
 func (a *V1) authCheck(c *gin.Context) {
-	user, err := a.getUser(c, users.FirstName, users.LastName)
+	user, err := a.getUser(c, users.Nickname)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
 		a.logger.Error("could not get user data", zap.Error(err))
@@ -25,7 +24,6 @@ func (a *V1) authCheck(c *gin.Context) {
 		a.logger.Info("user is playing as guest")
 		return
 	}
-	response.FirstName = user.FirstName
-	response.LastName = user.LastName
+	response.Nickname = user.Nickname
 	c.JSON(200, response)
 }

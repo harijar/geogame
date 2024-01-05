@@ -3,6 +3,10 @@ body {
     height: 100vh;
 }
 
+.layoutTop {
+    display: inline-block;
+}
+
 #pagetop {
     border: 3px darkslategray;
     padding: 10px;

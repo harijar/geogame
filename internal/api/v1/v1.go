@@ -26,6 +26,7 @@ type V1 struct {
 	tokens       repo.Tokens
 	users        repo.Users
 	authService  AuthService
+	usersService UsersService
 	statistics   StatisticsService
 	botToken     string
 	triesLimit   int
@@ -38,6 +39,7 @@ func New(countries repo.Countries,
 	tokens repo.Tokens,
 	users repo.Users,
 	authService AuthService,
+	usersService UsersService,
 	statistics StatisticsService,
 	botToken string,
 	triesLimit int,
@@ -50,6 +52,7 @@ func New(countries repo.Countries,
 		tokens:       tokens,
 		users:        users,
 		authService:  authService,
+		usersService: usersService,
 		statistics:   statistics,
 		botToken:     botToken,
 		triesLimit:   triesLimit,

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings</title>
+    <script type="module" src="../../js/profile/settings.js"></script>
+    <link rel="stylesheet" href="../../style/style.css">
+    <link rel="stylesheet" href="../../style/profile/settings.css">
+</head>
+<body>
+    <div id="pagetop">
+        <div id="profile" style="display: block">
+            <button id="profileButton"></button>
+        </div>
+        <button id="backButton">Back to profile</button>
+        <button id="mainMenuButton">To the main menu</button>
+    </div>
+    <div id="mainPage">
+        <div id="info">
+            <br>
+            <h1>Profile settings</h1>
+            <br><br>
+            <form id="settings" style="text-align: left">
+                <div class="form-group">
+                    <label for="nickname">Nickname:</label>
+                    <input type="text" id="nickname" name="nickname" required>
+                </div>
+                <br><br><br>
+
+                <div class="form-group">
+                    <label>Profile Type:</label>
+                    <input type="radio" id="public" name="profileType" value="public">
+                    <label for="public" class="tooltip">Public
+                        <span class="tooltiptext">
+                            Everybody sees your profile and information (first name, last name, profile picture, statistics)
+                            and can invite you to play a game.
+                        </span>
+                    </label>
+                    <input type="radio" id="private" name="profileType" value="private">
+                    <label for="private" class="tooltip">Private
+                        <span class="tooltiptext">
+                            Nobody can see your profile and get in contact with you.
+                        </span>
+                    </label>
+                </div>
+                <br>
+                <div class="form-group">
+                    <button type="submit">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
