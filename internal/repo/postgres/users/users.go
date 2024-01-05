@@ -26,6 +26,13 @@ func (u *Users) Get(ctx context.Context, id int, columns ...string) (*User, erro
 	return user, nil
 }
 
+func (u *Users) Exists(ctx context.Context, id int) (bool, error) {
+	return u.db.NewSelect().
+		Model((*User)(nil)).
+		Where("id=?", id).
+		Exists(ctx)
+}
+
 func (u *Users) Save(ctx context.Context, user *User) error {
 	_, err := u.db.NewInsert().
 		Model(user).

@@ -16,7 +16,8 @@ type PromptsService interface {
 
 type AuthService interface {
 	GenerateToken() (string, error)
-	GetUser(ctx context.Context, id int) (*users.User, error)
+	GetUser(ctx context.Context, id int, columns ...string) (*users.User, error)
+	UserExists(ctx context.Context, id int) (bool, error)
 	RegisterOrUpdate(ctx context.Context, user *users.User) error
 	GetUserID(ctx context.Context, token string) (int, error)
 	GetGameID(ctx context.Context, token string) (uuid.UUID, error)

@@ -62,19 +62,26 @@ func (a *V1) auth(c *gin.Context) {
 	}
 
 	if createNewToken {
-		user, err := a.authService.GetUser(c, int(request.ID))
+		exists, err := a.authService.UserExists(c, int(request.ID))
 		if err != nil {
-			if err.Error() == "sql: no rows in result set" {
-				user = &users.User{
-					ID:               int(request.ID),
-					Nickname:         request.Username,
-					TelegramUsername: request.Username,
-					Public:           false}
-			} else {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
+			a.logger.Error("could not check if user exists", zap.Error(err))
+			return
+		}
+		var user *users.User
+		if exists {
+			user, err = a.authService.GetUser(c, int(request.ID))
+			if err != nil {
 				c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
-				a.logger.Error("could not look for user in database", zap.Error(err))
+				a.logger.Error("could not find user", zap.Error(err))
 				return
 			}
+		} else {
+			user = &users.User{
+				ID:               int(request.ID),
+				Nickname:         request.Username,
+				TelegramUsername: request.Username,
+				Public:           false}
 		}
 
 		err = a.authService.RegisterOrUpdate(c, user)

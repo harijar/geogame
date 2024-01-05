@@ -11,17 +11,35 @@ import (
 	"net/http"
 )
 
-type SettingsRequest struct {
+type GetProfileSettingsResponse struct {
 	Nickname string `json:"nickname"`
 	Public   bool   `json:"public"`
 }
 
-type SettingsResponse struct {
+type UpdateProfileSettingsRequest struct {
+	Nickname string `json:"nickname"`
+	Public   bool   `json:"public"`
+}
+
+type UpdateProfileSettingsResponse struct {
 	Msg string `json:"msg"`
 }
 
+func (a *V1) getProfileSettings(c *gin.Context) {
+	user, err := a.getUser(c, users.Nickname, users.Public)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
+		a.logger.Error("could not get user", zap.Error(err))
+		return
+	}
+	c.JSON(http.StatusOK, &GetProfileSettingsResponse{
+		Nickname: user.Nickname,
+		Public:   user.Public,
+	})
+}
+
 func (a *V1) updateProfileSettings(c *gin.Context) {
-	request := &SettingsRequest{}
+	request := &UpdateProfileSettingsRequest{}
 	err := c.BindJSON(request)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, &gin.H{"error": "invalid data"})
@@ -43,14 +61,11 @@ func (a *V1) updateProfileSettings(c *gin.Context) {
 		a.logger.Error("could not update settings", zap.Error(err))
 		return
 	}
-	c.JSON(status, &SettingsResponse{Msg: msg})
+	c.JSON(status, &UpdateProfileSettingsResponse{Msg: msg})
 }
 
 func (a *V1) checkAndUpdate(c context.Context, user *users.User) (int, string, error) {
-	if len(user.Nickname) > 30 {
-		return http.StatusConflict, "nickname too long", nil
-	}
-	err := validator.New().Var(user.Nickname, "ascii,excludesall=#%&()?/\".")
+	err := validator.New().Var(user.Nickname, "lt=30,ascii,excludesall=#%&()?/\".")
 	if err != nil {
 		return http.StatusConflict, "nickname must contain only latin letters, numbers and underscores", nil
 	}

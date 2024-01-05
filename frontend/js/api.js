@@ -112,7 +112,7 @@ export async function UpdateProfileSettingsRequest(settings) {
         body: JSON.stringify(settings)
     })
     if (!response.ok) {
-        if (response.status < 500) {
+        if (response.status === 409) {
             const data = await response.json()
             if (!data) {
                 throw Error('Failed to update: ' + await response.text())

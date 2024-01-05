@@ -34,8 +34,12 @@ func (a *Auth) GenerateToken() (string, error) {
 	return string(token), err
 }
 
-func (a *Auth) GetUser(ctx context.Context, id int) (*users.User, error) {
-	return a.usersRepo.Get(ctx, id)
+func (a *Auth) GetUser(ctx context.Context, id int, columns ...string) (*users.User, error) {
+	return a.usersRepo.Get(ctx, id, columns...)
+}
+
+func (a *Auth) UserExists(ctx context.Context, id int) (bool, error) {
+	return a.usersRepo.Exists(ctx, id)
 }
 
 func (a *Auth) RegisterOrUpdate(ctx context.Context, user *users.User) error {
