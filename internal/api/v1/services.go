@@ -30,6 +30,6 @@ type StatisticsService interface {
 	GetStatistics(ctx context.Context, id int) (*guesses.Statistics, error)
 }
 
-type ProfileService interface {
+type UsersService interface {
 	UpdateUser(ctx context.Context, user *users.User) error
 }

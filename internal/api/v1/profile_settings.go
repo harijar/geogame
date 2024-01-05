@@ -69,7 +69,7 @@ func (a *V1) checkAndUpdate(c context.Context, user *users.User) (int, string, e
 	if err != nil {
 		return http.StatusConflict, "nickname must contain only latin letters, numbers and underscores", nil
 	}
-	err = a.profileService.UpdateUser(c, user)
+	err = a.usersService.UpdateUser(c, user)
 	if err != nil {
 		if err, ok := err.(pgdriver.Error); ok && err.Field('C') == pgerrcode.UniqueViolation {
 			return http.StatusConflict, "nickname already in use", nil

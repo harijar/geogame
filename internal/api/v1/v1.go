@@ -20,18 +20,18 @@ type ServerConfig struct {
 }
 
 type V1 struct {
-	server         *gin.Engine
-	countries      repo.Countries
-	prompts        PromptsService
-	tokens         repo.Tokens
-	users          repo.Users
-	authService    AuthService
-	profileService ProfileService
-	statistics     StatisticsService
-	botToken       string
-	triesLimit     int
-	serverConfig   *ServerConfig
-	logger         *zap.Logger
+	server       *gin.Engine
+	countries    repo.Countries
+	prompts      PromptsService
+	tokens       repo.Tokens
+	users        repo.Users
+	authService  AuthService
+	usersService UsersService
+	statistics   StatisticsService
+	botToken     string
+	triesLimit   int
+	serverConfig *ServerConfig
+	logger       *zap.Logger
 }
 
 func New(countries repo.Countries,
@@ -39,25 +39,25 @@ func New(countries repo.Countries,
 	tokens repo.Tokens,
 	users repo.Users,
 	authService AuthService,
-	profileService ProfileService,
+	usersService UsersService,
 	statistics StatisticsService,
 	botToken string,
 	triesLimit int,
 	serverConfig *ServerConfig,
 	logger *zap.Logger) *V1 {
 	return &V1{
-		server:         gin.New(),
-		countries:      countries,
-		prompts:        prompts,
-		tokens:         tokens,
-		users:          users,
-		authService:    authService,
-		profileService: profileService,
-		statistics:     statistics,
-		botToken:       botToken,
-		triesLimit:     triesLimit,
-		serverConfig:   serverConfig,
-		logger:         logger,
+		server:       gin.New(),
+		countries:    countries,
+		prompts:      prompts,
+		tokens:       tokens,
+		users:        users,
+		authService:  authService,
+		usersService: usersService,
+		statistics:   statistics,
+		botToken:     botToken,
+		triesLimit:   triesLimit,
+		serverConfig: serverConfig,
+		logger:       logger,
 	}
 }
 

@@ -1,4 +1,4 @@
-package profile
+package users
 
 import (
 	"context"
@@ -6,14 +6,14 @@ import (
 	"github.com/harijar/geogame/internal/repo/postgres/users"
 )
 
-type Profile struct {
+type Users struct {
 	usersRepo repo.Users
 }
 
-func New(usersRepo repo.Users) *Profile {
-	return &Profile{usersRepo: usersRepo}
+func New(usersRepo repo.Users) *Users {
+	return &Users{usersRepo: usersRepo}
 }
 
-func (p *Profile) UpdateUser(ctx context.Context, user *users.User) error {
+func (p *Users) UpdateUser(ctx context.Context, user *users.User) error {
 	return p.usersRepo.Update(ctx, user)
 }
