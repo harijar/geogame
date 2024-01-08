@@ -4,4 +4,5 @@ ALTER TABLE IF EXISTS users
 ALTER TABLE IF EXISTS users
     DROP COLUMN first_name,
     DROP COLUMN last_name,
-    ADD COLUMN public bool;
+    ADD COLUMN public bool,
+    ADD COLUMN nickname TEXT;

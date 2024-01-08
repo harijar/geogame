@@ -54,14 +54,19 @@ func (a *V1) updateProfileSettings(c *gin.Context) {
 	}
 	user.Nickname = request.Nickname
 	user.Public = request.Public
+	response := &UpdateProfileSettingsResponse{}
+	err = a.usersService.UpdateUser(c, user)
+	if err != nil {
+		er, ok := err.(validator.ValidationErrors)
+		if ok {
+			//...
+		}
+		er, ok = err.(pgdriver.Error)
+		if ok && err.Field('C') == pgerrcode.UniqueViolation {
+			response.Msg = "nickname already in use"
+		}
 
-	status, msg, err := a.checkAndUpdate(c, user)
-	if status == http.StatusInternalServerError {
-		c.AbortWithStatusJSON(status, &gin.H{"error": "internal server error"})
-		a.logger.Error("could not update settings", zap.Error(err))
-		return
 	}
-	c.JSON(status, &UpdateProfileSettingsResponse{Msg: msg})
 }
 
 func (a *V1) checkAndUpdate(c context.Context, user *users.User) (int, string, error) {
@@ -74,7 +79,7 @@ func (a *V1) checkAndUpdate(c context.Context, user *users.User) (int, string, e
 		if err, ok := err.(pgdriver.Error); ok && err.Field('C') == pgerrcode.UniqueViolation {
 			return http.StatusConflict, "nickname already in use", nil
 		}
-		return http.StatusInternalServerError, "interval server eror", err
+		return http.StatusInternalServerError, "interval server error", err
 	}
 	return http.StatusOK, "", nil
 }

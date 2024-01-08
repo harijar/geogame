@@ -16,7 +16,6 @@ type PromptsService interface {
 
 type AuthService interface {
 	GenerateToken() (string, error)
-	GetUser(ctx context.Context, id int, columns ...string) (*users.User, error)
 	UserExists(ctx context.Context, id int) (bool, error)
 	RegisterOrUpdate(ctx context.Context, user *users.User) error
 	GetUserID(ctx context.Context, token string) (int, error)
@@ -31,5 +30,6 @@ type StatisticsService interface {
 }
 
 type UsersService interface {
+	GetUser(ctx context.Context, id int, columns ...string) (*users.User, error)
 	UpdateUser(ctx context.Context, user *users.User) error
 }

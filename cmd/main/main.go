@@ -65,10 +65,10 @@ func main() {
 	authService := auth.New(tokensRepo, usersRepo, logger.With(zap.String("service", "auth")))
 
 	guessesRepo := guesses.New(clickhouseDB)
-	profileService := usersService.New(usersRepo)
+	usersService := usersService.New(usersRepo)
 	statisticsService := statistics.New(guessesRepo)
 
-	api := v1.New(countriesRepo, promptsService, tokensRepo, usersRepo, authService, profileService, statisticsService, cfg.BotToken, cfg.TriesLimit, &v1.ServerConfig{
+	api := v1.New(countriesRepo, promptsService, tokensRepo, usersRepo, authService, usersService, statisticsService, cfg.BotToken, cfg.TriesLimit, &v1.ServerConfig{
 		CookieDomain:         cfg.CookieDomain,
 		CookieSecure:         cfg.CookieSecure,
 		CORSEnabled:          cfg.CORSEnabled,
