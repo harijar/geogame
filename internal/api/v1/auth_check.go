@@ -25,5 +25,5 @@ func (a *V1) authCheck(c *gin.Context) {
 		return
 	}
 	response.Nickname = user.Nickname
-	c.JSON(200, response)
+	c.JSON(http.StatusOK, response)
 }

@@ -34,5 +34,5 @@ func (a *V1) profile(c *gin.Context) {
 		return
 	}
 	response.TotalGames, response.GamesWon, response.AverageGuesses = int(statistics.TotalGames), int(statistics.GamesWon), statistics.AverageGuesses
-	c.JSON(200, response)
+	c.JSON(http.StatusOK, response)
 }

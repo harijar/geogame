@@ -59,5 +59,5 @@ func (a *V1) gameStart(c *gin.Context) {
 		return
 	}
 	a.logger.Debug("game ID set")
-	c.JSON(200, &StartResponse{prompt.Text})
+	c.JSON(http.StatusOK, &StartResponse{prompt.Text})
 }

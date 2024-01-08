@@ -1,12 +1,12 @@
 package v1
 
 import (
-	"context"
+	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"github.com/harijar/geogame/internal/repo"
 	"github.com/harijar/geogame/internal/repo/postgres/users"
-	"github.com/jackc/pgerrcode"
-	"github.com/uptrace/bun/driver/pgdriver"
+	"github.com/ssoroka/slice"
 	"go.uber.org/zap"
 	"net/http"
 )
@@ -22,7 +22,7 @@ type UpdateProfileSettingsRequest struct {
 }
 
 type UpdateProfileSettingsResponse struct {
-	Msg string `json:"msg"`
+	Msg []string `json:"msg"`
 }
 
 func (a *V1) getProfileSettings(c *gin.Context) {
@@ -54,32 +54,30 @@ func (a *V1) updateProfileSettings(c *gin.Context) {
 	}
 	user.Nickname = request.Nickname
 	user.Public = request.Public
+
 	response := &UpdateProfileSettingsResponse{}
+	status := http.StatusOK // status code can change to 409 if nickname is invalid for some reason
 	err = a.usersService.UpdateUser(c, user)
 	if err != nil {
-		er, ok := err.(validator.ValidationErrors)
-		if ok {
-			//...
+		if errors.Is(err, ErrInvalidNickname) {
+			for _, err := range err.(validator.ValidationErrors) {
+				switch {
+				case err.Tag() == "lt":
+					response.Msg = append(response.Msg, "nickname is too long")
+				case err.Tag() == "ascii" || err.Tag() == "excludesall":
+					response.Msg = append(response.Msg, "nickname must contain only latin letters, number and underscores")
+				}
+			}
+			response.Msg = slice.Unique(response.Msg)
+			status = http.StatusConflict
+		} else if errors.Is(err, repo.ErrNicknameNotUnique) {
+			response.Msg = []string{"nickname is already in use"}
+			status = http.StatusConflict
+		} else {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
+			a.logger.Error("could not update user", zap.Error(err))
+			return
 		}
-		er, ok = err.(pgdriver.Error)
-		if ok && err.Field('C') == pgerrcode.UniqueViolation {
-			response.Msg = "nickname already in use"
-		}
-
 	}
-}
-
-func (a *V1) checkAndUpdate(c context.Context, user *users.User) (int, string, error) {
-	err := validator.New().Var(user.Nickname, "lt=30,ascii,excludesall=#%&()?/\".")
-	if err != nil {
-		return http.StatusConflict, "nickname must contain only latin letters, numbers and underscores", nil
-	}
-	err = a.usersService.UpdateUser(c, user)
-	if err != nil {
-		if err, ok := err.(pgdriver.Error); ok && err.Field('C') == pgerrcode.UniqueViolation {
-			return http.StatusConflict, "nickname already in use", nil
-		}
-		return http.StatusInternalServerError, "interval server error", err
-	}
-	return http.StatusOK, "", nil
+	c.JSON(status, response)
 }
