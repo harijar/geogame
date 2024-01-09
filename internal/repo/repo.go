@@ -2,7 +2,6 @@ package repo
 
 import (
 	"context"
-	"errors"
 	"github.com/google/uuid"
 	"github.com/harijar/geogame/internal/repo/clickhouse/guesses"
 	"github.com/harijar/geogame/internal/repo/postgres/countries"
@@ -21,8 +20,6 @@ type Countries interface {
 	GetPlaceGDPPerCapita(country *countries.Country) int
 	GetPlaceHDI(country *countries.Country) int
 }
-
-var ErrNicknameNotUnique = errors.New("nickname is already in use")
 
 type Users interface {
 	Get(ctx context.Context, id int, columns ...string) (*users.User, error)

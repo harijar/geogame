@@ -267,3 +267,84 @@ paths:
                 properties:
                   error:
                     type: string
+  /v1/profile/settings:
+    get:
+      summary: Information for profile settings page
+      description: Gets all necessary user profile information from server to load in an HTML form as default values
+      responses:
+        '200':
+          description: got all information successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  nickname:
+                    type: string
+                  public:
+                    type: boolean
+                    description: if true, user's profile is visible to other users
+        '500':
+          description: internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+    post:
+      summary: Changes profile information
+      description: Takes user's changed settings, checks whether the data is valid and updates profile
+      requestBody:
+        required: true
+        content:
+          appliction/json:
+            schema:
+              type: object
+              properties:
+                nickname:
+                  type: string
+                public:
+                  type: boolean
+                  description: if true, user's profile is visible to other users
+      responses:
+        '200':
+          description: information updated successfully, no validation errors
+        '409':
+          description: there are some errors in nickname validation, e. g. nickname is too long or already exists
+          content:
+            appliction/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    description: all validation errors messages
+        '500':
+          description: internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string

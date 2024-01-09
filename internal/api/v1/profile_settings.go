@@ -1,12 +1,8 @@
 package v1
 
 import (
-	"errors"
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
-	"github.com/harijar/geogame/internal/repo"
 	"github.com/harijar/geogame/internal/repo/postgres/users"
-	"github.com/ssoroka/slice"
 	"go.uber.org/zap"
 	"net/http"
 )
@@ -22,7 +18,7 @@ type UpdateProfileSettingsRequest struct {
 }
 
 type UpdateProfileSettingsResponse struct {
-	Msg []string `json:"msg"`
+	Errors []string `json:"errors"`
 }
 
 func (a *V1) getProfileSettings(c *gin.Context) {
@@ -57,27 +53,15 @@ func (a *V1) updateProfileSettings(c *gin.Context) {
 
 	response := &UpdateProfileSettingsResponse{}
 	status := http.StatusOK // status code can change to 409 if nickname is invalid for some reason
-	err = a.usersService.UpdateUser(c, user)
+	updateErrors, err := a.usersService.UpdateUser(c, user)
 	if err != nil {
-		if errors.Is(err, ErrInvalidNickname) {
-			for _, err := range err.(validator.ValidationErrors) {
-				switch {
-				case err.Tag() == "lt":
-					response.Msg = append(response.Msg, "nickname is too long")
-				case err.Tag() == "ascii" || err.Tag() == "excludesall":
-					response.Msg = append(response.Msg, "nickname must contain only latin letters, number and underscores")
-				}
-			}
-			response.Msg = slice.Unique(response.Msg)
-			status = http.StatusConflict
-		} else if errors.Is(err, repo.ErrNicknameNotUnique) {
-			response.Msg = []string{"nickname is already in use"}
-			status = http.StatusConflict
-		} else {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
-			a.logger.Error("could not update user", zap.Error(err))
-			return
-		}
+		c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
+		a.logger.Error("could not update user", zap.Error(err))
+		return
+	}
+	response.Errors = updateErrors
+	if len(updateErrors) > 0 {
+		status = http.StatusConflict
 	}
 	c.JSON(status, response)
 }

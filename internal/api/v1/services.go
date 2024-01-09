@@ -2,7 +2,6 @@ package v1
 
 import (
 	"context"
-	"errors"
 	"github.com/google/uuid"
 	"github.com/harijar/geogame/internal/repo/clickhouse/guesses"
 	"github.com/harijar/geogame/internal/repo/postgres/countries"
@@ -30,9 +29,7 @@ type StatisticsService interface {
 	GetStatistics(ctx context.Context, id int) (*guesses.Statistics, error)
 }
 
-var ErrInvalidNickname = errors.New("invalid nickname")
-
 type UsersService interface {
 	GetUser(ctx context.Context, id int, columns ...string) (*users.User, error)
-	UpdateUser(ctx context.Context, user *users.User) error
+	UpdateUser(ctx context.Context, user *users.User) ([]string, error)
 }
