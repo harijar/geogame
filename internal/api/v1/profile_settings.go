@@ -57,6 +57,7 @@ func (a *V1) updateProfileSettings(c *gin.Context) {
 	status := http.StatusOK // status code can change to 409 if nickname is invalid for some reason
 	errs := a.usersService.UpdateUser(c, user)
 	if len(errs) > 0 {
+		status = http.StatusConflict
 		for _, err := range errs {
 			if errors.Is(err, ErrNicknameTooLong) || errors.Is(err, ErrInvalidNickname) || errors.Is(err, repo.ErrNicknameNotUnique) {
 				response.Errors = append(response.Errors, err.Error())
@@ -66,9 +67,6 @@ func (a *V1) updateProfileSettings(c *gin.Context) {
 				return
 			}
 		}
-	}
-	if len(response.Errors) > 0 {
-		status = http.StatusConflict
 	}
 	c.JSON(status, response)
 }
