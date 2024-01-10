@@ -2,6 +2,7 @@ package v1
 
 import (
 	"context"
+	"errors"
 	"github.com/google/uuid"
 	"github.com/harijar/geogame/internal/repo/clickhouse/guesses"
 	"github.com/harijar/geogame/internal/repo/postgres/countries"
@@ -29,7 +30,10 @@ type StatisticsService interface {
 	GetStatistics(ctx context.Context, id int) (*guesses.Statistics, error)
 }
 
+var ErrNicknameTooLong = errors.New("nickname length must be less than 30 symbols")
+var ErrInvalidNickname = errors.New("nickname must contain only latin letters, number and underscores")
+
 type UsersService interface {
 	GetUser(ctx context.Context, id int, columns ...string) (*users.User, error)
-	UpdateUser(ctx context.Context, user *users.User) ([]string, error)
+	UpdateUser(ctx context.Context, user *users.User) []error
 }

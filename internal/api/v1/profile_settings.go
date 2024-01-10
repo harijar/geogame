@@ -1,7 +1,9 @@
 package v1
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
+	"github.com/harijar/geogame/internal/repo"
 	"github.com/harijar/geogame/internal/repo/postgres/users"
 	"go.uber.org/zap"
 	"net/http"
@@ -51,16 +53,21 @@ func (a *V1) updateProfileSettings(c *gin.Context) {
 	user.Nickname = request.Nickname
 	user.Public = request.Public
 
-	response := &UpdateProfileSettingsResponse{}
+	response := &UpdateProfileSettingsResponse{Errors: make([]string, 0)}
 	status := http.StatusOK // status code can change to 409 if nickname is invalid for some reason
-	updateErrors, err := a.usersService.UpdateUser(c, user)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
-		a.logger.Error("could not update user", zap.Error(err))
-		return
+	errs := a.usersService.UpdateUser(c, user)
+	if len(errs) > 0 {
+		for _, err := range errs {
+			if errors.Is(err, ErrNicknameTooLong) || errors.Is(err, ErrInvalidNickname) || errors.Is(err, repo.ErrNicknameNotUnique) {
+				response.Errors = append(response.Errors, err.Error())
+			} else {
+				c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
+				a.logger.Error("could not update user", zap.Error(err))
+				return
+			}
+		}
 	}
-	response.Errors = updateErrors
-	if len(updateErrors) > 0 {
+	if len(response.Errors) > 0 {
 		status = http.StatusConflict
 	}
 	c.JSON(status, response)
