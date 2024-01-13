@@ -1,4 +1,4 @@
-package v1
+package service
 
 import (
 	"context"
@@ -10,12 +10,12 @@ import (
 	"github.com/harijar/geogame/internal/service/prompts"
 )
 
-type PromptsService interface {
+type Prompts interface {
 	Gen(id int, c *countries.Country, prev []*prompts.Prompt) (*prompts.Prompt, error)
 	GenRandom(c *countries.Country, prev []*prompts.Prompt) (*prompts.Prompt, error)
 }
 
-type AuthService interface {
+type Auth interface {
 	GenerateToken() (string, error)
 	UserExists(ctx context.Context, id int) (bool, error)
 	RegisterOrUpdate(ctx context.Context, user *users.User) error
@@ -25,15 +25,14 @@ type AuthService interface {
 	SetGameID(ctx context.Context, token string, id uuid.UUID) error
 }
 
-type StatisticsService interface {
+type Statistics interface {
 	SaveRecord(ctx context.Context, g *guesses.Guess) error
 	GetStatistics(ctx context.Context, id int) (*guesses.Statistics, error)
 }
 
-var ErrNicknameTooLong = errors.New("nickname length must be less than 30 symbols")
-var ErrInvalidNickname = errors.New("nickname must contain only latin letters, number and underscores")
+var ErrInvalidNickname = errors.New("invalid nickname")
 
-type UsersService interface {
+type Users interface {
 	GetUser(ctx context.Context, id int, columns ...string) (*users.User, error)
-	UpdateUser(ctx context.Context, user *users.User) []error
+	UpdateUser(ctx context.Context, user *users.User) error
 }

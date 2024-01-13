@@ -2,7 +2,10 @@ package users
 
 import (
 	"context"
+	"github.com/harijar/geogame/internal/repo"
+	"github.com/jackc/pgerrcode"
 	"github.com/uptrace/bun"
+	"github.com/uptrace/bun/driver/pgdriver"
 )
 
 type Users struct {
@@ -61,5 +64,12 @@ func (u *Users) Update(ctx context.Context, user *User) error {
 		Column(Nickname, Public).
 		Where("id=?", user.ID).
 		Exec(ctx)
-	return err
+	if err != nil {
+		if err, ok := err.(pgdriver.Error); ok && err.Field('C') == pgerrcode.UniqueViolation {
+			return repo.ErrNicknameNotUnique
+		}
+		return err
+	}
+
+	return nil
 }
