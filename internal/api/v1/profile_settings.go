@@ -3,8 +3,8 @@ package v1
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
-	"github.com/harijar/geogame/internal/repo/postgres/users"
-	"github.com/harijar/geogame/internal/service"
+	usersRepo "github.com/harijar/geogame/internal/repo/postgres/users"
+	usersService "github.com/harijar/geogame/internal/service/users"
 	"go.uber.org/zap"
 	"net/http"
 )
@@ -25,7 +25,7 @@ type UpdateProfileSettingsResponse struct {
 }
 
 func (a *V1) getProfileSettings(c *gin.Context) {
-	user, err := a.getUser(c, users.Nickname, users.Public)
+	user, err := a.getUser(c, usersRepo.Nickname, usersRepo.Public)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
 		a.logger.Error("could not get user", zap.Error(err))
@@ -45,7 +45,7 @@ func (a *V1) updateProfileSettings(c *gin.Context) {
 		a.logger.Warn("invalid data", zap.Error(err))
 		return
 	}
-	user, err := a.getUser(c, users.ID)
+	user, err := a.getUser(c, usersRepo.ID)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
 		a.logger.Error("could not get user info", zap.Error(err))
@@ -54,18 +54,23 @@ func (a *V1) updateProfileSettings(c *gin.Context) {
 	user.Nickname = request.Nickname
 	user.Public = request.Public
 
-	err = a.usersService.UpdateUser(c, user)
-	if err != nil {
-		if errors.As(err, &service.ErrInvalidNickname) {
-			c.AbortWithStatusJSON(http.StatusConflict, &gin.H{"error": err.Error()})
-		} else {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
-			a.logger.Error("could not update user", zap.Error(err))
+	errs := a.usersService.UpdateUser(c, user)
+	if errs != nil {
+		updateErrors := ""
+		for _, err := range errs {
+			if !errors.Is(err, usersService.ErrNicknameTooLong) && !errors.Is(err, usersService.ErrInvalidNickname) && !errors.Is(err, usersRepo.ErrNicknameNotUnique) {
+				c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
+				a.logger.Error("could not update user", zap.Error(err))
+				return
+			}
+			a.logger.Info("invalid nickname", zap.Error(err))
+			updateErrors += err.Error() + "\n"
 		}
+		c.AbortWithStatusJSON(http.StatusConflict, &gin.H{"error": updateErrors})
 		return
 	}
 
-	c.JSON(200, &UpdateProfileSettingsResponse{
+	c.JSON(http.StatusOK, &UpdateProfileSettingsResponse{
 		Nickname: user.Nickname,
 		Public:   user.Public,
 	})

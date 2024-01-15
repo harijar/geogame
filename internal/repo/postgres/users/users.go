@@ -2,11 +2,13 @@ package users
 
 import (
 	"context"
-	"github.com/harijar/geogame/internal/repo"
+	"errors"
 	"github.com/jackc/pgerrcode"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/driver/pgdriver"
 )
+
+var ErrNicknameNotUnique = errors.New("nickname is already in use")
 
 type Users struct {
 	db *bun.DB
@@ -66,7 +68,7 @@ func (u *Users) Update(ctx context.Context, user *User) error {
 		Exec(ctx)
 	if err != nil {
 		if err, ok := err.(pgdriver.Error); ok && err.Field('C') == pgerrcode.UniqueViolation {
-			return repo.ErrNicknameNotUnique
+			return ErrNicknameNotUnique
 		}
 		return err
 	}
