@@ -1,0 +1,57 @@
+.form-group {
+    margin-bottom: 15px;
+    position: relative;
+    left: 35px;
+}
+
+.tooltip {
+    border-bottom: 1px dotted black;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+    bottom: 100%;
+    left: 50%;
+    margin-left: -60px;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+}
+
+label {
+    display: inline-block;
+    width: 120px;
+    text-align: left;
+    margin-right: 15px;
+}
+
+input, label {
+    vertical-align: middle;
+}
+
+input[type="radio"] {
+    margin-right: 5px;
+}
+
+#profileTypeInfo {
+    position: absolute;
+    top: 0;
+    left: 150px;
+    display: none;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 300px;
+}

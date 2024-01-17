@@ -13,6 +13,7 @@ import (
 	"github.com/harijar/geogame/internal/service/auth"
 	"github.com/harijar/geogame/internal/service/prompts"
 	"github.com/harijar/geogame/internal/service/statistics"
+	usersService "github.com/harijar/geogame/internal/service/users"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -64,9 +65,10 @@ func main() {
 	authService := auth.New(tokensRepo, usersRepo, logger.With(zap.String("service", "auth")))
 
 	guessesRepo := guesses.New(clickhouseDB)
+	usersService := usersService.New(usersRepo)
 	statisticsService := statistics.New(guessesRepo)
 
-	api := v1.New(countriesRepo, promptsService, tokensRepo, usersRepo, authService, statisticsService, cfg.BotToken, cfg.TriesLimit, &v1.ServerConfig{
+	api := v1.New(countriesRepo, promptsService, tokensRepo, usersRepo, authService, usersService, statisticsService, cfg.BotToken, cfg.TriesLimit, &v1.ServerConfig{
 		CookieDomain:         cfg.CookieDomain,
 		CookieSecure:         cfg.CookieSecure,
 		CORSEnabled:          cfg.CORSEnabled,

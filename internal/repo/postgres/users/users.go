@@ -2,8 +2,13 @@ package users
 
 import (
 	"context"
+	"errors"
+	"github.com/jackc/pgerrcode"
 	"github.com/uptrace/bun"
+	"github.com/uptrace/bun/driver/pgdriver"
 )
+
+var ErrNicknameNotUnique = errors.New("nickname is already in use")
 
 type Users struct {
 	db *bun.DB
@@ -26,6 +31,13 @@ func (u *Users) Get(ctx context.Context, id int, columns ...string) (*User, erro
 	return user, nil
 }
 
+func (u *Users) Exists(ctx context.Context, id int) (bool, error) {
+	return u.db.NewSelect().
+		Model((*User)(nil)).
+		Where("id=?", id).
+		Exists(ctx)
+}
+
 func (u *Users) Save(ctx context.Context, user *User) error {
 	_, err := u.db.NewInsert().
 		Model(user).
@@ -46,4 +58,20 @@ func (u *Users) UpdateOrSave(ctx context.Context, user *User) error {
 		On("CONFLICT (id) DO UPDATE").
 		Exec(ctx)
 	return err
+}
+
+func (u *Users) Update(ctx context.Context, user *User) error {
+	_, err := u.db.NewUpdate().
+		Model(user).
+		Column(Nickname, Public).
+		Where("id=?", user.ID).
+		Exec(ctx)
+	if err != nil {
+		if err, ok := err.(pgdriver.Error); ok && err.Field('C') == pgerrcode.UniqueViolation {
+			return ErrNicknameNotUnique
+		}
+		return err
+	}
+
+	return nil
 }

@@ -67,7 +67,7 @@ func (a *V1) gameGuess(c *gin.Context) {
 		return
 	}
 
-	response := GuessResponse{}
+	response := &GuessResponse{}
 	token, err := c.Cookie("token")
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusNotFound, &gin.H{"error": "game has not started"})
@@ -106,7 +106,7 @@ func (a *V1) gameGuess(c *gin.Context) {
 				c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal sever error"})
 				a.logger.Error("could not record statistics", zap.Error(err))
 			}
-			c.JSON(200, &response)
+			c.JSON(http.StatusOK, response)
 			return
 		}
 	}
@@ -144,5 +144,5 @@ func (a *V1) gameGuess(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal sever error"})
 		a.logger.Error("could not record statistics", zap.Error(err))
 	}
-	c.JSON(200, &response)
+	c.JSON(http.StatusOK, response)
 }

@@ -5,6 +5,7 @@ import (
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
 	"github.com/harijar/geogame/internal/repo"
+	"github.com/harijar/geogame/internal/service"
 	"go.uber.org/zap"
 	"time"
 )
@@ -22,11 +23,12 @@ type ServerConfig struct {
 type V1 struct {
 	server       *gin.Engine
 	countries    repo.Countries
-	prompts      PromptsService
+	prompts      service.Prompts
 	tokens       repo.Tokens
 	users        repo.Users
-	authService  AuthService
-	statistics   StatisticsService
+	authService  service.Auth
+	usersService service.Users
+	statistics   service.Statistics
 	botToken     string
 	triesLimit   int
 	serverConfig *ServerConfig
@@ -34,11 +36,12 @@ type V1 struct {
 }
 
 func New(countries repo.Countries,
-	prompts PromptsService,
+	prompts service.Prompts,
 	tokens repo.Tokens,
 	users repo.Users,
-	authService AuthService,
-	statistics StatisticsService,
+	authService service.Auth,
+	usersService service.Users,
+	statistics service.Statistics,
 	botToken string,
 	triesLimit int,
 	serverConfig *ServerConfig,
@@ -50,6 +53,7 @@ func New(countries repo.Countries,
 		tokens:       tokens,
 		users:        users,
 		authService:  authService,
+		usersService: usersService,
 		statistics:   statistics,
 		botToken:     botToken,
 		triesLimit:   triesLimit,
