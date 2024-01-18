@@ -30,8 +30,8 @@ async function update() {
         nickname: document.getElementById("nickname").value,
         public: document.getElementById("public").checked
     }
-    let err = await UpdateProfileSettingsRequest(data)
-    if (err != null) {
-        alert(err['msg'])
+    let error = await UpdateProfileSettingsRequest(data)
+    if (error != null) {
+        alert(error['error'])
     }
 }
