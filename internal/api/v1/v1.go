@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/harijar/geogame/internal/repo"
 	"github.com/harijar/geogame/internal/service"
+	"github.com/harijar/geogame/internal/transport/ws"
 	"go.uber.org/zap"
 	"sync"
 	"time"
@@ -24,7 +25,7 @@ type ServerConfig struct {
 type V1 struct {
 	sync.RWMutex
 	server       *gin.Engine
-	wsClients    map[*wsClient]bool
+	wsClients    map[*ws.Client]bool
 	wsHandlers   map[string]wsHandler
 	countries    repo.Countries
 	prompts      service.Prompts
@@ -52,7 +53,7 @@ func New(countries repo.Countries,
 	logger *zap.Logger) *V1 {
 	return &V1{
 		server:       gin.New(),
-		wsClients:    make(map[*wsClient]bool),
+		wsClients:    make(map[*ws.Client]bool),
 		wsHandlers:   make(map[string]wsHandler),
 		countries:    countries,
 		prompts:      prompts,
