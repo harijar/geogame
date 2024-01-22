@@ -8,8 +8,8 @@ import (
 )
 
 var (
-	errorConnectionClosed = errors.New("ws connection closed")
-	errorInvalidJSON      = errors.New("invalid json data in ws message")
+	ErrorConnectionClosed = errors.New("ws connection closed")
+	ErrorInvalidJSON      = errors.New("invalid json data in ws message")
 
 	pingInterval = 5 * time.Second
 	pongWait     = 6 * time.Second
@@ -17,11 +17,12 @@ var (
 
 // Client contains information about a single websocket connection to a client
 type Client struct {
-	conn    *websocket.Conn
-	ticker  *time.Ticker // timer for ping messages
-	Ingress chan Message // channel for incoming messages
-	Egress  chan Message // channel for outcoming messages
-	Errors  chan error   // all Errors are sent to this channel and then processed in serveWS function
+	conn      *websocket.Conn
+	pingTimer *time.Ticker  // timer for ping messages
+	ingress   chan *Message // channel for incoming messages
+	egress    chan *Message // channel for outcoming messages
+	stop      chan bool
+	Errors    chan error // all Errors are sent to this channel and then processed in serveWS function
 }
 
 type Message struct {
@@ -31,22 +32,25 @@ type Message struct {
 
 func NewClient(conn *websocket.Conn) *Client {
 	return &Client{
-		conn:    conn,
-		ticker:  time.NewTicker(pingInterval),
-		Errors:  make(chan error),
-		Ingress: make(chan Message),
-		Egress:  make(chan Message),
+		conn:      conn,
+		pingTimer: time.NewTicker(pingInterval),
+		ingress:   make(chan *Message),
+		egress:    make(chan *Message),
+		Errors:    make(chan error),
 	}
 }
 
 func (c *Client) Start() {
-	go c.readMessages()
-	go c.writeMessages()
+	go c.read()
+	go c.write()
 }
 
 // listens to incoming messages from websocket
-func (c *Client) readMessages() {
-	// deadline for pong messages
+func (c *Client) read() {
+	defer func() {
+		close(c.ingress)
+		c.stop <- true
+	}()
 	err := c.conn.SetReadDeadline(time.Now().Add(pongWait))
 	if err != nil {
 		c.Errors <- err
@@ -63,43 +67,45 @@ func (c *Client) readMessages() {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				c.Errors <- err
 			} else {
-				c.Errors <- errors.Join(err, errorConnectionClosed)
+				c.Errors <- errors.Join(err, ErrorConnectionClosed)
 			}
 			return
 		}
 
-		// turning raw payload to a Message
-		var message Message
-		err = json.Unmarshal(payload, &message)
+		var message *Message
+		err = json.Unmarshal(payload, message)
 		if err != nil {
-			c.Errors <- errors.Join(err, errorInvalidJSON)
+			c.Errors <- errors.Join(err, ErrorInvalidJSON)
 			continue
 		}
-		c.Ingress <- message
+		c.ingress <- message
 	}
 }
 
 // sends all outcoming messages to websocket
-func (c *Client) writeMessages() {
-	defer c.ticker.Stop()
+func (c *Client) write() {
+	defer func() {
+		c.pingTimer.Stop()
+		close(c.egress)
+	}()
 	// for cycle for constantly wrining messages
 	for {
 		select {
-		case message, ok := <-c.Egress: // this message needs to be sent
+		case message, ok := <-c.egress: // this message needs to be sent
 			if !ok {
 				// something is wrong, we need to close the connection
 				err := c.conn.WriteMessage(websocket.CloseMessage, nil)
 				if err != nil {
 					c.Errors <- err
 				} else {
-					c.Errors <- errors.Join(err, errorConnectionClosed)
+					c.Errors <- errors.Join(err, ErrorConnectionClosed)
 				}
 				return
 			}
 			// encoding message to send it in json
 			payload, err := json.Marshal(message)
 			if err != nil {
-				c.Errors <- errors.Join(err, errorInvalidJSON)
+				c.Errors <- errors.Join(err, ErrorInvalidJSON)
 				continue
 			}
 			err = c.conn.WriteMessage(websocket.TextMessage, payload)
@@ -107,18 +113,21 @@ func (c *Client) writeMessages() {
 				c.Errors <- err
 				return
 			}
-		case <-c.ticker.C:
+		case <-c.pingTimer.C:
 			// time for sending ping
 			err := c.conn.WriteMessage(websocket.PingMessage, []byte{})
 			if err != nil {
 				c.Errors <- err
 				return
 			}
+		case <-c.stop:
+			return
 		}
 	}
 }
 
 func (c *Client) Stop() {
+	c.stop <- true
 	c.conn.WriteMessage(websocket.CloseMessage, nil)
 	c.conn.Close()
 }

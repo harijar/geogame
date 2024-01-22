@@ -15,7 +15,7 @@ var upgrader = websocket.Upgrader{
 	CheckOrigin:     func(r *http.Request) bool { return true },
 }
 
-type wsHandler func(message ws.Message, c *wsClient)
+type wsHandler func(message ws.Message, c *ws.Client)
 
 const (
 	pongMessage = "pong"
@@ -35,10 +35,10 @@ func (a *V1) serveWS(c *gin.Context) {
 	select {
 	case err := <-client.Errors:
 		switch {
-		case errors.As(err, &errorConnectionClosed):
+		case errors.As(err, &ws.ErrorConnectionClosed):
 			c.AbortWithStatusJSON(http.StatusNotFound, &gin.H{"error": "ws connection closed"})
 			a.logger.Error("ws connection closed", zap.Error(err))
-		case errors.As(err, &errorInvalidJSON):
+		case errors.As(err, &ws.ErrorInvalidJSON):
 			c.AbortWithStatusJSON(http.StatusUnprocessableEntity, &gin.H{"error": "invalid json data in ws message"})
 			a.logger.Error("invalid json data in ws message", zap.Error(err))
 		default:
@@ -51,7 +51,6 @@ func (a *V1) serveWS(c *gin.Context) {
 }
 
 func (a *V1) addWsClient(client *ws.Client) {
-	// working with clients so using mutex
 	a.Lock()
 	defer a.Unlock()
 	a.wsClients[client] = true
