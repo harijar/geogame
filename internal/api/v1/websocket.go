@@ -12,6 +12,7 @@ import (
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
+	CheckOrigin:     func(r *http.Request) bool { return true },
 }
 
 type wsHandler func(message Message, c *wsClient)
@@ -20,19 +21,25 @@ const (
 	pongMessage = "pong"
 )
 
+// Message is a message template for all websocket messages
+// if a message does not fit in this template, it's an error
 type Message struct {
 	Type    string          `json:"type"`
 	Payload json.RawMessage `json:"payload"`
 }
 
+// handler for /v1/ws route responsible for websocket connection
 func (a *V1) serveWS(c *gin.Context) {
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		return
 	}
 
+	// create a client struct for a connection
 	client := newWsClient(conn)
 	a.addWsClient(client)
+
+	// these functions are run in a goroutine because many people can connect at the same time
 	go client.readMessages()
 	go client.writeMessages()
 
@@ -56,6 +63,7 @@ func (a *V1) serveWS(c *gin.Context) {
 }
 
 func (a *V1) addWsClient(client *wsClient) {
+	// working with clients so using mutex
 	a.Lock()
 	defer a.Unlock()
 	a.wsClients[client] = true
