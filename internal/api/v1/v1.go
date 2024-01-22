@@ -7,6 +7,7 @@ import (
 	"github.com/harijar/geogame/internal/repo"
 	"github.com/harijar/geogame/internal/service"
 	"go.uber.org/zap"
+	"sync"
 	"time"
 )
 
@@ -21,7 +22,10 @@ type ServerConfig struct {
 }
 
 type V1 struct {
+	sync.RWMutex
 	server       *gin.Engine
+	wsClients    map[*wsClient]bool
+	wsHandlers   map[string]wsHandler
 	countries    repo.Countries
 	prompts      service.Prompts
 	tokens       repo.Tokens
@@ -48,6 +52,8 @@ func New(countries repo.Countries,
 	logger *zap.Logger) *V1 {
 	return &V1{
 		server:       gin.New(),
+		wsClients:    make(map[*wsClient]bool),
+		wsHandlers:   make(map[string]wsHandler),
 		countries:    countries,
 		prompts:      prompts,
 		tokens:       tokens,
