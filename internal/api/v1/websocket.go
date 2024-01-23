@@ -27,7 +27,7 @@ func (a *V1) serveWS(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	client := ws.NewClient(conn)
+	client := ws.New(conn)
 	a.addWsClient(client)
 	client.Start()
 	defer client.Stop()
