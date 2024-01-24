@@ -19,18 +19,15 @@ var (
 )
 
 // Client represents ws connection initialized from client
-// Ingress channel used for watch received messages, it will be closed along with the connection
-// Egress channel used for send messages, close it to close the connection
+// Ingress channel used for watching received messages, it will be closed along with the connection
+// Egress channel used for sending messages, closing it closing the connection
 type Client struct {
 	conn      *websocket.Conn
 	pingTimer *time.Ticker
 
-	// Incoming messages
-	Ingress chan *Message
-	// Channel for send a message
-	Egress chan *Message
-	// Here non-critical errors will be sent
-	Errors chan error
+	Ingress chan *Message // Incoming messages
+	Egress  chan *Message // Outcoming messages
+	Errors  chan error    // Channel for non-critical errors
 
 	cancel func()
 	wg     sync.WaitGroup
@@ -57,22 +54,24 @@ func (c *Client) Start(ctx context.Context) {
 	c.cancel = cancel
 
 	c.wg = sync.WaitGroup{}
-
 	go c.readHandler(ctxWithCancel)
 	go c.writeHandler(ctxWithCancel)
+
+	c.conn.SetPongHandler(func(data string) error {
+		c.Ingress <- &Message{
+			Type:    "pong",
+			Payload: nil,
+		}
+		return c.conn.SetReadDeadline(time.Now().Add(pongWait))
+	})
 }
 
 // Continuously reading messages from the connection and publishing to exported Ingress channel
-// Stops if the connection closed, context cancelled or critical error occurred, Ingress channel will be closed
+// If the connection closed, context cancelled or critical error occurred, the function stops and Ingress channel closes
 func (c *Client) readHandler(ctx context.Context) {
 	defer close(c.Ingress)
-
 	c.wg.Add(1)
 	defer c.wg.Done()
-
-	c.conn.SetPongHandler(func(data string) error {
-		return c.conn.SetReadDeadline(time.Now().Add(pongWait))
-	})
 
 	for {
 		select {
@@ -87,7 +86,6 @@ func (c *Client) readHandler(ctx context.Context) {
 			if err != nil {
 				return
 			}
-
 			if msgType != websocket.TextMessage {
 				continue
 			}

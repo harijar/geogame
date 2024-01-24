@@ -29,7 +29,7 @@ type V1 struct {
 	wsHandlers   map[string]wsHandler
 	countries    repo.Countries
 	prompts      service.Prompts
-	tokens       repo.Tokens
+	redis        repo.Redis
 	users        repo.Users
 	authService  service.Auth
 	usersService service.Users
@@ -42,7 +42,7 @@ type V1 struct {
 
 func New(countries repo.Countries,
 	prompts service.Prompts,
-	tokens repo.Tokens,
+	redis repo.Redis,
 	users repo.Users,
 	authService service.Auth,
 	usersService service.Users,
@@ -57,7 +57,7 @@ func New(countries repo.Countries,
 		wsHandlers:   make(map[string]wsHandler),
 		countries:    countries,
 		prompts:      prompts,
-		tokens:       tokens,
+		redis:        redis,
 		users:        users,
 		authService:  authService,
 		usersService: usersService,

@@ -30,11 +30,17 @@ type Users interface {
 	Update(ctx context.Context, user *users.User) error
 }
 
-type Tokens interface {
+type Redis interface {
+	// Methods working with authentification tokens
 	GetUserID(ctx context.Context, token string) (int, error)
 	GetGameID(ctx context.Context, token string) (uuid.UUID, error)
 	SetUserID(ctx context.Context, token string, id int) error
 	SetGameID(ctx context.Context, token string, id uuid.UUID) error
+
+	// Method working with clients' last activity
+	GetLastSeen(ctx context.Context, id int) (int64, error)
+	UpdateLastSeen(ctx context.Context, id int) error
+
 	Delete(ctx context.Context, token string) error
 }
 

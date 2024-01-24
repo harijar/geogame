@@ -32,4 +32,5 @@ type Statistics interface {
 type Users interface {
 	GetUser(ctx context.Context, id int, columns ...string) (*users.User, error)
 	UpdateUser(ctx context.Context, user *users.User) []error
+	UpdateLastSeen(ctx context.Context, id int) error
 }

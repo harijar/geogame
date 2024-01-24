@@ -10,14 +10,14 @@ import (
 )
 
 type Auth struct {
-	tokensRepo repo.Tokens
+	tokensRepo repo.Redis
 	usersRepo  repo.Users
 	logger     *zap.Logger
 }
 
 const tokenLenght = 64
 
-func New(tokensRepo repo.Tokens, usersRepo repo.Users, logger *zap.Logger) *Auth {
+func New(tokensRepo repo.Redis, usersRepo repo.Users, logger *zap.Logger) *Auth {
 	return &Auth{
 		tokensRepo: tokensRepo,
 		usersRepo:  usersRepo,

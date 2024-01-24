@@ -9,7 +9,7 @@ import (
 	"github.com/harijar/geogame/internal/repo/postgres"
 	"github.com/harijar/geogame/internal/repo/postgres/countries"
 	"github.com/harijar/geogame/internal/repo/postgres/users"
-	"github.com/harijar/geogame/internal/repo/redis/tokens"
+	"github.com/harijar/geogame/internal/repo/redis"
 	"github.com/harijar/geogame/internal/service/auth"
 	"github.com/harijar/geogame/internal/service/prompts"
 	"github.com/harijar/geogame/internal/service/statistics"
@@ -61,14 +61,14 @@ func main() {
 	promptsService := prompts.New(countriesRepo, logger.With(zap.String("service", "prompts")))
 
 	usersRepo := users.New(postgresDB)
-	tokensRepo := tokens.New(redisDB)
-	authService := auth.New(tokensRepo, usersRepo, logger.With(zap.String("service", "auth")))
+	redisRepo := redis.New(redisDB)
+	authService := auth.New(redisRepo, usersRepo, logger.With(zap.String("service", "auth")))
 
 	guessesRepo := guesses.New(clickhouseDB)
-	usersService := usersService.New(usersRepo)
+	usersService := usersService.New(usersRepo, redisRepo)
 	statisticsService := statistics.New(guessesRepo)
 
-	api := v1.New(countriesRepo, promptsService, tokensRepo, usersRepo, authService, usersService, statisticsService, cfg.BotToken, cfg.TriesLimit, &v1.ServerConfig{
+	api := v1.New(countriesRepo, promptsService, redisRepo, usersRepo, authService, usersService, statisticsService, cfg.BotToken, cfg.TriesLimit, &v1.ServerConfig{
 		CookieDomain:         cfg.CookieDomain,
 		CookieSecure:         cfg.CookieSecure,
 		CORSEnabled:          cfg.CORSEnabled,

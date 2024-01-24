@@ -9,15 +9,21 @@ import (
 	"unicode"
 )
 
-var ErrInvalidNickname = errors.New("nickname must not contain any non-latin letters, spaces and following symbols: ,.&%#=\"/")
-var ErrNicknameTooLong = errors.New("nickname length must be less than 30 characters")
+var (
+	ErrInvalidNickname = errors.New("nickname must not contain any non-latin letters, spaces and following symbols: ,.&%#=\"/")
+	ErrNicknameTooLong = errors.New("nickname length must be less than 30 characters")
+)
 
 type Users struct {
 	usersRepo repo.Users
+	redisRepo repo.Redis
 }
 
-func New(usersRepo repo.Users) *Users {
-	return &Users{usersRepo: usersRepo}
+func New(usersRepo repo.Users, redisRepo repo.Redis) *Users {
+	return &Users{
+		usersRepo: usersRepo,
+		redisRepo: redisRepo,
+	}
 }
 
 func (u *Users) GetUser(ctx context.Context, id int, columns ...string) (*users.User, error) {
@@ -53,4 +59,8 @@ func (u *Users) UpdateUser(ctx context.Context, user *users.User) []error {
 	err := u.usersRepo.Update(ctx, user)
 	updateErrors = append(updateErrors, err)
 	return updateErrors
+}
+
+func (u *Users) UpdateLastSeen(ctx context.Context, id int) error {
+	return u.redisRepo.UpdateLastSeen(ctx, id)
 }
