@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"github.com/gin-gonic/gin"
@@ -21,7 +22,7 @@ var upgrader = websocket.Upgrader{
 	CheckOrigin:     func(r *http.Request) bool { return true },
 }
 
-type wsHandler func(c *gin.Context, msg *ws.Message, client *ws.Client) error
+type wsHandler func(ctx context.Context, msg *ws.Message, c *ws.Client) error
 
 // handler for /v1/ws route responsible for websocket connection
 func (a *V1) serveWS(c *gin.Context) {
@@ -29,10 +30,15 @@ func (a *V1) serveWS(c *gin.Context) {
 	if err != nil {
 		return
 	}
+	user, err := a.getUser(c, users.ID)
+	if err != nil {
+		a.logger.Error("could not get user", zap.Error(err))
+		return
+	}
 	client := ws.New(conn)
 	a.addWsClient(client)
 	a.routeWS()
-	client.Start(c)
+	client.Start(c, user.ID)
 	defer client.Stop()
 
 	errorMsg := &ws.Message{Type: "error"} // template for any error message that should be sent to the client
@@ -91,10 +97,11 @@ func (a *V1) removeWsClient(client *ws.Client) {
 	}
 }
 
-func (a *V1) pongHandler(c *gin.Context, msg *ws.Message, client *ws.Client) error {
-	user, err := a.getUser(c, users.ID)
+func (a *V1) pongHandler(ctx context.Context, msg *ws.Message, c *ws.Client) error {
+	id := 0
+	err := json.Unmarshal(msg.Payload, &id)
 	if err != nil {
 		return err
 	}
-	return a.usersService.UpdateLastSeen(c, user.ID)
+	return a.usersService.UpdateLastSeen(ctx, id)
 }
