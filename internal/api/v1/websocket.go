@@ -22,6 +22,21 @@ var upgrader = websocket.Upgrader{
 	CheckOrigin:     func(r *http.Request) bool { return true },
 }
 
+var (
+	errorInternalServerError = &ws.Message{
+		Type:    "error",
+		Payload: json.RawMessage("internal server error"),
+	}
+	errorInvalidMessageType = &ws.Message{
+		Type:    "error",
+		Payload: json.RawMessage("invalid message type"),
+	}
+	errorInvalidPayload = &ws.Message{
+		Type:    "error",
+		Payload: json.RawMessage("invalid payload"),
+	}
+)
+
 type wsHandler func(ctx context.Context, msg *ws.Message, c *ws.Client) error
 
 // handler for /v1/ws route responsible for websocket connection
@@ -41,37 +56,31 @@ func (a *V1) serveWS(c *gin.Context) {
 	client.Start(c, user.ID)
 	defer client.Stop()
 
-	errorMsg := &ws.Message{Type: "error"} // template for any error message that should be sent to the client
 	select {
 	case message, ok := <-client.Ingress:
 		if !ok {
 			a.logger.Debug("ws connection closed")
 			return
 		}
-		// routing and handling message
 		if handler, ok := a.wsHandlers[message.Type]; ok {
 			err = handler(c, message, client)
 			if err != nil {
 				a.logger.Warn("could not handle ws message", zap.Error(err))
-				errorMsg.Payload = json.RawMessage(err.Error())
-				client.Egress <- errorMsg
+				client.Egress <- errorInternalServerError
 			}
 		} else {
 			a.logger.Warn("invalid ws message type, could not route message", zap.String("type", message.Type))
-			errorMsg.Payload = json.RawMessage("invalid message type: " + message.Type)
-			client.Egress <- errorMsg
+			client.Egress <- errorInvalidMessageType
 		}
 
 	case err := <-client.Errors:
 		switch {
 		case errors.As(err, &ws.ErrorInvalidJSON):
-			a.logger.Warn("invalid json data in ws message", zap.Error(err))
-			errorMsg.Payload = json.RawMessage("invalid JSON data")
-			client.Egress <- errorMsg
+			a.logger.Warn("invalid json data in payload", zap.Error(err))
+			client.Egress <- errorInvalidPayload
 		default:
 			a.logger.Error("unexpected error", zap.Error(err))
-			errorMsg.Payload = json.RawMessage(err.Error())
-			client.Egress <- errorMsg
+			client.Egress <- errorInternalServerError
 		}
 	}
 }
