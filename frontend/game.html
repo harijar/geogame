@@ -4,26 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Guess the country</title>
-    <script type="module" src="js/game.js"></script>
+    <script type="module" src="js/game/game.js"></script>
     <link rel="stylesheet" href="style/game.css">
+    <link rel="stylesheet" href="style/style.css">
 </head>
 <body>
-    <div id="buttonsGame">
-        <button type="button" id="newGameButton">New game</button>
-        <button type="button" id="stopGameButton">To the main menu</button>
+    <div id="pagetop">
+        <div class="layoutTop" id="buttonsGame">
+            <button type="button" id="newGameButton">New game</button>
+            <button type="button" id="stopGameButton">To the main menu</button>
+        </div>
+        <div class="layoutTop" id="auth">
+            <script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-login="geogame_auth_bot" data-size="medium" data-onauth="onTelegramAuth(user)" data-request-access="write"></script>
+            <script type="text/javascript">
+                async function onTelegramAuth(user) {
+                    await window.auth(user)
+                }
+            </script>
+        </div>
+        <div class="layoutTop" id="profile">
+            <button id="profileButton" style="text-align: right"></button>
+        </div>
     </div>
-    <h1 style="text-align: center">Guess the country</h1>
-    <form id="guessForm">
-        <label for="guessInput">Country:</label>
-        <input type="text" id="guessInput" autofocus>
-        <button type="submit" id="guessButton">Submit</button>
-    </form>
-    <div id="promptsDiv">
-    </div>
-    <div id="buttonsGameEnded">
-        <br><br>
-        <button type="button" id="playAgainButton">Play again</button>
-        <button type="button" id="mainMenuButton">To the main menu</button>
+    <div id="mainPage">
+        <div id="info">
+            <br>
+            <h1>Guess the country</h1>
+            <form id="guessForm">
+                <label for="guessInput">Country:</label>
+                <input type="text" id="guessInput" autofocus>
+                <button type="submit" id="guessButton">Submit</button>
+            </form>
+            <div id="promptsDiv">
+            </div>
+            <div id="buttonsGameEnded">
+                <br><br>
+                <button type="button" id="playAgainButton">Play again</button>
+                <button type="button" id="mainMenuButton">To the main menu</button>
+            </div>
+        </div>
     </div>
 </body>
 </html>

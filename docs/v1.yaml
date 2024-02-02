@@ -1,13 +1,13 @@
 openapi: 3.0.0
 info:
   title: GeoGame V1 API
-  version: 0.1.0
+  version: 0.1.1
 paths:
-  /game/start:
+  /v1/game/start:
     post:
       summary: Start a new game
       description: If there is already a started game, it will be restarted. 
-                   If we have information about last(or ongoing) game we should ensure that the new country is different from the previous one.
+                   If we have information about last (or ongoing) game we should ensure that the new country is different from the previous one.
       responses:
         '200':
           description: First prompt
@@ -37,7 +37,7 @@ paths:
                 properties:
                   error:
                     type: string
-  /game/guess:
+  /v1/game/guess:
     post:
       summary: Guess the country
       requestBody:
@@ -89,6 +89,249 @@ paths:
                     type: string
         '500':
           description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  /v1/auth:
+    get:
+      summary: Check if user is authorized
+      description: If user is authorized, there will be access to their profile and statistics.
+                   If user is not authorized, there will be an 'Authorize with Telegram' button.
+      responses:
+        '200':
+          description: user is authorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  first_name:
+                    type: string
+                    nullable: true
+                    description: user's first name
+                  last_name:
+                    type: string
+                    nullable: true
+                    description: user's last name
+        '403':
+          description: user is not authorized, e. g. playing as guest
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  info:
+                    type: string
+        '500':
+          description: internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+    post:
+      summary: Authorize user with Telegram
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  description: user ID defined by Telegram
+                first_name:
+                  type: string
+                  nullable: true
+                  description: user's first name
+                last_name:
+                  type: string
+                  nullable: true
+                  description: user's last name
+                username:
+                  type: string
+                  description: user's Telegram username
+                photo_url:
+                  type: string
+                  nullable: true
+                  description: link to user's Telegram profile picture
+                auth_date:
+                  type: integer
+                  description: authorization date in Unix timestamp format
+                hash:
+                  type: string
+                  description: hash string to prove that authorization data is going from Telegram
+      responses:
+        '200':
+          description: user is successfully authorized
+        '403':
+          description: could not check sign, invalid authorization data
+          content:
+            applicaton/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: internal server error
+          content:
+            applicaton/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  /v1/profile:
+    get:
+      summary: User profile
+      description: Gets user profile information such as game statistics from server
+      responses:
+        '200':
+          description: got all information successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: user's first name and last name joined with ' '
+                  total_games:
+                    type: integer
+                    description: total number of games that user played
+                  games_won:
+                    type: integer
+                    description: number of games that user won (successfully guessed the country)
+                  average_guesses:
+                    type: number
+                    description: average number of guesses given to the user per game
+        '404':
+          description: user is not authorized, there is no data about them
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  /v1/profile/settings:
+    get:
+      summary: Information for profile settings page
+      description: Gets all necessary user profile information from server to load in an HTML form as default values
+      responses:
+        '200':
+          description: got all information successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  nickname:
+                    type: string
+                  public:
+                    type: boolean
+                    description: if true, user's profile is visible to other users
+        '500':
+          description: internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+    post:
+      summary: Changes profile information
+      description: Takes user's changed settings, checks whether the data is valid and updates profile
+      requestBody:
+        required: true
+        content:
+          appliction/json:
+            schema:
+              type: object
+              properties:
+                nickname:
+                  type: string
+                public:
+                  type: boolean
+                  description: if true, user's profile is visible to other users
+      responses:
+        '200':
+          description: information updated successfully, no validation errors
+        '409':
+          description: there are some errors in nickname validation, e. g. nickname is too long or already exists
+          content:
+            appliction/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    description: all validation errors messages
+        '500':
+          description: internal server error
           content:
             application/json:
               schema:

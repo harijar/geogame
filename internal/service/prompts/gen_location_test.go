@@ -2,9 +2,10 @@ package prompts
 
 import (
 	"github.com/harijar/geogame/internal/mocks"
-	"github.com/harijar/geogame/internal/repo/countries"
+	"github.com/harijar/geogame/internal/repo/postgres/countries"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
+	"go.uber.org/zap"
 	"strconv"
 	"testing"
 )
@@ -71,6 +72,7 @@ func TestPrompts_GenLocation(t *testing.T) {
 	countriesRepo := mocks.NewMockCountries(mockCtrl)
 
 	p := &Prompts{countriesRepo: countriesRepo}
+	p.logger = zap.Must(zap.NewProduction())
 	for index, cs := range casesGenLocationLat {
 		t.Run(strconv.Itoa(index), func(t *testing.T) {
 			countriesRepo.EXPECT().GetAnotherRandom(cs.country).Return(cs.another)

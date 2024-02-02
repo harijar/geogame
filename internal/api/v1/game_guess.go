@@ -2,12 +2,16 @@ package v1
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/agnivade/levenshtein"
 	"github.com/gin-gonic/gin"
+	"github.com/harijar/geogame/internal/repo/clickhouse/guesses"
 	"github.com/harijar/geogame/internal/service/prompts"
+	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 type GuessRequest struct {
@@ -63,20 +67,51 @@ func (a *V1) gameGuess(c *gin.Context) {
 		return
 	}
 
-	response := GuessResponse{}
+	response := &GuessResponse{}
+	token, err := c.Cookie("token")
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusNotFound, &gin.H{"error": "game has not started"})
+		a.logger.Warn("no game ID in cookie", zap.Error(err))
+		return
+	}
+	gameID, err := a.tokens.GetGameID(c, token)
+	if err != nil {
+		if errors.Is(err, redis.Nil) {
+			c.AbortWithStatusJSON(http.StatusNotFound, &gin.H{"error": "game has not started"})
+			a.logger.Warn("no game ID in redis DB", zap.Error(err))
+			return
+		}
+		c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
+		a.logger.Error("could not get gameID from redis DB", zap.Error(err))
+		return
+	}
+	guess := &guesses.Guess{
+		GameID:      gameID,
+		CountryID:   countryIDi,
+		Text:        request.Guess,
+		GuessNumber: len(prev),
+		Timestamp:   time.Now().Unix(),
+	}
 	for _, alias := range country.Aliases {
 		if levenshtein.ComputeDistance(request.Guess, alias) <= 1 {
 			response.Right = true
 			response.Country = country.Name
 			a.setCookie(c, "prompts", "", true)
-			c.JSON(200, &response)
 			a.logger.Debug("user guessed successfully",
 				zap.Bool("userWon", true),
 				zap.Int("totalTries", len(prev)+1))
+			guess.Right = true
+			err = a.recordStatistics(c, guess)
+			if err != nil {
+				c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal sever error"})
+				a.logger.Error("could not record statistics", zap.Error(err))
+			}
+			c.JSON(http.StatusOK, response)
 			return
 		}
 	}
 	response.Right = false
+	guess.Right = false
 
 	if a.triesLimit == len(prev) {
 		response.Country = country.Name
@@ -104,5 +139,10 @@ func (a *V1) gameGuess(c *gin.Context) {
 			zap.Int("tryNumber", len(prev)))
 		response.Prompt = prompt.Text
 	}
-	c.JSON(200, &response)
+	err = a.recordStatistics(c, guess)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal sever error"})
+		a.logger.Error("could not record statistics", zap.Error(err))
+	}
+	c.JSON(http.StatusOK, response)
 }

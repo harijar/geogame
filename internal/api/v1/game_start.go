@@ -3,7 +3,7 @@ package v1
 import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
-	"github.com/harijar/geogame/internal/repo/countries"
+	"github.com/harijar/geogame/internal/repo/postgres/countries"
 	"github.com/harijar/geogame/internal/service/prompts"
 	"go.uber.org/zap"
 	"net/http"
@@ -52,5 +52,12 @@ func (a *V1) gameStart(c *gin.Context) {
 	}
 	a.setCookie(c, "country", strconv.Itoa(country.ID), false)
 	a.setCookie(c, "prompts", string(promptsOut), false)
-	c.JSON(200, &StartResponse{prompt.Text})
+	err = a.setGameID(c)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
+		a.logger.Error("could not set game id", zap.Error(err))
+		return
+	}
+	a.logger.Debug("game ID set")
+	c.JSON(http.StatusOK, &StartResponse{prompt.Text})
 }

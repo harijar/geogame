@@ -3,7 +3,7 @@ package prompts
 import (
 	"errors"
 	"fmt"
-	"github.com/harijar/geogame/internal/repo/countries"
+	"github.com/harijar/geogame/internal/repo/postgres/countries"
 	"go.uber.org/zap"
 	"math/rand"
 )
@@ -71,21 +71,31 @@ func (p *Prompts) Gen(id int, c *countries.Country, prev []*Prompt) (*Prompt, er
 			text = formatFunFact(c.Funfacts[random])
 		}
 	case AreaID:
-		text = formatArea(c)
+		return p.genArea(c), nil
 	case PopulationID:
-		text = formatPopulation(c)
+		return p.genPopulation(c), nil
 	case GDPID:
-		text = formatGDP(c)
+		return p.genGDP(c), nil
 	case GDPPerCapitaID:
-		text = formatGDPPerCapita(c)
+		return p.genGDPPerCapita(c), nil
 	case HDIID:
-		text = formatHDI(c)
+		return p.genHDI(c), nil
+	case CompareAreaID:
+		return p.genCompareArea(c, prev), nil
+	case ComparePopulationID:
+		return p.genComparePopulation(c, prev), nil
+	case CompareGDPID:
+		return p.genCompareGDP(c, prev), nil
+	case CompareGDPPerCapitaID:
+		return p.genCompareGDPPerCapita(c, prev), nil
+	case CompareHDIID:
+		return p.genCompareHDI(c, prev), nil
 	case AgriculturalSectorID:
-		text = formatAgriculturalSector(c)
+		return p.genAgriculturalSector(c, prev), nil
 	case IndustrialSectorID:
-		text = formatIndustrialSector(c)
+		return p.genIndustrialSector(c, prev), nil
 	case ServiceSectorID:
-		text = formatServiceSector(c)
+		return p.genServiceSector(c, prev), nil
 	case HemisphereLatID:
 		return p.genHemisphereLat(c, prev), nil
 	case HemisphereLongID:

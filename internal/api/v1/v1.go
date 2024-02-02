@@ -5,8 +5,7 @@ import (
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
 	"github.com/harijar/geogame/internal/repo"
-	"github.com/harijar/geogame/internal/repo/countries"
-	"github.com/harijar/geogame/internal/service/prompts"
+	"github.com/harijar/geogame/internal/service"
 	"go.uber.org/zap"
 	"time"
 )
@@ -24,22 +23,39 @@ type ServerConfig struct {
 type V1 struct {
 	server       *gin.Engine
 	countries    repo.Countries
-	prompts      PromptsService
+	prompts      service.Prompts
+	tokens       repo.Tokens
+	users        repo.Users
+	authService  service.Auth
+	usersService service.Users
+	statistics   service.Statistics
+	botToken     string
 	triesLimit   int
 	serverConfig *ServerConfig
 	logger       *zap.Logger
 }
 
-type PromptsService interface {
-	Gen(id int, c *countries.Country, prev []*prompts.Prompt) (*prompts.Prompt, error)
-	GenRandom(c *countries.Country, prev []*prompts.Prompt) (*prompts.Prompt, error)
-}
-
-func New(countries repo.Countries, prompts PromptsService, triesLimit int, serverConfig *ServerConfig, logger *zap.Logger) *V1 {
+func New(countries repo.Countries,
+	prompts service.Prompts,
+	tokens repo.Tokens,
+	users repo.Users,
+	authService service.Auth,
+	usersService service.Users,
+	statistics service.Statistics,
+	botToken string,
+	triesLimit int,
+	serverConfig *ServerConfig,
+	logger *zap.Logger) *V1 {
 	return &V1{
 		server:       gin.New(),
 		countries:    countries,
 		prompts:      prompts,
+		tokens:       tokens,
+		users:        users,
+		authService:  authService,
+		usersService: usersService,
+		statistics:   statistics,
+		botToken:     botToken,
 		triesLimit:   triesLimit,
 		serverConfig: serverConfig,
 		logger:       logger,

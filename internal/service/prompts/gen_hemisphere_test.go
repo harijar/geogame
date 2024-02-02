@@ -2,9 +2,10 @@ package prompts
 
 import (
 	"github.com/harijar/geogame/internal/mocks"
-	"github.com/harijar/geogame/internal/repo/countries"
+	"github.com/harijar/geogame/internal/repo/postgres/countries"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
+	"go.uber.org/zap"
 	"strconv"
 	"testing"
 )
@@ -45,13 +46,13 @@ func TestPrompts_Hemisphere(t *testing.T) {
 	countriesRepo := mocks.NewMockCountries(mockCtrl)
 
 	p := &Prompts{countriesRepo: countriesRepo}
+	p.logger = zap.Must(zap.NewProduction())
 	for index, cs := range casesHemisphereLat {
 		t.Run(strconv.Itoa(index), func(t *testing.T) {
 			if len(cs.prev) > 0 {
 				countriesRepo.EXPECT().Get(cs.prev[0].AnotherCountryID).Return(cs.another)
 			}
 			prompt, _ := p.Gen(HemisphereLatID, cs.country, cs.prev)
-
 			assert.Equal(t, cs.prompt, prompt)
 		})
 	}
@@ -61,7 +62,6 @@ func TestPrompts_Hemisphere(t *testing.T) {
 				countriesRepo.EXPECT().Get(cs.prev[0].AnotherCountryID).Return(cs.another)
 			}
 			prompt, _ := p.Gen(HemisphereLongID, cs.country, cs.prev)
-
 			assert.Equal(t, cs.prompt, prompt)
 		})
 	}
