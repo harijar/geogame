@@ -9,6 +9,8 @@ import (
 	"time"
 )
 
+const PongMessageType = "pong"
+
 var (
 	ErrorInvalidJSON = errors.New("invalid json data in ws message")
 
@@ -63,7 +65,7 @@ func (c *Client) Start(ctx context.Context, id int) {
 			return err
 		}
 		c.Ingress <- &Message{
-			Type:    "pong",
+			Type:    PongMessageType,
 			Payload: payload,
 		}
 		return c.conn.SetReadDeadline(time.Now().Add(pongWait))
@@ -86,12 +88,9 @@ func (c *Client) readHandler(ctx context.Context) {
 			if err != nil {
 				return
 			}
-			msgType, payload, err := c.conn.ReadMessage()
+			_, payload, err := c.conn.ReadMessage()
 			if err != nil {
 				return
-			}
-			if msgType != websocket.TextMessage {
-				continue
 			}
 
 			var message *Message

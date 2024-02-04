@@ -12,10 +12,6 @@ import (
 	"net/http"
 )
 
-const (
-	pongMessage = "pong"
-)
-
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
@@ -56,38 +52,44 @@ func (a *V1) serveWS(c *gin.Context) {
 	client.Start(c, user.ID)
 	defer client.Stop()
 
-	select {
-	case message, ok := <-client.Ingress:
-		if !ok {
-			a.logger.Debug("ws connection closed")
-			return
-		}
-		if handler, ok := a.wsHandlers[message.Type]; ok {
-			err = handler(c, message, client)
-			if err != nil {
-				a.logger.Warn("could not handle ws message", zap.Error(err))
+	for {
+		select {
+		case message, ok := <-client.Ingress:
+			if !ok {
+				a.logger.Debug("ws connection closed")
+				return
+			}
+			if handler, ok := a.wsHandlers[message.Type]; ok {
+				err = handler(c, message, client)
+				if err != nil {
+					a.logger.Warn("could not handle ws message", zap.Error(err))
+					client.Egress <- errorInternalServerError
+				}
+			} else {
+				a.logger.Warn("invalid ws message type, could not route message", zap.String("type", message.Type))
+				client.Egress <- errorInvalidMessageType
+			}
+
+		case err := <-client.Errors:
+			switch {
+			case errors.As(err, &ws.ErrorInvalidJSON):
+				a.logger.Warn("invalid json data in payload", zap.Error(err))
+				client.Egress <- errorInvalidPayload
+			default:
+				a.logger.Error("unexpected error", zap.Error(err))
 				client.Egress <- errorInternalServerError
 			}
-		} else {
-			a.logger.Warn("invalid ws message type, could not route message", zap.String("type", message.Type))
-			client.Egress <- errorInvalidMessageType
-		}
 
-	case err := <-client.Errors:
-		switch {
-		case errors.As(err, &ws.ErrorInvalidJSON):
-			a.logger.Warn("invalid json data in payload", zap.Error(err))
-			client.Egress <- errorInvalidPayload
-		default:
-			a.logger.Error("unexpected error", zap.Error(err))
-			client.Egress <- errorInternalServerError
+		case <-c.Done():
+			a.logger.Info("ws connection closed")
+			return
 		}
 	}
 }
 
 func (a *V1) routeWS() {
 	a.wsHandlers = map[string]wsHandler{
-		pongMessage: a.pongHandler,
+		ws.PongMessageType: a.pongHandler,
 	}
 }
 

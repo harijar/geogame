@@ -18,20 +18,23 @@ func (a *V1) setCookie(c *gin.Context, name string, value string, expired bool) 
 }
 
 func (a *V1) getUser(c *gin.Context, columns ...string) (*users.User, error) {
-	token, err := c.Cookie("token")
-	if err != nil {
-		a.logger.Debug("user is playing as guest")
-		return nil, nil
-	}
-	userID, err := a.authService.GetUserID(c, token)
-	if err != nil {
-		if !errors.Is(err, redis.Nil) {
-			return nil, err
+	userID, exists := c.Get("user")
+	if !exists {
+		token, err := c.Cookie("token")
+		if err != nil {
+			a.logger.Debug("user is playing as guest")
+			return nil, nil
 		}
-		a.setCookie(c, "token", "", true)
-		return nil, nil
+		userID, err = a.authService.GetUserID(c, token)
+		if err != nil {
+			if !errors.Is(err, redis.Nil) {
+				return nil, err
+			}
+			a.setCookie(c, "token", "", true)
+			return nil, nil
+		}
 	}
-	user, err := a.usersService.GetUser(c, userID, columns...)
+	user, err := a.usersService.GetUser(c, userID.(int), columns...)
 	if err != nil {
 		return nil, err
 	}
