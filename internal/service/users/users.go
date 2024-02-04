@@ -63,7 +63,3 @@ func (u *Users) UpdateUser(ctx context.Context, user *users.User) []error {
 	updateErrors = append(updateErrors, err)
 	return updateErrors
 }
-
-func (u *Users) UpdateLastSeen(ctx context.Context, id int) error {
-	return u.redisRepo.UpdateLastSeen(ctx, id, lastSeenTTL)
-}

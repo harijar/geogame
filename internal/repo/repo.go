@@ -24,6 +24,7 @@ type Countries interface {
 
 type Users interface {
 	Get(ctx context.Context, id int, columns ...string) (*users.User, error)
+	GetAll(ctx context.Context, conditions []string, columns ...string) ([]*users.User, error)
 	Exists(ctx context.Context, id int) (bool, error)
 	Save(ctx context.Context, user *users.User) error
 	Delete(ctx context.Context, id int) error
