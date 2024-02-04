@@ -7,6 +7,13 @@ import (
 	"github.com/harijar/geogame/internal/repo"
 	"github.com/harijar/geogame/internal/repo/postgres/users"
 	"go.uber.org/zap"
+	"time"
+)
+
+const (
+	tokenLenght = 64
+	userIDTTL   = 720 * time.Hour
+	gameIDTTL   = 24 * time.Hour
 )
 
 type Auth struct {
@@ -14,8 +21,6 @@ type Auth struct {
 	usersRepo  repo.Users
 	logger     *zap.Logger
 }
-
-const tokenLenght = 64
 
 func New(tokensRepo repo.Redis, usersRepo repo.Users, logger *zap.Logger) *Auth {
 	return &Auth{
@@ -51,9 +56,9 @@ func (a *Auth) GetGameID(ctx context.Context, token string) (uuid.UUID, error) {
 }
 
 func (a *Auth) SetUserID(ctx context.Context, token string, id int) error {
-	return a.tokensRepo.SetUserID(ctx, token, id)
+	return a.tokensRepo.SetUserID(ctx, token, id, userIDTTL)
 }
 
 func (a *Auth) SetGameID(ctx context.Context, token string, id uuid.UUID) error {
-	return a.tokensRepo.SetGameID(ctx, token, id)
+	return a.tokensRepo.SetGameID(ctx, token, id, gameIDTTL)
 }

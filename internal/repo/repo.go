@@ -6,6 +6,7 @@ import (
 	"github.com/harijar/geogame/internal/repo/clickhouse/guesses"
 	"github.com/harijar/geogame/internal/repo/postgres/countries"
 	"github.com/harijar/geogame/internal/repo/postgres/users"
+	"time"
 )
 
 //go:generate mockgen -destination=../mocks/mock_countries.go -package=mocks . Countries
@@ -34,12 +35,12 @@ type Redis interface {
 	// Methods working with authentification tokens
 	GetUserID(ctx context.Context, token string) (int, error)
 	GetGameID(ctx context.Context, token string) (uuid.UUID, error)
-	SetUserID(ctx context.Context, token string, id int) error
-	SetGameID(ctx context.Context, token string, id uuid.UUID) error
+	SetUserID(ctx context.Context, token string, id int, ttl time.Duration) error
+	SetGameID(ctx context.Context, token string, id uuid.UUID, ttl time.Duration) error
 
 	// Method working with clients' last activity
 	GetLastSeen(ctx context.Context, id int) (int64, error)
-	UpdateLastSeen(ctx context.Context, id int) error
+	UpdateLastSeen(ctx context.Context, id int, ttl time.Duration) error
 
 	Delete(ctx context.Context, token string) error
 }

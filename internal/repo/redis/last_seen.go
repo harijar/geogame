@@ -8,7 +8,6 @@ import (
 )
 
 const (
-	lastSeenTTL    = 4380 * time.Hour
 	lastSeenPrefix = "lastseen:"
 )
 
@@ -28,6 +27,6 @@ func (r *Redis) GetLastSeen(ctx context.Context, id int) (int64, error) {
 }
 
 // UpdateLastSeen is called when a pong message is received and updates the timestamp
-func (r *Redis) UpdateLastSeen(ctx context.Context, id int) error {
-	return r.db.Set(ctx, lastSeenPrefix+string(rune(id)), time.Now().Unix(), lastSeenTTL).Err()
+func (r *Redis) UpdateLastSeen(ctx context.Context, id int, ttl time.Duration) error {
+	return r.db.Set(ctx, lastSeenPrefix+string(rune(id)), time.Now().Unix(), ttl).Err()
 }

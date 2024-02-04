@@ -7,9 +7,7 @@ import (
 )
 
 const (
-	userIDTTL    = 720 * time.Hour
 	userIDPrefix = "userID:"
-	gameIDTTL    = 24 * time.Hour
 	gameIDPrefix = "gameID:"
 )
 
@@ -33,14 +31,14 @@ func (r *Redis) GetGameID(ctx context.Context, token string) (uuid.UUID, error) 
 	return uuid.FromBytes(idBytes)
 }
 
-func (r *Redis) SetUserID(ctx context.Context, token string, id int) error {
-	return r.db.Set(ctx, userIDPrefix+token, id, userIDTTL).Err()
+func (r *Redis) SetUserID(ctx context.Context, token string, id int, ttl time.Duration) error {
+	return r.db.Set(ctx, userIDPrefix+token, id, ttl).Err()
 }
 
-func (r *Redis) SetGameID(ctx context.Context, token string, id uuid.UUID) error {
+func (r *Redis) SetGameID(ctx context.Context, token string, id uuid.UUID, ttl time.Duration) error {
 	idBytes, err := id.MarshalBinary()
 	if err != nil {
 		return err
 	}
-	return r.db.Set(ctx, gameIDPrefix+token, idBytes, gameIDTTL).Err()
+	return r.db.Set(ctx, gameIDPrefix+token, idBytes, ttl).Err()
 }

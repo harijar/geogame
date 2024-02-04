@@ -6,8 +6,11 @@ import (
 	"github.com/harijar/geogame/internal/repo"
 	"github.com/harijar/geogame/internal/repo/postgres/users"
 	"strings"
+	"time"
 	"unicode"
 )
+
+const lastSeenTTL = 4380 * time.Hour
 
 var (
 	ErrInvalidNickname = errors.New("nickname must not contain any non-latin letters, spaces and following symbols: ,.&%#=\"/")
@@ -62,5 +65,5 @@ func (u *Users) UpdateUser(ctx context.Context, user *users.User) []error {
 }
 
 func (u *Users) UpdateLastSeen(ctx context.Context, id int) error {
-	return u.redisRepo.UpdateLastSeen(ctx, id)
+	return u.redisRepo.UpdateLastSeen(ctx, id, lastSeenTTL)
 }
