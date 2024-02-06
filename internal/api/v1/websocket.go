@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"github.com/gin-gonic/gin"
@@ -19,21 +18,21 @@ var upgrader = websocket.Upgrader{
 }
 
 var (
-	errorInternalServerError = &ws.Message{
+	ErrorWSInternalServerError = &ws.Message{
 		Type:    "error",
 		Payload: json.RawMessage("internal server error"),
 	}
-	errorInvalidMessageType = &ws.Message{
+	ErrorWSInvalidMessageType = &ws.Message{
 		Type:    "error",
 		Payload: json.RawMessage("invalid message type"),
 	}
-	errorInvalidPayload = &ws.Message{
+	ErrorWSInvalidPayload = &ws.Message{
 		Type:    "error",
 		Payload: json.RawMessage("invalid payload"),
 	}
 )
 
-type wsHandler func(ctx context.Context, msg *ws.Message, c *ws.Client) error
+type wsHandler func(c *gin.Context, msg *ws.Message, client *ws.Client) error
 
 // handler for /v1/ws route responsible for websocket connection
 func (a *V1) serveWS(c *gin.Context) {
@@ -41,78 +40,66 @@ func (a *V1) serveWS(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	user, err := a.getUser(c, users.ID)
-	if err != nil {
-		a.logger.Error("could not get user", zap.Error(err))
-		return
-	}
+
 	client := ws.New(conn)
-	a.addWsClient(client)
-	a.routeWS()
-	client.Start(c, user.ID)
+	a.addWSClient(client)
+	client.Start(c)
 	defer client.Stop()
 
 	for {
 		select {
 		case message, ok := <-client.Ingress:
 			if !ok {
-				a.logger.Debug("ws connection closed")
+				a.logger.Info("ws connection closed")
 				return
 			}
 			if handler, ok := a.wsHandlers[message.Type]; ok {
 				err = handler(c, message, client)
 				if err != nil {
 					a.logger.Warn("could not handle ws message", zap.Error(err))
-					client.Egress <- errorInternalServerError
+					client.Egress <- ErrorWSInternalServerError
 				}
 			} else {
 				a.logger.Warn("invalid ws message type, could not route message", zap.String("type", message.Type))
-				client.Egress <- errorInvalidMessageType
+				client.Egress <- ErrorWSInvalidMessageType
 			}
 
 		case err := <-client.Errors:
 			switch {
 			case errors.As(err, &ws.ErrorInvalidJSON):
 				a.logger.Warn("invalid json data in payload", zap.Error(err))
-				client.Egress <- errorInvalidPayload
+				client.Egress <- ErrorWSInvalidPayload
 			default:
 				a.logger.Error("unexpected error", zap.Error(err))
-				client.Egress <- errorInternalServerError
+				client.Egress <- ErrorWSInternalServerError
 			}
 
 		case <-c.Done():
-			a.logger.Info("ws connection closed")
+			a.logger.Info("gin context done, ws connection closed")
 			return
 		}
 	}
 }
 
-func (a *V1) routeWS() {
-	a.wsHandlers = map[string]wsHandler{
-		ws.PongMessageType: a.pongHandler,
-	}
-}
-
-func (a *V1) addWsClient(client *ws.Client) {
-	a.Lock()
-	defer a.Unlock()
+func (a *V1) addWSClient(client *ws.Client) {
+	a.WSmutex.Lock()
+	defer a.WSmutex.Unlock()
 	a.wsClients[client] = true
 }
 
-func (a *V1) removeWsClient(client *ws.Client) {
-	a.Lock()
-	defer a.Unlock()
+func (a *V1) removeWSClient(client *ws.Client) {
+	a.WSmutex.Lock()
+	defer a.WSmutex.Unlock()
 	if _, ok := a.wsClients[client]; ok {
 		client.Stop()
 		delete(a.wsClients, client)
 	}
 }
 
-func (a *V1) pongHandler(ctx context.Context, msg *ws.Message, c *ws.Client) error {
-	id := 0
-	err := json.Unmarshal(msg.Payload, &id)
+func (a *V1) pongHandler(c *gin.Context, msg *ws.Message, client *ws.Client) error {
+	user, err := a.getUser(c, users.ID)
 	if err != nil {
 		return err
 	}
-	return a.usersService.UpdateLastSeen(ctx, id)
+	return a.users.UpdateLastSeen(c, user.ID)
 }

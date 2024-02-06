@@ -70,7 +70,7 @@ func (a *V1) auth(c *gin.Context) {
 		}
 		var user *users.User
 		if exists {
-			user, err = a.usersService.GetUser(c, int(request.ID))
+			user, err = a.users.GetUser(c, int(request.ID))
 			if err != nil {
 				c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
 				a.logger.Error("could not find user", zap.Error(err))
@@ -96,7 +96,7 @@ func (a *V1) auth(c *gin.Context) {
 			a.logger.Error("failed to generate token", zap.Error(err))
 			return
 		}
-		err = a.redis.SetUserID(c, token, user.ID)
+		err = a.authService.SetUserID(c, token, user.ID)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
 			a.logger.Error("failed to save token to redis DB", zap.Error(err))

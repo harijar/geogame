@@ -6,7 +6,6 @@ import (
 	"github.com/jackc/pgerrcode"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/driver/pgdriver"
-	"strings"
 )
 
 var ErrNicknameNotUnique = errors.New("nickname is already in use")
@@ -32,14 +31,15 @@ func (u *Users) Get(ctx context.Context, id int, columns ...string) (*User, erro
 	return user, nil
 }
 
-func (u *Users) GetAll(ctx context.Context, conditions []string, columns ...string) ([]*User, error) {
+func (u *Users) GetAll(ctx context.Context, public bool, columns ...string) ([]*User, error) {
 	users := make([]*User, 0)
-	whereQuery := strings.Join(conditions, " AND ")
-	err := u.db.NewSelect().
+	q := u.db.NewSelect().
 		Model(&users).
-		Where(whereQuery).
-		Column(columns...).
-		Scan(ctx)
+		Column(columns...)
+	if public {
+		q = q.Where("public=true")
+	}
+	err := q.Scan(ctx)
 	if err != nil {
 		return nil, err
 	}

@@ -24,7 +24,7 @@ type Countries interface {
 
 type Users interface {
 	Get(ctx context.Context, id int, columns ...string) (*users.User, error)
-	GetAll(ctx context.Context, conditions []string, columns ...string) ([]*users.User, error)
+	GetAll(ctx context.Context, public bool, columns ...string) ([]*users.User, error)
 	Exists(ctx context.Context, id int) (bool, error)
 	Save(ctx context.Context, user *users.User) error
 	Delete(ctx context.Context, id int) error
@@ -39,11 +39,9 @@ type Redis interface {
 	SetUserID(ctx context.Context, token string, id int, ttl time.Duration) error
 	SetGameID(ctx context.Context, token string, id uuid.UUID, ttl time.Duration) error
 
-	// Method working with clients' last activity
+	// Methods working with clients' last activity
 	GetLastSeen(ctx context.Context, id int) (int64, error)
 	UpdateLastSeen(ctx context.Context, id int, ttl time.Duration) error
-
-	Delete(ctx context.Context, token string) error
 }
 
 type Guesses interface {

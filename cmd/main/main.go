@@ -68,7 +68,7 @@ func main() {
 	usersService := usersService.New(usersRepo, redisRepo)
 	statisticsService := statistics.New(guessesRepo)
 
-	api := v1.New(countriesRepo, promptsService, redisRepo, usersRepo, authService, usersService, statisticsService, cfg.BotToken, cfg.TriesLimit, &v1.ServerConfig{
+	api := v1.New(promptsService, authService, usersService, statisticsService, cfg.BotToken, cfg.TriesLimit, &v1.ServerConfig{
 		CookieDomain:         cfg.CookieDomain,
 		CookieSecure:         cfg.CookieSecure,
 		CORSEnabled:          cfg.CORSEnabled,

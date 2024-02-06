@@ -51,7 +51,7 @@ func New(conn *websocket.Conn) *Client {
 }
 
 // Start reading and writing handlers
-func (c *Client) Start(ctx context.Context, id int) {
+func (c *Client) Start(ctx context.Context) {
 	ctxWithCancel, cancel := context.WithCancel(ctx)
 	c.cancel = cancel
 
@@ -60,14 +60,6 @@ func (c *Client) Start(ctx context.Context, id int) {
 	go c.writeHandler(ctxWithCancel)
 
 	c.conn.SetPongHandler(func(data string) error {
-		payload, err := json.Marshal(id)
-		if err != nil {
-			return err
-		}
-		c.Ingress <- &Message{
-			Type:    PongMessageType,
-			Payload: payload,
-		}
 		return c.conn.SetReadDeadline(time.Now().Add(pongWait))
 	})
 }

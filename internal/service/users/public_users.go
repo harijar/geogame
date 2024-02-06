@@ -28,26 +28,27 @@ func (u *Users) UpdateLastSeen(ctx context.Context, id int) error {
 	return u.redisRepo.UpdateLastSeen(ctx, id, lastSeenTTL)
 }
 
-// ByLastseen is an implementation of sort.Interface for []*PublicUser based on the LastSeen field
+// byLastseen is an implementation of sort.Interface for []*PublicUser based on the LastSeen field
 // We want to show online users first
-type ByLastseen []*PublicUser
+type byLastseen []*PublicUser
 
-func (l ByLastseen) Len() int {
+func (l byLastseen) Len() int {
 	return len(l)
 }
-func (l ByLastseen) Swap(i, j int) {
+func (l byLastseen) Swap(i, j int) {
 	l[i], l[j] = l[j], l[i]
 }
-func (l ByLastseen) Less(i, j int) bool {
+func (l byLastseen) Less(i, j int) bool {
 	return l[i].LastSeen < l[j].LastSeen
 }
 
 func (u *Users) GetPublicUsers(ctx context.Context) ([]*PublicUser, error) {
-	users, err := u.usersRepo.GetAll(ctx, []string{fmt.Sprintf("%s = true", users.Public)}, users.Nickname)
+	users, err := u.usersRepo.GetAll(ctx, true, users.Nickname)
 	if err != nil {
 		return nil, err
 	}
 
+	// TODO: make it better
 	result := make([]*PublicUser, 0, len(users))
 	for _, user := range users {
 		var publicUser *PublicUser
@@ -68,7 +69,7 @@ func (u *Users) GetPublicUsers(ctx context.Context) ([]*PublicUser, error) {
 		publicUser.LastSeenString = getLastSeenString(difference)
 	}
 
-	sort.Sort(ByLastseen(result))
+	sort.Sort(byLastseen(result))
 	return result, nil
 }
 

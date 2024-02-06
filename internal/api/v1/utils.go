@@ -35,7 +35,7 @@ func (a *V1) getUser(c *gin.Context, columns ...string) (*users.User, error) {
 		a.setCookie(c, "token", "", true)
 		return nil, nil
 	}
-	user, err = a.usersService.GetUser(c, userID, columns...)
+	user, err = a.users.GetUser(c, userID, columns...)
 	if err != nil {
 		return nil, err
 	}
