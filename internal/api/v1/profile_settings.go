@@ -58,6 +58,7 @@ func (a *V1) updateProfileSettings(c *gin.Context) {
 	if errs != nil {
 		updateErrors := ""
 		for _, err := range errs {
+			// nickname is not validated
 			if !errors.Is(err, usersService.ErrNicknameTooLong) && !errors.Is(err, usersService.ErrInvalidNickname) && !errors.Is(err, usersRepo.ErrNicknameNotUnique) {
 				c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
 				a.logger.Error("could not update user", zap.Error(err))

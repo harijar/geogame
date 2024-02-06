@@ -43,7 +43,7 @@ func (a *V1) auth(c *gin.Context) {
 	createNewToken := false
 	cookieToken, err := c.Cookie("token")
 	if err != nil {
-		// token for this request is not found in cookie
+		// token for this request does not exist in cookie
 		createNewToken = true
 	} else {
 		redisId, err := a.tokens.GetUserID(c, cookieToken)

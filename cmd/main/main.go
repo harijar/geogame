@@ -53,6 +53,7 @@ func main() {
 		logger.Debug("clickhouse migrations carried out successfully")
 	}
 
+	// Initializing repositories and starting server
 	countriesRepo := countries.New(postgresDB)
 	err = countriesRepo.Init(ctx)
 	if err != nil {
