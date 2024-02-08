@@ -7,6 +7,7 @@ const (
 	Nickname         = "nickname"
 	TelegramUsername = "telegram_username"
 	Public           = "public"
+	LastSeen         = "last_seen"
 )
 
 type User struct {
@@ -16,4 +17,6 @@ type User struct {
 	Nickname         string `bun:"nickname"`
 	TelegramUsername string `bun:"telegram_username"`
 	Public           bool   `bun:"public"`
+	LastSeen         int64  `bun:"last_seen"`
+	LastSeenString   string
 }

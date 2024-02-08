@@ -21,8 +21,8 @@ var (
 )
 
 // Client represents ws connection initialized from client
-// Ingress channel used for watching received messages, it will be closed along with the connection
-// Egress channel used for sending messages, closing it closing the connection
+// Ingress channel is used for watching received messages, it will be closed along with the connection
+// Egress channel is used for sending messages, closing it closes the connection
 type Client struct {
 	conn      *websocket.Conn
 	pingTimer *time.Ticker

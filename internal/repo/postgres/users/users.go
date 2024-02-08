@@ -8,6 +8,8 @@ import (
 	"github.com/uptrace/bun/driver/pgdriver"
 )
 
+const pageLength = 20
+
 var ErrNicknameNotUnique = errors.New("nickname is already in use")
 
 type Users struct {
@@ -31,15 +33,16 @@ func (u *Users) Get(ctx context.Context, id int, columns ...string) (*User, erro
 	return user, nil
 }
 
-func (u *Users) GetAll(ctx context.Context, public bool, columns ...string) ([]*User, error) {
+func (u *Users) GetPublic(ctx context.Context, pageNumber int) ([]*User, error) {
 	users := make([]*User, 0)
-	q := u.db.NewSelect().
+	err := u.db.NewSelect().
 		Model(&users).
-		Column(columns...)
-	if public {
-		q = q.Where("public=true")
-	}
-	err := q.Scan(ctx)
+		Column(Nickname, LastSeen).
+		Order(LastSeen + " ASC").
+		Limit(pageLength).
+		Offset(pageNumber * pageLength).
+		Scan(ctx)
+
 	if err != nil {
 		return nil, err
 	}
@@ -75,10 +78,10 @@ func (u *Users) UpdateOrSave(ctx context.Context, user *User) error {
 	return err
 }
 
-func (u *Users) Update(ctx context.Context, user *User) error {
+func (u *Users) Update(ctx context.Context, user *User, columns ...string) error {
 	_, err := u.db.NewUpdate().
 		Model(user).
-		Column(Nickname, Public).
+		Column(columns...).
 		Where("id=?", user.ID).
 		Exec(ctx)
 	if err != nil {
@@ -87,6 +90,5 @@ func (u *Users) Update(ctx context.Context, user *User) error {
 		}
 		return err
 	}
-
 	return nil
 }

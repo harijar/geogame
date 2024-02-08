@@ -9,6 +9,7 @@ import (
 	"github.com/harijar/geogame/internal/transport/ws"
 	"go.uber.org/zap"
 	"net/http"
+	"time"
 )
 
 var upgrader = websocket.Upgrader{
@@ -101,5 +102,6 @@ func (a *V1) pongHandler(c *gin.Context, msg *ws.Message, client *ws.Client) err
 	if err != nil {
 		return err
 	}
-	return a.users.UpdateLastSeen(c, user.ID)
+	user.LastSeen = time.Now().Unix()
+	return a.users.UpdateUser(c, user, users.LastSeen)[0]
 }

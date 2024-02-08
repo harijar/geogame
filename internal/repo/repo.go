@@ -24,12 +24,12 @@ type Countries interface {
 
 type Users interface {
 	Get(ctx context.Context, id int, columns ...string) (*users.User, error)
-	GetAll(ctx context.Context, public bool, columns ...string) ([]*users.User, error)
+	GetPublic(ctx context.Context, pageNumber int) ([]*users.User, error)
 	Exists(ctx context.Context, id int) (bool, error)
 	Save(ctx context.Context, user *users.User) error
 	Delete(ctx context.Context, id int) error
 	UpdateOrSave(ctx context.Context, user *users.User) error
-	Update(ctx context.Context, user *users.User) error
+	Update(ctx context.Context, user *users.User, columns ...string) error
 }
 
 type Redis interface {
@@ -38,10 +38,6 @@ type Redis interface {
 	GetGameID(ctx context.Context, token string) (uuid.UUID, error)
 	SetUserID(ctx context.Context, token string, id int, ttl time.Duration) error
 	SetGameID(ctx context.Context, token string, id uuid.UUID, ttl time.Duration) error
-
-	// Methods working with clients' last activity
-	GetLastSeen(ctx context.Context, id int) (int64, error)
-	UpdateLastSeen(ctx context.Context, id int, ttl time.Duration) error
 }
 
 type Guesses interface {

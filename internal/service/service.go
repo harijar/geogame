@@ -32,7 +32,7 @@ type Statistics interface {
 
 type Users interface {
 	GetUser(ctx context.Context, id int, columns ...string) (*users.User, error)
-	UpdateUser(ctx context.Context, user *users.User) []error
+	UpdateUser(ctx context.Context, user *users.User, columns ...string) []error
 	UpdateLastSeen(ctx context.Context, id int) error
 	GetPublicUsers(ctx context.Context) ([]*usersService.PublicUser, error)
 }

@@ -33,7 +33,7 @@ func (u *Users) GetUser(ctx context.Context, id int, columns ...string) (*users.
 	return u.usersRepo.Get(ctx, id, columns...)
 }
 
-func (u *Users) UpdateUser(ctx context.Context, user *users.User) []error {
+func (u *Users) UpdateUser(ctx context.Context, user *users.User, columns ...string) []error {
 	nickname := user.Nickname
 	updateErrors := make([]error, 0)
 
@@ -59,7 +59,7 @@ func (u *Users) UpdateUser(ctx context.Context, user *users.User) []error {
 		return updateErrors
 	}
 
-	err := u.usersRepo.Update(ctx, user)
+	err := u.usersRepo.Update(ctx, user, columns...)
 	updateErrors = append(updateErrors, err)
 	return updateErrors
 }
