@@ -4,6 +4,7 @@ import (
 	"github.com/gin-contrib/cors"
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
+	"github.com/harijar/geogame/internal/repo"
 	"github.com/harijar/geogame/internal/service"
 	"github.com/harijar/geogame/internal/transport/ws"
 	"go.uber.org/zap"
@@ -26,6 +27,7 @@ type V1 struct {
 	server       *gin.Engine
 	wsClients    map[*ws.Client]bool
 	wsHandlers   map[string]wsHandler
+	countries    repo.Countries
 	prompts      service.Prompts
 	authService  service.Auth
 	users        service.Users
@@ -36,7 +38,8 @@ type V1 struct {
 	logger       *zap.Logger
 }
 
-func New(prompts service.Prompts,
+func New(countries repo.Countries,
+	prompts service.Prompts,
 	authService service.Auth,
 	users service.Users,
 	statistics service.Statistics,
@@ -49,6 +52,7 @@ func New(prompts service.Prompts,
 		server:       gin.New(),
 		wsClients:    make(map[*ws.Client]bool),
 		wsHandlers:   make(map[string]wsHandler),
+		countries:    countries,
 		prompts:      prompts,
 		authService:  authService,
 		users:        users,

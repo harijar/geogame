@@ -7,7 +7,6 @@ import (
 	"github.com/harijar/geogame/internal/repo/postgres/countries"
 	"github.com/harijar/geogame/internal/repo/postgres/users"
 	"github.com/harijar/geogame/internal/service/prompts"
-	usersService "github.com/harijar/geogame/internal/service/users"
 )
 
 type Prompts interface {
@@ -33,6 +32,5 @@ type Statistics interface {
 type Users interface {
 	GetUser(ctx context.Context, id int, columns ...string) (*users.User, error)
 	UpdateUser(ctx context.Context, user *users.User, columns ...string) []error
-	UpdateLastSeen(ctx context.Context, id int) error
-	GetPublicUsers(ctx context.Context) ([]*usersService.PublicUser, error)
+	GetPublicUsers(ctx context.Context, pageNumber int) ([]*users.User, error)
 }

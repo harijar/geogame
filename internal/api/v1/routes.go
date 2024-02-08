@@ -12,6 +12,7 @@ func (a *V1) registerRoutes() {
 	a.server.GET("v1/profile", a.profile)
 	a.server.POST("/v1/profile/settings", a.updateProfileSettings)
 	a.server.GET("/v1/profile/settings", a.getProfileSettings)
+	a.server.POST("/v1/users", a.usersPage)
 
 	a.wsHandlers = map[string]wsHandler{
 		ws.PongMessageType: a.pongHandler,

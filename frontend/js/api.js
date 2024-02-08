@@ -4,6 +4,7 @@ const GAME_GUESS_URL = API_URL + 'game/guess'
 const AUTH_URL = API_URL + 'auth'
 const PROFILE_URL = API_URL + 'profile'
 const PROFILE_SETTINGS_URL = API_URL + 'profile/settings'
+const USERS_URL = API_URL + 'users'
 
 export async function StartGameRequest() {
     const response= await fetch(GAME_START_URL, {
@@ -122,4 +123,21 @@ export async function UpdateProfileSettingsRequest(settings) {
         throw Error('Failed to update: ' + response.status)
     }
     return null
+}
+
+export async function UsersRequest(pageNumber) {
+    const response = await fetch(USERS_URL, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        credentials: 'include',
+        body: JSON.stringify({page_number: pageNumber})
+    })
+    if (response.ok) {
+        const data = await response.json()
+        if (!data) {
+            throw Error('Failed to get users: ' + await response.text())
+        }
+        return data
+    }
+    throw Error('Failed to get users: ' + await response.text())
 }

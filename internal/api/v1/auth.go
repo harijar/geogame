@@ -46,7 +46,7 @@ func (a *V1) auth(c *gin.Context) {
 		// token for this request is not found in cookie
 		createNewToken = true
 	} else {
-		redisId, err := a.redis.GetUserID(c, cookieToken)
+		redisId, err := a.authService.GetUserID(c, cookieToken)
 		if err != nil {
 			if !errors.Is(err, redis.Nil) {
 				c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})

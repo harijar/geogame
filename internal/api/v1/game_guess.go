@@ -74,7 +74,7 @@ func (a *V1) gameGuess(c *gin.Context) {
 		a.logger.Warn("no game ID in cookie", zap.Error(err))
 		return
 	}
-	gameID, err := a.redis.GetGameID(c, token)
+	gameID, err := a.authService.GetGameID(c, token)
 	if err != nil {
 		if errors.Is(err, redis.Nil) {
 			c.AbortWithStatusJSON(http.StatusNotFound, &gin.H{"error": "game has not started"})

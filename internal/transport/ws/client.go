@@ -15,9 +15,9 @@ var (
 	ErrorInvalidJSON = errors.New("invalid json data in ws message")
 
 	pingInterval = 3 * time.Second
-	pongWait     = 1 * time.Second
+	pongWait     = 5 * time.Second
 
-	writeTimeout = 1 * time.Second
+	writeTimeout = 5 * time.Second
 )
 
 // Client represents ws connection initialized from client
@@ -60,6 +60,7 @@ func (c *Client) Start(ctx context.Context) {
 	go c.writeHandler(ctxWithCancel)
 
 	c.conn.SetPongHandler(func(data string) error {
+		c.Ingress <- &Message{Type: "pong"}
 		return c.conn.SetReadDeadline(time.Now().Add(pongWait))
 	})
 }
@@ -76,10 +77,6 @@ func (c *Client) readHandler(ctx context.Context) {
 		case <-ctx.Done():
 			return
 		default:
-			err := c.conn.SetReadDeadline(time.Now().Add(pongWait))
-			if err != nil {
-				return
-			}
 			_, payload, err := c.conn.ReadMessage()
 			if err != nil {
 				return
