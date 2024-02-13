@@ -60,7 +60,7 @@ func (c *Client) Start(ctx context.Context) {
 	go c.writeHandler(ctxWithCancel)
 
 	c.conn.SetPongHandler(func(data string) error {
-		c.Ingress <- &Message{Type: "pong"}
+		c.Ingress <- &Message{Type: PongMessageType}
 		return c.conn.SetReadDeadline(time.Now().Add(pongWait))
 	})
 }

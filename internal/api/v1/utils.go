@@ -18,10 +18,13 @@ func (a *V1) setCookie(c *gin.Context, name string, value string, expired bool) 
 }
 
 func (a *V1) getUser(c *gin.Context, columns ...string) (*users.User, error) {
+	// check if user is in cache
 	user, ok := c.Get("user")
 	if ok {
 		return user.(*users.User), nil
 	}
+
+	// put user in cache
 	token, err := c.Cookie("token")
 	if err != nil {
 		a.logger.Debug("user is playing as guest")
@@ -35,7 +38,7 @@ func (a *V1) getUser(c *gin.Context, columns ...string) (*users.User, error) {
 		a.setCookie(c, "token", "", true)
 		return nil, nil
 	}
-	user, err = a.users.GetUser(c, userID, columns...)
+	user, err = a.users.Get(c, userID, columns...)
 	if err != nil {
 		return nil, err
 	}

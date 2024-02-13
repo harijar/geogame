@@ -29,11 +29,28 @@ func New(usersRepo repo.Users, redisRepo repo.Redis) *Users {
 	}
 }
 
-func (u *Users) GetUser(ctx context.Context, id int, columns ...string) (*users.User, error) {
+func (u *Users) Get(ctx context.Context, id int, columns ...string) (*users.User, error) {
 	return u.usersRepo.Get(ctx, id, columns...)
 }
 
-func (u *Users) UpdateUser(ctx context.Context, user *users.User, columns ...string) []error {
+func (u *Users) GetPublic(ctx context.Context, pageNumber int) ([]*users.User, error) {
+	users, err := u.usersRepo.GetPublic(ctx, pageLength, pageNumber)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, user := range users {
+		if err != nil {
+			return nil, err
+		}
+		difference := time.Now().Sub(user.LastSeen)
+		user.LastSeenString = formatLastSeen(difference)
+	}
+
+	return users, nil
+}
+
+func (u *Users) Update(ctx context.Context, user *users.User, columns ...string) []error {
 	nickname := user.Nickname
 	updateErrors := make([]error, 0)
 

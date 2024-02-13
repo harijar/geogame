@@ -24,7 +24,7 @@ type Countries interface {
 
 type Users interface {
 	Get(ctx context.Context, id int, columns ...string) (*users.User, error)
-	GetPublic(ctx context.Context, pageNumber int) ([]*users.User, error)
+	GetPublic(ctx context.Context, pageLength int, pageNumber int) ([]*users.User, error)
 	Exists(ctx context.Context, id int) (bool, error)
 	Save(ctx context.Context, user *users.User) error
 	Delete(ctx context.Context, id int) error

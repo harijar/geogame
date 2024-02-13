@@ -1,3 +1,4 @@
+export const WS_URL = 'ws://localhost:8080/v1/ws'
 const API_URL = 'http://localhost:8080/v1/'
 const GAME_START_URL = API_URL + 'game/start'
 const GAME_GUESS_URL = API_URL + 'game/guess'

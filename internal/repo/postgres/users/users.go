@@ -8,8 +8,6 @@ import (
 	"github.com/uptrace/bun/driver/pgdriver"
 )
 
-const pageLength = 20
-
 var ErrNicknameNotUnique = errors.New("nickname is already in use")
 
 type Users struct {
@@ -33,7 +31,7 @@ func (u *Users) Get(ctx context.Context, id int, columns ...string) (*User, erro
 	return user, nil
 }
 
-func (u *Users) GetPublic(ctx context.Context, pageNumber int) ([]*User, error) {
+func (u *Users) GetPublic(ctx context.Context, pageLength int, pageNumber int) ([]*User, error) {
 	users := make([]*User, 0)
 	err := u.db.NewSelect().
 		Model(&users).

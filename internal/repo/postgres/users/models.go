@@ -1,6 +1,9 @@
 package users
 
-import "github.com/uptrace/bun"
+import (
+	"github.com/uptrace/bun"
+	"time"
+)
 
 const (
 	ID               = "id"
@@ -13,10 +16,10 @@ const (
 type User struct {
 	bun.BaseModel `bun:"table:users"`
 
-	ID               int    `bun:"id,pk"`
-	Nickname         string `bun:"nickname"`
-	TelegramUsername string `bun:"telegram_username"`
-	Public           bool   `bun:"public"`
-	LastSeen         int64  `bun:"last_seen"`
+	ID               int       `bun:"id,pk"`
+	Nickname         string    `bun:"nickname"`
+	TelegramUsername string    `bun:"telegram_username"`
+	Public           bool      `bun:"public"`
+	LastSeen         time.Time `bun:"last_seen"`
 	LastSeenString   string
 }

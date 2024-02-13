@@ -23,19 +23,19 @@ type ServerConfig struct {
 }
 
 type V1 struct {
-	WSmutex      sync.RWMutex
-	server       *gin.Engine
-	wsClients    map[*ws.Client]bool
-	wsHandlers   map[string]wsHandler
-	countries    repo.Countries
-	prompts      service.Prompts
-	authService  service.Auth
-	users        service.Users
-	statistics   service.Statistics
-	botToken     string
-	triesLimit   int
-	serverConfig *ServerConfig
-	logger       *zap.Logger
+	WSClientsMutex sync.RWMutex
+	server         *gin.Engine
+	wsClients      map[*ws.Client]bool
+	wsHandlers     map[string]wsHandler
+	countries      repo.Countries
+	prompts        service.Prompts
+	authService    service.Auth
+	users          service.Users
+	statistics     service.Statistics
+	botToken       string
+	triesLimit     int
+	serverConfig   *ServerConfig
+	logger         *zap.Logger
 }
 
 func New(countries repo.Countries,
@@ -48,19 +48,19 @@ func New(countries repo.Countries,
 	serverConfig *ServerConfig,
 	logger *zap.Logger) *V1 {
 	return &V1{
-		WSmutex:      sync.RWMutex{},
-		server:       gin.New(),
-		wsClients:    make(map[*ws.Client]bool),
-		wsHandlers:   make(map[string]wsHandler),
-		countries:    countries,
-		prompts:      prompts,
-		authService:  authService,
-		users:        users,
-		statistics:   statistics,
-		botToken:     botToken,
-		triesLimit:   triesLimit,
-		serverConfig: serverConfig,
-		logger:       logger,
+		WSClientsMutex: sync.RWMutex{},
+		server:         gin.New(),
+		wsClients:      make(map[*ws.Client]bool),
+		wsHandlers:     make(map[string]wsHandler),
+		countries:      countries,
+		prompts:        prompts,
+		authService:    authService,
+		users:          users,
+		statistics:     statistics,
+		botToken:       botToken,
+		triesLimit:     triesLimit,
+		serverConfig:   serverConfig,
+		logger:         logger,
 	}
 }
 

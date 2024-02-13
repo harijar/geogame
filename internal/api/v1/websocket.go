@@ -45,7 +45,10 @@ func (a *V1) serveWS(c *gin.Context) {
 	client := ws.New(conn)
 	a.addWSClient(client)
 	client.Start(c)
-	defer client.Stop()
+	defer func() {
+		client.Stop()
+		a.removeWSClient(client)
+	}()
 
 	for {
 		select {
@@ -83,14 +86,14 @@ func (a *V1) serveWS(c *gin.Context) {
 }
 
 func (a *V1) addWSClient(client *ws.Client) {
-	a.WSmutex.Lock()
-	defer a.WSmutex.Unlock()
+	a.WSClientsMutex.Lock()
+	defer a.WSClientsMutex.Unlock()
 	a.wsClients[client] = true
 }
 
 func (a *V1) removeWSClient(client *ws.Client) {
-	a.WSmutex.Lock()
-	defer a.WSmutex.Unlock()
+	a.WSClientsMutex.Lock()
+	defer a.WSClientsMutex.Unlock()
 	if _, ok := a.wsClients[client]; ok {
 		client.Stop()
 		delete(a.wsClients, client)
@@ -103,5 +106,9 @@ func (a *V1) pongHandler(c *gin.Context, msg *ws.Message, client *ws.Client) err
 		return err
 	}
 	user.LastSeen = time.Now().Unix()
-	return a.users.UpdateUser(c, user, users.LastSeen)[0]
+	errs := a.users.Update(c, user, users.LastSeen)
+	if errs != nil {
+		return errs[0]
+	}
+	return nil
 }
