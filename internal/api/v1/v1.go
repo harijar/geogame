@@ -6,7 +6,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/harijar/geogame/internal/repo"
 	"github.com/harijar/geogame/internal/service"
+	"github.com/harijar/geogame/internal/transport/ws"
 	"go.uber.org/zap"
+	"sync"
 	"time"
 )
 
@@ -21,44 +23,44 @@ type ServerConfig struct {
 }
 
 type V1 struct {
-	server       *gin.Engine
-	countries    repo.Countries
-	prompts      service.Prompts
-	tokens       repo.Tokens
-	users        repo.Users
-	authService  service.Auth
-	usersService service.Users
-	statistics   service.Statistics
-	botToken     string
-	triesLimit   int
-	serverConfig *ServerConfig
-	logger       *zap.Logger
+	WSClientsMutex sync.RWMutex
+	server         *gin.Engine
+	wsClients      map[*ws.Client]bool
+	wsHandlers     map[string]wsHandler
+	countries      repo.Countries
+	prompts        service.Prompts
+	authService    service.Auth
+	users          service.Users
+	statistics     service.Statistics
+	botToken       string
+	triesLimit     int
+	serverConfig   *ServerConfig
+	logger         *zap.Logger
 }
 
 func New(countries repo.Countries,
 	prompts service.Prompts,
-	tokens repo.Tokens,
-	users repo.Users,
 	authService service.Auth,
-	usersService service.Users,
+	users service.Users,
 	statistics service.Statistics,
 	botToken string,
 	triesLimit int,
 	serverConfig *ServerConfig,
 	logger *zap.Logger) *V1 {
 	return &V1{
-		server:       gin.New(),
-		countries:    countries,
-		prompts:      prompts,
-		tokens:       tokens,
-		users:        users,
-		authService:  authService,
-		usersService: usersService,
-		statistics:   statistics,
-		botToken:     botToken,
-		triesLimit:   triesLimit,
-		serverConfig: serverConfig,
-		logger:       logger,
+		WSClientsMutex: sync.RWMutex{},
+		server:         gin.New(),
+		wsClients:      make(map[*ws.Client]bool),
+		wsHandlers:     make(map[string]wsHandler),
+		countries:      countries,
+		prompts:        prompts,
+		authService:    authService,
+		users:          users,
+		statistics:     statistics,
+		botToken:       botToken,
+		triesLimit:     triesLimit,
+		serverConfig:   serverConfig,
+		logger:         logger,
 	}
 }
 

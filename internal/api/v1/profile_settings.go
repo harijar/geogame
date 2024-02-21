@@ -54,7 +54,7 @@ func (a *V1) updateProfileSettings(c *gin.Context) {
 	user.Nickname = request.Nickname
 	user.Public = request.Public
 
-	errs := a.usersService.UpdateUser(c, user)
+	errs := a.users.Update(c, user, usersRepo.Nickname, usersRepo.Public)
 	if errs != nil {
 		updateErrors := ""
 		for _, err := range errs {

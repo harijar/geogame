@@ -31,6 +31,22 @@ func (u *Users) Get(ctx context.Context, id int, columns ...string) (*User, erro
 	return user, nil
 }
 
+func (u *Users) GetPublic(ctx context.Context, pageLength int, pageNumber int) ([]*User, error) {
+	users := make([]*User, 0)
+	err := u.db.NewSelect().
+		Model(&users).
+		Column(Nickname, LastSeen).
+		Order(LastSeen + " ASC").
+		Limit(pageLength).
+		Offset(pageNumber * pageLength).
+		Scan(ctx)
+
+	if err != nil {
+		return nil, err
+	}
+	return users, nil
+}
+
 func (u *Users) Exists(ctx context.Context, id int) (bool, error) {
 	return u.db.NewSelect().
 		Model((*User)(nil)).
@@ -60,10 +76,10 @@ func (u *Users) UpdateOrSave(ctx context.Context, user *User) error {
 	return err
 }
 
-func (u *Users) Update(ctx context.Context, user *User) error {
+func (u *Users) Update(ctx context.Context, user *User, columns ...string) error {
 	_, err := u.db.NewUpdate().
 		Model(user).
-		Column(Nickname, Public).
+		Column(columns...).
 		Where("id=?", user.ID).
 		Exec(ctx)
 	if err != nil {
@@ -72,6 +88,5 @@ func (u *Users) Update(ctx context.Context, user *User) error {
 		}
 		return err
 	}
-
 	return nil
 }

@@ -219,7 +219,7 @@ paths:
   /v1/profile:
     get:
       summary: User profile
-      description: Gets user profile information such as game statistics from server
+      description: User profile information such as game statistics
       responses:
         '200':
           description: got all information successfully
@@ -303,7 +303,7 @@ paths:
                   error:
                     type: string
     post:
-      summary: Changes profile information
+      summary: Change profile information
       description: Takes user's changed settings, checks whether the data is valid and updates profile
       requestBody:
         required: true
@@ -330,6 +330,68 @@ paths:
                   errors:
                     type: array
                     description: all validation errors messages
+                    items:
+                      type: string
+                      description: validation error
+        '500':
+          description: internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  /v1/users:
+    post:
+      summary: Gets all users' nickname and last seen information
+      description: Gets max. 20 users from the database based on page number and sorted by their last activity timestamp. First page contains online and the most "fresh" users.
+      requestBody:
+        required: true
+        content:
+          appliction/json:
+            schema:
+              type: object
+              properties:
+                page_number:
+                  type: integer
+                  description: page number is needed to calculate the offset for the database query
+      responses:
+        '200':
+          description: got all information successfully
+          content:
+            appliction/json:
+              schema:
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        nickname:
+                          type: string
+                        last_seen:
+                          type: string
+                          description: formatted last seen value, e. g. "last seen 2 days ago", "online"
+        '409':
+          description: invalid json data in request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
         '500':
           description: internal server error
           content:
