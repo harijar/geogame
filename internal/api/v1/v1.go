@@ -23,14 +23,14 @@ type ServerConfig struct {
 }
 
 type V1 struct {
-	WSClientsMutex sync.RWMutex
 	server         *gin.Engine
+	wsClientsMutex sync.RWMutex
 	wsClients      map[*ws.Client]bool
 	wsHandlers     map[string]wsHandler
 	countries      repo.Countries
 	prompts        service.Prompts
 	authService    service.Auth
-	users          service.Users
+	usersService   service.Users
 	statistics     service.Statistics
 	botToken       string
 	triesLimit     int
@@ -41,21 +41,21 @@ type V1 struct {
 func New(countries repo.Countries,
 	prompts service.Prompts,
 	authService service.Auth,
-	users service.Users,
+	usersService service.Users,
 	statistics service.Statistics,
 	botToken string,
 	triesLimit int,
 	serverConfig *ServerConfig,
 	logger *zap.Logger) *V1 {
 	return &V1{
-		WSClientsMutex: sync.RWMutex{},
 		server:         gin.New(),
+		wsClientsMutex: sync.RWMutex{},
 		wsClients:      make(map[*ws.Client]bool),
 		wsHandlers:     make(map[string]wsHandler),
 		countries:      countries,
 		prompts:        prompts,
 		authService:    authService,
-		users:          users,
+		usersService:   usersService,
 		statistics:     statistics,
 		botToken:       botToken,
 		triesLimit:     triesLimit,

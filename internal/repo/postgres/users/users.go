@@ -36,7 +36,7 @@ func (u *Users) GetPublic(ctx context.Context, pageLength int, pageNumber int) (
 	err := u.db.NewSelect().
 		Model(&users).
 		Column(Nickname, LastSeen).
-		Order(LastSeen + " ASC").
+		Order(LastSeen + " DESC").
 		Limit(pageLength).
 		Offset(pageNumber * pageLength).
 		Scan(ctx)

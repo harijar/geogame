@@ -6,11 +6,10 @@ import (
 	"github.com/harijar/geogame/internal/repo"
 	"github.com/harijar/geogame/internal/repo/postgres/users"
 	"strings"
-	"time"
 	"unicode"
 )
 
-const lastSeenTTL = 4380 * time.Hour
+const pageLength = 20
 
 var (
 	ErrInvalidNickname = errors.New("nickname must not contain any non-latin letters, spaces and following symbols: ,.&%#=\"/")
@@ -37,14 +36,6 @@ func (u *Users) GetPublic(ctx context.Context, pageNumber int) ([]*users.User, e
 	users, err := u.usersRepo.GetPublic(ctx, pageLength, pageNumber)
 	if err != nil {
 		return nil, err
-	}
-
-	for _, user := range users {
-		if err != nil {
-			return nil, err
-		}
-		difference := time.Now().Sub(user.LastSeen)
-		user.LastSeenString = formatLastSeen(difference)
 	}
 
 	return users, nil

@@ -354,7 +354,7 @@ paths:
   /v1/users:
     post:
       summary: Gets all users' nickname and last seen information
-      description: Gets max. 20 users from the database based on page number and sorted by their last activity timestamp. First page contains online and the most "fresh" users.
+      description: Gets max. 20 users from the database based on page number and sorted by their last activity timestamp. First page contains online and the most "fresh" users. Each user is shown with a nickname and a phrase like "last seen 5 minutes ago".
       requestBody:
         required: true
         content:

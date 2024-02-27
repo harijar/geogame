@@ -1,7 +1,7 @@
-ALTER TABLE IF EXISTS users
+ALTER TABLE users
     RENAME username TO telegram_username;
 
-ALTER TABLE IF EXISTS users
+ALTER TABLE users
     DROP COLUMN first_name,
     DROP COLUMN last_name,
     ADD COLUMN public bool,

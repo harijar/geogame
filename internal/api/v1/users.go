@@ -31,7 +31,7 @@ type UsersResponse struct {
 	Users []*User `json:"users"`
 }
 
-func (a *V1) usersPage(c *gin.Context) {
+func (a *V1) users(c *gin.Context) {
 	request := UsersRequest{}
 	err := c.BindJSON(&request)
 	if err != nil {
@@ -49,10 +49,9 @@ func (a *V1) usersPage(c *gin.Context) {
 	result := make([]*User, 0)
 	for _, user := range users {
 		difference := time.Now().Sub(user.LastSeen)
-		user.LastSeenString = formatLastSeen(difference)
 		result = append(result, &User{
 			Nickname: user.Nickname,
-			LastSeen: user.LastSeenString,
+			LastSeen: formatLastSeen(difference),
 		})
 	}
 	c.JSON(http.StatusOK, &UsersResponse{Users: result})

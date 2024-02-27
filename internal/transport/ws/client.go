@@ -60,7 +60,6 @@ func (c *Client) Start(ctx context.Context) {
 	go c.writeHandler(ctxWithCancel)
 
 	c.conn.SetPongHandler(func(data string) error {
-		c.Ingress <- &Message{Type: PongMessageType}
 		return c.conn.SetReadDeadline(time.Now().Add(pongWait))
 	})
 }
@@ -77,16 +76,20 @@ func (c *Client) readHandler(ctx context.Context) {
 		case <-ctx.Done():
 			return
 		default:
-			_, payload, err := c.conn.ReadMessage()
+			msgType, payload, err := c.conn.ReadMessage()
 			if err != nil {
 				return
 			}
 
 			var message *Message
-			err = json.Unmarshal(payload, message)
-			if err != nil {
-				c.Errors <- errors.Join(err, ErrorInvalidJSON)
-				continue
+			if msgType == websocket.PongMessage {
+				message.Type = PongMessageType
+			} else {
+				err = json.Unmarshal(payload, message)
+				if err != nil {
+					c.Errors <- errors.Join(err, ErrorInvalidJSON)
+					continue
+				}
 			}
 			c.Ingress <- message
 		}

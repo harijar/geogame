@@ -1,5 +1,8 @@
-export const WS_URL = 'ws://localhost:8080/v1/ws'
-const API_URL = 'http://localhost:8080/v1/'
+const HOST_URL = 'localhost:8080/'
+const WS_URL = 'ws://v1/' + HOST_URL + 'ws'
+const socket = new WebSocket(WS_URL)
+
+const API_URL = 'http://' + HOST_URL + 'v1/'
 const GAME_START_URL = API_URL + 'game/start'
 const GAME_GUESS_URL = API_URL + 'game/guess'
 const AUTH_URL = API_URL + 'auth'

@@ -1,2 +1,2 @@
-ALTER TABLE IF EXISTS users
+ALTER TABLE users
     ADD COLUMN last_seen timestamp;

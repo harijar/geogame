@@ -3,6 +3,7 @@ package v1
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"github.com/harijar/geogame/internal/repo/postgres/users"
@@ -33,8 +34,6 @@ var (
 	}
 )
 
-type wsHandler func(c *gin.Context, msg *ws.Message, client *ws.Client) error
-
 // handler for /v1/ws route responsible for websocket connection
 func (a *V1) serveWS(c *gin.Context) {
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
@@ -46,7 +45,6 @@ func (a *V1) serveWS(c *gin.Context) {
 	a.addWSClient(client)
 	client.Start(c)
 	defer func() {
-		client.Stop()
 		a.removeWSClient(client)
 	}()
 
@@ -74,7 +72,7 @@ func (a *V1) serveWS(c *gin.Context) {
 				a.logger.Warn("invalid json data in payload", zap.Error(err))
 				client.Egress <- ErrorWSInvalidPayload
 			default:
-				a.logger.Error("unexpected error", zap.Error(err))
+				a.logger.Error("error", zap.Error(err))
 				client.Egress <- ErrorWSInternalServerError
 			}
 
@@ -86,14 +84,14 @@ func (a *V1) serveWS(c *gin.Context) {
 }
 
 func (a *V1) addWSClient(client *ws.Client) {
-	a.WSClientsMutex.Lock()
-	defer a.WSClientsMutex.Unlock()
+	a.wsClientsMutex.Lock()
+	defer a.wsClientsMutex.Unlock()
 	a.wsClients[client] = true
 }
 
 func (a *V1) removeWSClient(client *ws.Client) {
-	a.WSClientsMutex.Lock()
-	defer a.WSClientsMutex.Unlock()
+	a.wsClientsMutex.Lock()
+	defer a.wsClientsMutex.Unlock()
 	if _, ok := a.wsClients[client]; ok {
 		client.Stop()
 		delete(a.wsClients, client)
@@ -101,12 +99,13 @@ func (a *V1) removeWSClient(client *ws.Client) {
 }
 
 func (a *V1) pongHandler(c *gin.Context, msg *ws.Message, client *ws.Client) error {
-	user, err := a.getUser(c, users.ID)
+	fmt.Println("pong")
+	user, err := a.getUser(c, users.ID, users.LastSeen)
 	if err != nil {
 		return err
 	}
-	user.LastSeen = time.Now().Unix()
-	errs := a.users.Update(c, user, users.LastSeen)
+	user.LastSeen = time.Now()
+	errs := a.usersService.Update(c, user, users.LastSeen)
 	if errs != nil {
 		return errs[0]
 	}

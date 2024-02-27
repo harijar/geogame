@@ -21,5 +21,4 @@ type User struct {
 	TelegramUsername string    `bun:"telegram_username"`
 	Public           bool      `bun:"public"`
 	LastSeen         time.Time `bun:"last_seen"`
-	LastSeenString   string
 }
