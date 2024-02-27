@@ -39,7 +39,7 @@ func (a *V1) usersPage(c *gin.Context) {
 		a.logger.Warn("could not bind JSON", zap.Error(err))
 		return
 	}
-	users, err := a.users.GetPublic(c, request.PageNumber)
+	users, err := a.usersService.GetPublic(c, request.PageNumber)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, &gin.H{"error": "internal server error"})
 		a.logger.Error("could not get public users", zap.Error(err))
