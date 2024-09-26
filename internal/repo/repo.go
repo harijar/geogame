@@ -6,6 +6,7 @@ import (
 	"github.com/harijar/geogame/internal/repo/clickhouse/guesses"
 	"github.com/harijar/geogame/internal/repo/postgres/countries"
 	"github.com/harijar/geogame/internal/repo/postgres/users"
+	"time"
 )
 
 //go:generate mockgen -destination=../mocks/mock_countries.go -package=mocks . Countries
@@ -23,19 +24,20 @@ type Countries interface {
 
 type Users interface {
 	Get(ctx context.Context, id int, columns ...string) (*users.User, error)
+	GetPublic(ctx context.Context, pageLength int, pageNumber int) ([]*users.User, error)
 	Exists(ctx context.Context, id int) (bool, error)
 	Save(ctx context.Context, user *users.User) error
 	Delete(ctx context.Context, id int) error
 	UpdateOrSave(ctx context.Context, user *users.User) error
-	Update(ctx context.Context, user *users.User) error
+	Update(ctx context.Context, user *users.User, columns ...string) error
 }
 
-type Tokens interface {
+type Redis interface {
+	// Methods working with authentification tokens
 	GetUserID(ctx context.Context, token string) (int, error)
 	GetGameID(ctx context.Context, token string) (uuid.UUID, error)
-	SetUserID(ctx context.Context, token string, id int) error
-	SetGameID(ctx context.Context, token string, id uuid.UUID) error
-	Delete(ctx context.Context, token string) error
+	SetUserID(ctx context.Context, token string, id int, ttl time.Duration) error
+	SetGameID(ctx context.Context, token string, id uuid.UUID, ttl time.Duration) error
 }
 
 type Guesses interface {

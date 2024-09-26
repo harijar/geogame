@@ -9,22 +9,39 @@ import (
 	"unicode"
 )
 
-var ErrInvalidNickname = errors.New("nickname must not contain any non-latin letters, spaces and following symbols: ,.&%#=\"/")
-var ErrNicknameTooLong = errors.New("nickname length must be less than 30 characters")
+const pageLength = 20
+
+var (
+	ErrInvalidNickname = errors.New("nickname must not contain any non-latin letters, spaces and following symbols: ,.&%#=\"/")
+	ErrNicknameTooLong = errors.New("nickname length must be less than 30 characters")
+)
 
 type Users struct {
 	usersRepo repo.Users
+	redisRepo repo.Redis
 }
 
-func New(usersRepo repo.Users) *Users {
-	return &Users{usersRepo: usersRepo}
+func New(usersRepo repo.Users, redisRepo repo.Redis) *Users {
+	return &Users{
+		usersRepo: usersRepo,
+		redisRepo: redisRepo,
+	}
 }
 
-func (u *Users) GetUser(ctx context.Context, id int, columns ...string) (*users.User, error) {
+func (u *Users) Get(ctx context.Context, id int, columns ...string) (*users.User, error) {
 	return u.usersRepo.Get(ctx, id, columns...)
 }
 
-func (u *Users) UpdateUser(ctx context.Context, user *users.User) []error {
+func (u *Users) GetPublic(ctx context.Context, pageNumber int) ([]*users.User, error) {
+	users, err := u.usersRepo.GetPublic(ctx, pageLength, pageNumber)
+	if err != nil {
+		return nil, err
+	}
+
+	return users, nil
+}
+
+func (u *Users) Update(ctx context.Context, user *users.User, columns ...string) []error {
 	nickname := user.Nickname
 	updateErrors := make([]error, 0)
 
@@ -50,7 +67,7 @@ func (u *Users) UpdateUser(ctx context.Context, user *users.User) []error {
 		return updateErrors
 	}
 
-	err := u.usersRepo.Update(ctx, user)
+	err := u.usersRepo.Update(ctx, user, columns...)
 	updateErrors = append(updateErrors, err)
 	return updateErrors
 }

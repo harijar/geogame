@@ -796,7 +796,6 @@ COPY public.languages (country_id, name) FROM stdin;
 173	Italian
 71	English
 130	Spanish
-165	Hindi
 165	English
 154	French
 58	Chewa

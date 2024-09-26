@@ -7,6 +7,9 @@ window.onload = async function() {
     document.getElementById("settingsButton").onclick = async function() {
         window.location.href = '/profile/settings'
     }
+    document.getElementById("usersButton").onclick = async function() {
+        window.location.href = '/users'
+    }
     await loadProfile()
 }
 
